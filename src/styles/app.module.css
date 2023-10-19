@@ -1,15 +1,49 @@
-.red{
-    color: red;
-    border: 1px solid red;
+.container {
+  width: 30%;
+  height: 80%;
+  margin: auto;
+  margin-top: 100px;
+  background-color: pink;
+  padding: 10px;
 }
 
-.green{
-    color: green;
-    border: 1px solid green;
+.text-container {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+}
+.text {
+  font-size: 32px;
+  font-weight: 600;
 }
 
-.footer{
-    text-align: center;
-    padding: 5px;
-    background-color: pink;
+.inputs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 5px;
+}
+
+.inputs {
+  display: flex;
+  flex-direction: column;
+}
+
+.forgot-password {
+  display: flex;
+  justify-content: end;
+  margin-bottom: 20px;
+}
+
+.text-last-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.footer {
+  text-align: center;
+  padding: 5px;
+  background-color: pink;
 }
