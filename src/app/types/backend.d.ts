@@ -5,5 +5,6 @@ interface IProduct {
   price: number;
   quantity: number;
   sold: number;
+  createdAt: date;
+  updatedAt: date;
 }
-

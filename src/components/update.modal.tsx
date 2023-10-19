@@ -2,31 +2,44 @@
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { mutate } from "swr";
 
 interface Iprops {
-  showModalCreate: boolean;
-  setShowModalCreate: (value: boolean) => void;
+  showModalUpdate: boolean;
+  setShowModalUpdate: (value: boolean) => void;
+  product: IProduct | null;
+  setProduct: (value: IProduct | null) => void;
 }
 
-function CreateModal(props: Iprops) {
-  const { showModalCreate, setShowModalCreate } = props;
+function UpdateModal(props: Iprops) {
+  const { showModalUpdate, setShowModalUpdate, product, setProduct } = props;
 
+  const [id, setId] = useState("");
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [price, setPrice] = useState<number>();
   const [quantity, setQuantity] = useState<number>();
+
+  useEffect(() => {
+    if (product && product._id) {
+      setId(product._id);
+      setTitle(product.title);
+      setDescription(product.description);
+      setPrice(product.price);
+      setQuantity(product.quantity);
+    }
+  }, [product]);
 
   const handleSubmitForm = async () => {
     if (!title || !description || !price || !quantity) {
       toast.error("Please complete all information");
       return;
     }
-    await axios.post(
-      "http://localhost:5000/api/product/create-product",
+    await axios.put(
+      `http://localhost:5000/api/product/${id}`,
       {
         title: title,
         description: description,
@@ -35,12 +48,12 @@ function CreateModal(props: Iprops) {
       },
       {
         headers: {
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTI5NzZlODFiZGU0Yjg1YzgyNDg0ZWYiLCJhZ2UiOjEwMCwiaWF0IjoxNjk3Njc5MjAwLCJleHAiOjE2OTc2ODI4MDB9.AXKbQg50Vf8C2iBHVZe52Abgbr16AizeSjMPEXd2td4`,
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTI5NzZlODFiZGU0Yjg1YzgyNDg0ZWYiLCJhZ2UiOjEwMCwiaWF0IjoxNjk3NjgzMzQwLCJleHAiOjE2OTc2ODY5NDB9.uD2o7hfBm8vDZlTmLKKSj7chW4a906g3Wj9O15OdWfE`,
         },
       }
     );
 
-    toast.success("Create succeed !...");
+    toast.success("Updated product succeed !...");
     handleCloseModal();
     mutate("http://localhost:5000/api/product");
   };
@@ -50,13 +63,14 @@ function CreateModal(props: Iprops) {
     setDescription("");
     setPrice(undefined);
     setQuantity(undefined);
-    setShowModalCreate(false);
+    setProduct(null);
+    setShowModalUpdate(false);
   };
 
   return (
     <>
       <Modal
-        show={showModalCreate}
+        show={showModalUpdate}
         onHide={handleCloseModal}
         backdrop="static"
         keyboard={false}
@@ -134,4 +148,4 @@ function CreateModal(props: Iprops) {
   );
 }
 
-export default CreateModal;
+export default UpdateModal;
