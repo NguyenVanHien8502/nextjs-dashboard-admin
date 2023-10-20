@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "react-bootstrap";
-import styles from "../styles/app.module.css";
+import styles from "../styles/auth.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
