@@ -17,10 +17,6 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import Dashboard from "./dashboard/page";
-import User from "./user/page";
-import Movie from "./movie/page";
-import Category from "./category/page";
 import GridViewIcon from "@mui/icons-material/GridView";
 import GroupIcon from "@mui/icons-material/Group";
 import MovieIcon from "@mui/icons-material/Movie";
@@ -113,7 +109,6 @@ export default function MainLayout({
   const router = useRouter();
   const theme = useTheme();
   const [open, setOpen] = useState(true);
-  const [menuData, setMenuData] = useState("Dashboard");
 
   const handleDrawerClose = () => {
     setOpen(false);
@@ -126,6 +121,7 @@ export default function MainLayout({
     toast.success("You have successfully logouted");
     router.replace("/");
   };
+
   return (
     <>
       <Box sx={{ display: "flex" }}>
@@ -188,7 +184,7 @@ export default function MainLayout({
                 onClick={() => setOpenDropdown(!openDropdown)}
               >
                 <Image
-                  src="/public/images/avatar.jpg"
+                  src="/images/avatar.jpg"
                   alt="avatar"
                   height={20}
                   width={20}
@@ -256,7 +252,7 @@ export default function MainLayout({
               display: "block",
               marginTop: "20px",
             }}
-            onClick={() => setMenuData("Dashboard")}
+            onClick={() => router.replace("/admin")}
           >
             <ListItemButton
               sx={{
@@ -282,7 +278,7 @@ export default function MainLayout({
             <ListItem
               disablePadding
               sx={{ display: "block" }}
-              onClick={() => setMenuData("User")}
+              onClick={() => router.replace("/admin/user")}
             >
               <ListItemButton
                 sx={{
@@ -306,7 +302,7 @@ export default function MainLayout({
             <ListItem
               disablePadding
               sx={{ display: "block" }}
-              onClick={() => setMenuData("Movie")}
+              onClick={() => router.replace("/admin/movie")}
             >
               <ListItemButton
                 sx={{
@@ -330,7 +326,7 @@ export default function MainLayout({
             <ListItem
               disablePadding
               sx={{ display: "block" }}
-              onClick={() => setMenuData("Category")}
+              onClick={() => router.replace("/admin/category")}
             >
               <ListItemButton
                 sx={{
@@ -356,10 +352,6 @@ export default function MainLayout({
         </Drawer>
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
           <DrawerHeader />
-          {menuData === "Dashboard" && <Dashboard />}
-          {menuData === "User" && <User />}
-          {menuData === "Movie" && <Movie />}
-          {menuData === "Category" && <Category />}
           {children}
         </Box>
       </Box>

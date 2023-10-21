@@ -1,19 +1,19 @@
 "use client";
 import { Button } from "react-bootstrap";
 import Table from "react-bootstrap/Table";
-import CreateModal from "./create.modal";
 import { useState } from "react";
-import UpdateModal from "./update.modal";
 import Link from "next/link";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { mutate } from "swr";
+import UpdateModalProduct from "../updateModal/updateProduct.modal";
+import CreateModalProduct from "../createModal/createProduct.modal";
 
 interface Iprops {
   products: IProduct[];
 }
 
-const AppTable = (props: Iprops) => {
+const ProductTable = (props: Iprops) => {
   const { products } = props;
 
   const [product, setProduct] = useState<IProduct | null>(null);
@@ -96,11 +96,11 @@ const AppTable = (props: Iprops) => {
           ))}
         </tbody>
       </Table>
-      <CreateModal
+      <CreateModalProduct
         showModalCreate={showModalCreate}
         setShowModalCreate={setShowModalCreate}
       />
-      <UpdateModal
+      <UpdateModalProduct
         showModalUpdate={showModalUpdate}
         setShowModalUpdate={setShowModalUpdate}
         product={product}
@@ -110,4 +110,4 @@ const AppTable = (props: Iprops) => {
   );
 };
 
-export default AppTable;
+export default ProductTable;

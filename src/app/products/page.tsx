@@ -1,6 +1,6 @@
 "use client";
 
-import AppTable from "@/components/app.table";
+import ProductTable from "@/components/table/product.table";
 import useSWR from "swr";
 import axios from "axios";
 
@@ -21,7 +21,7 @@ const ProductPage = () => {
   }
   return (
     <>
-      <AppTable products={data?.allProduct ?? []} />
+      <ProductTable products={data?.allProduct ?? []} />
     </>
   );
 };

@@ -14,7 +14,7 @@ interface Iprops {
   setProduct: (value: IProduct | null) => void;
 }
 
-function UpdateModal(props: Iprops) {
+function UpdateModalProduct(props: Iprops) {
   const { showModalUpdate, setShowModalUpdate, product, setProduct } = props;
 
   const [id, setId] = useState("");
@@ -148,4 +148,4 @@ function UpdateModal(props: Iprops) {
   );
 }
 
-export default UpdateModal;
+export default UpdateModalProduct;

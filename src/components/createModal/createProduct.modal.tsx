@@ -12,7 +12,7 @@ interface Iprops {
   setShowModalCreate: (value: boolean) => void;
 }
 
-function CreateModal(props: Iprops) {
+function CreateModalProduct(props: Iprops) {
   const { showModalCreate, setShowModalCreate } = props;
 
   const [title, setTitle] = useState<string>("");
@@ -134,4 +134,4 @@ function CreateModal(props: Iprops) {
   );
 }
 
-export default CreateModal;
+export default CreateModalProduct;
