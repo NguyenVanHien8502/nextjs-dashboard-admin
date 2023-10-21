@@ -30,13 +30,15 @@ const MovieTable = (props: Iprops) => {
 
   const handleDeleteMovie = async (id: string) => {
     if (window.confirm("Are you sure want to delete this movie? ")) {
-      await axios.delete(`http://localhost:5000/api/movie/${id}`, {
+      const { data }= await axios.delete(`http://localhost:5000/api/movie/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      toast.success("Deleted movie succeed !...");
-      mutate("http://localhost:5000/api/movie");
+      if (data?.status === true) {
+        toast.success("Deleted movie succeed !...");
+        mutate("http://localhost:5000/api/movie");
+      }
     }
   };
 

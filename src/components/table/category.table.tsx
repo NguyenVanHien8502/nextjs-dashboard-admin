@@ -28,6 +28,23 @@ const CategoryTable = (props: Iprops) => {
   const [showModalUpdateCategory, setShowModalUpdateCategory] =
     useState<boolean>(false);
 
+  const handleDeleteCategory = async (id: string) => {
+    if (window.confirm("Are you sure want to delete this category? ")) {
+      const { data } = await axios.delete(
+        `http://localhost:5000/api/category/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (data?.status === true) {
+        toast.success("Deleted category successfully");
+        mutate("http://localhost:5000/api/category");
+      }
+    }
+  };
+
   return (
     <>
       <div
@@ -75,11 +92,19 @@ const CategoryTable = (props: Iprops) => {
                 <Button
                   variant="warning"
                   className="mx-3"
-                  onClick={() => setShowModalUpdateCategory(true)}
+                  onClick={() => {
+                    setCategory(category);
+                    setShowModalUpdateCategory(true);
+                  }}
                 >
                   Edit
                 </Button>
-                <Button variant="danger">Delete</Button>
+                <Button
+                  variant="danger"
+                  onClick={() => handleDeleteCategory(category._id)}
+                >
+                  Delete
+                </Button>
               </td>
             </tr>
           ))}
