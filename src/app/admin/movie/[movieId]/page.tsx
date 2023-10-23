@@ -22,10 +22,10 @@ const ViewUserDetail = ({ params }: { params: { movieId: string } }) => {
       revalidateOnReconnect: false,
     }
   );
+  console.log(11);
 
   if (isLoading) {
     return <h1>Loading...</h1>;
-    console.log(11);
   }
   return (
     <>
