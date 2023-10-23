@@ -46,7 +46,7 @@ const ViewUserDetail = ({ params }: { params: { movieId: string } }) => {
           <Card.Text>Link: {data?.link}</Card.Text>
           <Card.Text>Status: {data?.status}</Card.Text>
           <Card.Text>Description: {data?.desc}</Card.Text>
-          <Card.Text>Author: {data?.author}</Card.Text>
+          <Card.Text>Author: {data?.authorsss}</Card.Text>
         </Card.Body>
         <Card.Footer className="text-muted">
           <Card.Text>CreatedAt: {data?.createdAt}</Card.Text>
