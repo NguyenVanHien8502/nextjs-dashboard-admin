@@ -2,7 +2,7 @@
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { mutate } from "swr";
@@ -32,13 +32,26 @@ function CreateModalMovie(props: Iprops) {
     author: "",
   });
 
+  //fetch all Category
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axios.get(`http://localhost:5000/api/category`);
+        setCategories(data);
+      } catch (error) {
+        throw new Error("error");
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const handleSubmitForm = async () => {
-    const { name, slug, category, link, status, desc, author } = dataMovie;
-    if (!name || !slug || !category || !link || !status || !desc || !author) {
+    const { name, slug, category, link, status, desc } = dataMovie;
+    if (!name || !slug || !category || !link || !status || !desc) {
       toast.error("Please complete all information");
       return;
     }
-
     const { data } = await axios.post(
       "http://localhost:5000/api/movie/create-movie",
       {
@@ -48,7 +61,6 @@ function CreateModalMovie(props: Iprops) {
         link: link,
         status: status,
         desc: desc,
-        author: author,
       },
       {
         headers: {
@@ -56,6 +68,7 @@ function CreateModalMovie(props: Iprops) {
         },
       }
     );
+
     if (data?.status === true) {
       toast.success("Created movie succeed!...");
       handleCloseModalMovie();
@@ -121,17 +134,21 @@ function CreateModalMovie(props: Iprops) {
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Category</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Chọn category"
+              <Form.Select
+                name="category"
+                id="category"
                 value={dataMovie.category}
-                onChange={(e) =>
-                  setDataMovie((prevData) => ({
-                    ...prevData,
-                    category: e.target.value,
-                  }))
-                }
-              />
+                onChange={(e) => {
+                  const newData = { ...dataMovie };
+                  newData[e.target.id] = e.target.value;
+                  setDataMovie(newData);
+                }}
+              >
+                <option value="">Select Category</option>
+                {categories.map((category) => (
+                  <option key={category._id}>{category.name}</option>
+                ))}
+              </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Link</Form.Label>
@@ -171,20 +188,6 @@ function CreateModalMovie(props: Iprops) {
                   setDataMovie((prevData) => ({
                     ...prevData,
                     desc: e.target.value,
-                  }))
-                }
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Author</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Chọn Author"
-                value={dataMovie.author}
-                onChange={(e) =>
-                  setDataMovie((prevData) => ({
-                    ...prevData,
-                    author: e.target.value,
                   }))
                 }
               />

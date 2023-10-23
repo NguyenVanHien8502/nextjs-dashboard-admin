@@ -3,6 +3,7 @@ import Link from "next/link";
 import Card from "react-bootstrap/Card";
 import useSWR, { Fetcher } from "swr";
 import axios from "axios";
+import { useEffect, useState } from "react";
 
 const ViewUserDetail = ({ params }: { params: { movieId: string } }) => {
   const currentUserString = localStorage.getItem("currentUser");
@@ -22,6 +23,27 @@ const ViewUserDetail = ({ params }: { params: { movieId: string } }) => {
       revalidateOnReconnect: false,
     }
   );
+
+  const [author, setAuthor] = useState<IUser | any>({});
+  const fetchAuthor = async (userId: string | any) => {
+    const { data } = await axios.get(
+      `http://localhost:5000/api/user/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const authorName = data.username;
+    setAuthor((prev: any) => ({
+      ...prev,
+      [userId]: authorName,
+    }));
+  };
+  useEffect(() => {
+    const authorId: string | any = data?.author;
+    fetchAuthor(authorId);
+  }, [data]);
 
   if (isLoading) {
     return <h1>Loading...</h1>;
@@ -45,7 +67,7 @@ const ViewUserDetail = ({ params }: { params: { movieId: string } }) => {
           <Card.Text>Link: {data?.link}</Card.Text>
           <Card.Text>Status: {data?.status}</Card.Text>
           <Card.Text>Description: {data?.desc}</Card.Text>
-          <Card.Text>Author: {data?.author}</Card.Text>
+          <Card.Text>Author: {author[data?.author]}</Card.Text>
         </Card.Body>
         <Card.Footer className="text-muted">
           <Card.Text>CreatedAt: {data?.createdAt}</Card.Text>
