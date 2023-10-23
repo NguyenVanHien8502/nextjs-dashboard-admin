@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "react-bootstrap";
 import Table from "react-bootstrap/Table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -30,17 +30,49 @@ const MovieTable = (props: Iprops) => {
 
   const handleDeleteMovie = async (id: string) => {
     if (window.confirm("Are you sure want to delete this movie? ")) {
-      const { data }= await axios.delete(`http://localhost:5000/api/movie/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const { data } = await axios.delete(
+        `http://localhost:5000/api/movie/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (data?.status === true) {
         toast.success("Deleted movie succeed !...");
         mutate("http://localhost:5000/api/movie");
       }
     }
   };
+
+  //fetchAuthor for each authorId
+  const [author, setAuthor] = useState<IUser | any>({});
+  const fetchAuthor = async (authorId: string) => {
+    try {
+      const { data } = await axios.get(
+        `http://localhost:5000/api/user/${authorId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const authorName = data.username;
+      setAuthor((prev: any) => ({
+        ...prev,
+        [authorId]: authorName,
+      }));
+    } catch {
+      throw new Error("Not found this author");
+    }
+  };
+
+  useEffect(() => {
+    movies.forEach((movie: IMovie) => {
+      const authorId: string = movie.author;
+      fetchAuthor(authorId);
+    });
+  }, [movies]);
 
   return (
     <>
@@ -82,7 +114,7 @@ const MovieTable = (props: Iprops) => {
               <td>{movie.link}</td>
               <td>{movie.status}</td>
               <td>{movie.desc}</td>
-              <td>{movie.author}</td>
+              <td>{author[movie.author]}</td>
               <td>{movie.createdAt}</td>
               <td>{movie.updatedAt}</td>
               <td style={{ display: "flex", gap: "5px" }}>
