@@ -25,6 +25,7 @@ const ViewUserDetail = ({ params }: { params: { movieId: string } }) => {
 
   if (isLoading) {
     return <h1>Loading...</h1>;
+    console.log(11);
   }
   return (
     <>
