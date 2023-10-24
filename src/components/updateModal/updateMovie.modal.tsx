@@ -24,6 +24,20 @@ function UpdateModalMovie(props: Iprops) {
   const { showModalUpdateMovie, setShowModalUpdateMovie, movie, setMovie } =
     props;
 
+  //fetch all category
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axios.get(`http://localhost:5000/api/category`);
+        setCategories(data);
+      } catch (error) {
+        throw new Error("error");
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const [dataMovie, setDataMovie] = useState({
     id: "",
     name: "",
@@ -70,10 +84,10 @@ function UpdateModalMovie(props: Iprops) {
         },
       }
     );
-      if (data?.status === true) {
-        toast.success("Updated movie succeed !...");
-        handleCloseModalMovie();
-        mutate("http://localhost:5000/api/movie");
+    if (data?.status === true) {
+      toast.success("Updated movie succeed !...");
+      handleCloseModalMovie();
+      mutate("http://localhost:5000/api/movie");
     }
   };
 
@@ -136,8 +150,8 @@ function UpdateModalMovie(props: Iprops) {
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Category</Form.Label>
-              <Form.Control
-                type="text"
+              <Form.Select
+                id="category"
                 placeholder="Chọn category"
                 value={dataMovie.category}
                 onChange={(e) =>
@@ -146,7 +160,12 @@ function UpdateModalMovie(props: Iprops) {
                     category: e.target.value,
                   }))
                 }
-              />
+              >
+                <option value="">Select Blog Category</option>
+                {categories.map((category) => (
+                  <option key={category._id}>{category.name}</option>
+                ))}
+              </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Link</Form.Label>
