@@ -22,7 +22,7 @@ function CreateModalMovie(props: Iprops) {
 
   const { showModalCreateMovie, setShowModalCreateMovie } = props;
 
-  const [dataMovie, setDataMovie] = useState({
+  const [dataMovie, setDataMovie] = useState<IMovie | any>({
     name: "",
     slug: "",
     category: "",
@@ -33,7 +33,7 @@ function CreateModalMovie(props: Iprops) {
   });
 
   //fetch all Category
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<ICategory | any>([]);
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -111,7 +111,7 @@ function CreateModalMovie(props: Iprops) {
                 placeholder="Nhập tên movie"
                 value={dataMovie.name}
                 onChange={(e) =>
-                  setDataMovie((prevData) => ({
+                  setDataMovie((prevData: IMovie) => ({
                     ...prevData,
                     name: e.target.value,
                   }))
@@ -125,7 +125,7 @@ function CreateModalMovie(props: Iprops) {
                 placeholder="Nhập slug"
                 value={dataMovie.slug}
                 onChange={(e) =>
-                  setDataMovie((prevData) => ({
+                  setDataMovie((prevData: IMovie) => ({
                     ...prevData,
                     slug: e.target.value,
                   }))
@@ -139,13 +139,13 @@ function CreateModalMovie(props: Iprops) {
                 id="category"
                 value={dataMovie.category}
                 onChange={(e) => {
-                  const newData = { ...dataMovie };
+                  const newData: IMovie | any = { ...dataMovie };
                   newData[e.target.id] = e.target.value;
                   setDataMovie(newData);
                 }}
               >
                 <option value="">Select Category</option>
-                {categories.map((category) => (
+                {categories.map((category: ICategory) => (
                   <option key={category._id}>{category.name}</option>
                 ))}
               </Form.Select>
@@ -157,7 +157,7 @@ function CreateModalMovie(props: Iprops) {
                 placeholder="Nhập link"
                 value={dataMovie.link}
                 onChange={(e) =>
-                  setDataMovie((prevData) => ({
+                  setDataMovie((prevData: IMovie) => ({
                     ...prevData,
                     link: e.target.value,
                   }))
@@ -171,7 +171,7 @@ function CreateModalMovie(props: Iprops) {
                 placeholder="Nhập status"
                 value={dataMovie.status}
                 onChange={(e) =>
-                  setDataMovie((prevData) => ({
+                  setDataMovie((prevData: IMovie) => ({
                     ...prevData,
                     status: e.target.value,
                   }))
@@ -185,7 +185,7 @@ function CreateModalMovie(props: Iprops) {
                 placeholder="Nhập mô tả"
                 value={dataMovie.desc}
                 onChange={(e) =>
-                  setDataMovie((prevData) => ({
+                  setDataMovie((prevData: IMovie) => ({
                     ...prevData,
                     desc: e.target.value,
                   }))

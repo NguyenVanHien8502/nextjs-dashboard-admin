@@ -29,6 +29,10 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import Link from "next/link";
+import CampaignIcon from "@mui/icons-material/Campaign";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import SearchIcon from "@mui/icons-material/Search";
 
 const drawerWidth = 240;
 
@@ -122,6 +126,9 @@ export default function MainLayout({
     router.replace("/");
   };
 
+  const [openNotification, setOpenNotification] = useState(false);
+  const [openMessenger, setOpenMessenger] = useState(false);
+
   return (
     <>
       <Box sx={{ display: "flex" }}>
@@ -164,15 +171,467 @@ export default function MainLayout({
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "30px",
+                gap: "40px",
                 marginRight: "20px",
               }}
             >
-              <div style={{ cursor: "pointer" }}>
-                <NotificationsNoneSharpIcon />
+              <div
+                style={{
+                  border: "1px solid #ccc",
+                  borderRadius: "8px",
+                  padding: "10px",
+                  backgroundColor: "#E9FFE1",
+                  width: "300px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  style={{
+                    border: "none",
+                    backgroundColor: "#E9FFE1",
+                    outline: "none",
+                    width: "240px",
+                  }}
+                />
+                <span style={{ cursor: "pointer" }}>
+                  <SearchIcon />
+                </span>
               </div>
-              <div style={{ cursor: "pointer" }}>
-                <MessageSharpIcon />
+              <div
+                style={{ cursor: "pointer" }}
+                onClick={() => setOpenNotification(!openNotification)}
+              >
+                <div role="button" className="position-relative">
+                  <NotificationsNoneSharpIcon className="fs-4" />
+                  <span className="badge bg-primary rounded-circle p-1 position-absolute translate-middle">
+                    4
+                  </span>
+                </div>
+                {openNotification && (
+                  <Menu
+                    id="menu-appbar"
+                    anchorOrigin={{
+                      vertical: 20,
+                      horizontal: 1225,
+                    }}
+                    open={Boolean(openNotification)}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    style={{
+                      marginTop: "40px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        padding: "10px 20px",
+                        gap: "10px",
+                      }}
+                    >
+                      <p>You have 4 news notifications</p>
+                      <button
+                        style={{
+                          marginBottom: "14px",
+                          border: "none",
+                          borderRadius: "12px",
+                          backgroundColor: "blue",
+                        }}
+                      >
+                        View All
+                      </button>
+                    </div>
+                    <MenuItem
+                      style={{
+                        height: "100px",
+                        width: "400px",
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        borderTop: "1px solid #ccc",
+                      }}
+                    >
+                      <div
+                        style={{
+                          marginTop: "10px",
+                          display: "flex",
+                          alignItems: "flex-start",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <div style={{ marginRight: "15px" }}>
+                          <CampaignIcon />
+                        </div>
+                        <div
+                          style={{
+                            marginLeft: "15px",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "flex-start",
+                          }}
+                        >
+                          <div>
+                            <h5>Hary Maxguire</h5>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: "14px" }}>
+                              I want to remind everyone that ...
+                            </p>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: "10px" }}>2 hours ago</p>
+                          </div>
+                        </div>
+                      </div>
+                    </MenuItem>
+                    <MenuItem
+                      style={{
+                        height: "100px",
+                        width: "400px",
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        borderTop: "1px solid #ccc",
+                      }}
+                    >
+                      <div
+                        style={{
+                          marginTop: "10px",
+                          display: "flex",
+                          alignItems: "flex-start",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <div style={{ marginRight: "15px" }}>
+                          <CampaignIcon />
+                        </div>
+                        <div
+                          style={{
+                            marginLeft: "15px",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "flex-start",
+                          }}
+                        >
+                          <div>
+                            <h5>Dicta reprehenderit</h5>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: "14px" }}>
+                              Quae dolorem earum veritatis oditseno
+                            </p>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: "10px" }}>2 hours ago</p>
+                          </div>
+                        </div>
+                      </div>
+                    </MenuItem>
+                    <MenuItem
+                      style={{
+                        height: "100px",
+                        width: "400px",
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        borderTop: "1px solid #ccc",
+                      }}
+                    >
+                      <div
+                        style={{
+                          marginTop: "10px",
+                          display: "flex",
+                          alignItems: "flex-start",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <div style={{ marginRight: "15px" }}>
+                          <CampaignIcon />
+                        </div>
+                        <div
+                          style={{
+                            marginLeft: "15px",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "flex-start",
+                          }}
+                        >
+                          <div>
+                            <h5>Lorem Ipsum</h5>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: "14px" }}>
+                              Quae dolorem earum veritatis oditseno
+                            </p>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: "10px" }}>2 hours ago</p>
+                          </div>
+                        </div>
+                      </div>
+                    </MenuItem>
+                    <MenuItem
+                      style={{
+                        height: "100px",
+                        width: "400px",
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        borderTop: "1px solid #ccc",
+                      }}
+                    >
+                      <div
+                        style={{
+                          marginTop: "10px",
+                          display: "flex",
+                          alignItems: "flex-start",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <div style={{ marginRight: "15px" }}>
+                          <CampaignIcon />
+                        </div>
+                        <div
+                          style={{
+                            marginLeft: "15px",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "flex-start",
+                          }}
+                        >
+                          <div>
+                            <h5>Atque rerum nesciunt</h5>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: "14px" }}>
+                              Quae dolorem earum veritatis oditseno
+                            </p>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: "10px" }}>3 hours ago</p>
+                          </div>
+                        </div>
+                      </div>
+                    </MenuItem>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Link href={"/admin"}>Show all notifications</Link>
+                    </div>
+                  </Menu>
+                )}
+              </div>
+              <div
+                style={{ cursor: "pointer" }}
+                onClick={() => setOpenMessenger(!openMessenger)}
+              >
+                <div role="button" className="position-relative">
+                  <MessageSharpIcon className="fs-4" />
+                  <span className="badge bg-primary rounded-circle p-1 position-absolute translate-middle">
+                    3
+                  </span>
+                </div>
+                {openMessenger && (
+                  <Menu
+                    id="menu-appbar"
+                    anchorOrigin={{
+                      vertical: 20,
+                      horizontal: 1275,
+                    }}
+                    open={Boolean(openMessenger)}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    style={{
+                      marginTop: "40px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        padding: "10px 20px",
+                        gap: "10px",
+                      }}
+                    >
+                      <p>You have 3 news messages</p>
+                      <button
+                        style={{
+                          marginBottom: "14px",
+                          border: "none",
+                          borderRadius: "12px",
+                          backgroundColor: "blue",
+                        }}
+                      >
+                        View All
+                      </button>
+                    </div>
+                    <MenuItem
+                      style={{
+                        height: "100px",
+                        width: "400px",
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        borderTop: "1px solid #ccc",
+                      }}
+                    >
+                      <div
+                        style={{
+                          marginTop: "10px",
+                          display: "flex",
+                          alignItems: "flex-start",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <div>
+                          <Image
+                            src="/images/avatar.jpg"
+                            alt="avatar"
+                            height={70}
+                            width={70}
+                            style={{ borderRadius: "50%" }}
+                          />
+                        </div>
+                        <div
+                          style={{
+                            marginLeft: "15px",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "flex-start",
+                          }}
+                        >
+                          <div>
+                            <h5>Hary Maxguire</h5>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: "14px" }}>Hello everyone</p>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: "10px" }}>6 hours ago</p>
+                          </div>
+                        </div>
+                      </div>
+                    </MenuItem>
+                    <MenuItem
+                      style={{
+                        height: "100px",
+                        width: "400px",
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        borderTop: "1px solid #ccc",
+                      }}
+                    >
+                      <div
+                        style={{
+                          marginTop: "10px",
+                          display: "flex",
+                          alignItems: "flex-start",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <div>
+                          <Image
+                            src="/images/avatar.jpg"
+                            alt="avatar"
+                            height={70}
+                            width={70}
+                            style={{ borderRadius: "50%" }}
+                          />
+                        </div>
+                        <div
+                          style={{
+                            marginLeft: "15px",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "flex-start",
+                          }}
+                        >
+                          <div>
+                            <h5>Paul Pogba</h5>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: "14px" }}>Hi everyone</p>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: "10px" }}>8 hours ago</p>
+                          </div>
+                        </div>
+                      </div>
+                    </MenuItem>
+                    <MenuItem
+                      style={{
+                        height: "100px",
+                        width: "400px",
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        borderTop: "1px solid #ccc",
+                      }}
+                    >
+                      <div
+                        style={{
+                          marginTop: "10px",
+                          display: "flex",
+                          alignItems: "flex-start",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <div>
+                          <Image
+                            src="/images/avatar.jpg"
+                            alt="avatar"
+                            height={70}
+                            width={70}
+                            style={{ borderRadius: "50%" }}
+                          />
+                        </div>
+                        <div
+                          style={{
+                            marginLeft: "15px",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "flex-start",
+                          }}
+                        >
+                          <div>
+                            <h5>Hary Kane</h5>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: "14px" }}>Hello world</p>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: "10px" }}>9 hours ago</p>
+                          </div>
+                        </div>
+                      </div>
+                    </MenuItem>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Link href={"/admin"}>Show all messages</Link>
+                    </div>
+                  </Menu>
+                )}
               </div>
               <div
                 style={{
@@ -186,10 +645,12 @@ export default function MainLayout({
                 <Image
                   src="/images/avatar.jpg"
                   alt="avatar"
-                  height={20}
-                  width={20}
+                  height={35}
+                  width={35}
+                  style={{ borderRadius: "50%" }}
                 />
                 <div>James Cameron</div>
+                <ArrowDropDownIcon />
                 {openDropdown && (
                   <Menu
                     id="menu-appbar"
@@ -211,7 +672,7 @@ export default function MainLayout({
                       onClick={handleProfile}
                       style={{
                         height: "40px",
-                        width: "150px",
+                        width: "200px",
                         display: "flex",
                         justifyContent: "center",
                       }}
@@ -222,7 +683,7 @@ export default function MainLayout({
                       onClick={handleLogout}
                       style={{
                         height: "40px",
-                        width: "150px",
+                        width: "200px",
                         display: "flex",
                         justifyContent: "center",
                       }}

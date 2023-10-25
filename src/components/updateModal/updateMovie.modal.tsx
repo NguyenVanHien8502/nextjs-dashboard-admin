@@ -25,7 +25,7 @@ function UpdateModalMovie(props: Iprops) {
     props;
 
   //fetch all category
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<ICategory | any>([]);
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -162,7 +162,7 @@ function UpdateModalMovie(props: Iprops) {
                 }
               >
                 <option value="">Select Blog Category</option>
-                {categories.map((category) => (
+                {categories.map((category: ICategory) => (
                   <option key={category._id}>{category.name}</option>
                 ))}
               </Form.Select>

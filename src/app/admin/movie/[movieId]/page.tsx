@@ -23,7 +23,7 @@ const ViewUserDetail = ({ params }: { params: { movieId: string } }) => {
       revalidateOnReconnect: false,
     }
   );
-
+  const dataMovie: IMovie | any = data;
   const [author, setAuthor] = useState<IUser | any>({});
   const fetchAuthor = async (userId: string | any) => {
     const { data } = await axios.get(
@@ -43,7 +43,7 @@ const ViewUserDetail = ({ params }: { params: { movieId: string } }) => {
   useEffect(() => {
     const authorId: string | any = data?.author;
     fetchAuthor(authorId);
-  }, [data]);
+  }, [dataMovie]);
 
   if (isLoading) {
     return <h1>Loading...</h1>;
@@ -67,7 +67,7 @@ const ViewUserDetail = ({ params }: { params: { movieId: string } }) => {
           <Card.Text>Link: {data?.link}</Card.Text>
           <Card.Text>Status: {data?.status}</Card.Text>
           <Card.Text>Description: {data?.desc}</Card.Text>
-          <Card.Text>Author: {author[data?.author]}</Card.Text>
+          <Card.Text>Author: {author[dataMovie?.author]}</Card.Text>
         </Card.Body>
         <Card.Footer className="text-muted">
           <Card.Text>CreatedAt: {data?.createdAt}</Card.Text>
