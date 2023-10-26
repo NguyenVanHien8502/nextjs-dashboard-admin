@@ -24,14 +24,13 @@ function CreateModalCategory(props: Iprops) {
 
   const [dataCategory, setDataCategory] = useState({
     name: "",
-    slug: "",
     status: "",
     desc: "",
   });
 
   const handleSubmitForm = async () => {
-    const { name, slug, status, desc } = dataCategory;
-    if (!name || !slug || !status || !desc) {
+    const { name, status, desc } = dataCategory;
+    if (!name || !status || !desc) {
       toast.error("Please complete all information");
       return;
     }
@@ -40,7 +39,6 @@ function CreateModalCategory(props: Iprops) {
       `${process.env.BASE_URL}/category/create-category`,
       {
         name: name,
-        slug: slug,
         status: status,
         desc: desc,
       },
@@ -60,7 +58,6 @@ function CreateModalCategory(props: Iprops) {
   const handleCloseModalCategory = () => {
     setDataCategory({
       name: "",
-      slug: "",
       status: "",
       desc: "",
     });
@@ -92,20 +89,6 @@ function CreateModalCategory(props: Iprops) {
                   setDataCategory((prevData) => ({
                     ...prevData,
                     name: e.target.value,
-                  }))
-                }
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Slug</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Nhập slug"
-                value={dataCategory.slug}
-                onChange={(e) =>
-                  setDataCategory((prevData) => ({
-                    ...prevData,
-                    slug: e.target.value,
                   }))
                 }
               />

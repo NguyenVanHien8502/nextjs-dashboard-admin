@@ -31,7 +31,6 @@ function UpdateModalCategory(props: Iprops) {
   const [dataCategory, setDataCategory] = useState({
     id: "",
     name: "",
-    slug: "",
     status: "",
     desc: "",
   });
@@ -41,7 +40,6 @@ function UpdateModalCategory(props: Iprops) {
       setDataCategory({
         id: category._id,
         name: category.name,
-        slug: category.slug,
         status: category.status,
         desc: category.desc,
       });
@@ -49,8 +47,8 @@ function UpdateModalCategory(props: Iprops) {
   }, [category]);
 
   const handleSubmitForm = async () => {
-    const { name, slug, status, desc } = dataCategory;
-    if (!name || !slug || !status || !desc) {
+    const { name, status, desc } = dataCategory;
+    if (!name || !status || !desc) {
       toast.error("Please complete all information");
       return;
     }
@@ -58,7 +56,6 @@ function UpdateModalCategory(props: Iprops) {
       `${process.env.BASE_URL}/category/${dataCategory.id}`,
       {
         name: name,
-        slug: slug,
         status: status,
         desc: desc,
       },
@@ -79,7 +76,6 @@ function UpdateModalCategory(props: Iprops) {
     setDataCategory({
       id: "",
       name: "",
-      slug: "",
       status: "",
       desc: "",
     });
@@ -112,20 +108,6 @@ function UpdateModalCategory(props: Iprops) {
                   setDataCategory((prevData) => ({
                     ...prevData,
                     name: e.target.value,
-                  }))
-                }
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Slug</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Nhập slug"
-                value={dataCategory.slug}
-                onChange={(e) =>
-                  setDataCategory((prevData) => ({
-                    ...prevData,
-                    slug: e.target.value,
                   }))
                 }
               />

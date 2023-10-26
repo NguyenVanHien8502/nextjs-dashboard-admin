@@ -23,7 +23,6 @@ function CreateModalMovie(props: Iprops) {
   const { showModalCreateMovie, setShowModalCreateMovie } = props;
   const [dataMovie, setDataMovie] = useState<IMovie | any>({
     name: "",
-    slug: "",
     category: "",
     link: "",
     status: "",
@@ -45,8 +44,8 @@ function CreateModalMovie(props: Iprops) {
   }, []);
 
   const handleSubmitForm = async () => {
-    const { name, slug, category, link, status, desc } = dataMovie;
-    if (!name || !slug || !category || !link || !status || !desc) {
+    const { name, category, link, status, desc } = dataMovie;
+    if (!name || !category || !link || !status || !desc) {
       toast.error("Please complete all information");
       return;
     }
@@ -54,7 +53,6 @@ function CreateModalMovie(props: Iprops) {
       `${process.env.BASE_URL}/movie/create-movie`,
       {
         name: name,
-        slug: slug,
         category: category,
         link: link,
         status: status,
@@ -77,7 +75,6 @@ function CreateModalMovie(props: Iprops) {
   const handleCloseModalMovie = () => {
     setDataMovie({
       name: "",
-      slug: "",
       category: "",
       link: "",
       status: "",
@@ -111,20 +108,6 @@ function CreateModalMovie(props: Iprops) {
                   setDataMovie((prevData: IMovie) => ({
                     ...prevData,
                     name: e.target.value,
-                  }))
-                }
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Slug</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Nhập slug"
-                value={dataMovie.slug}
-                onChange={(e) =>
-                  setDataMovie((prevData: IMovie) => ({
-                    ...prevData,
-                    slug: e.target.value,
                   }))
                 }
               />

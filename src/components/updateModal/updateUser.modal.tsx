@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { mutate } from "swr";
+import validator from "validator";
 
 interface Iprops {
   showModalUpdateUser: boolean;
@@ -21,8 +22,12 @@ function UpdateModalUser(props: Iprops) {
     const currentUser = JSON.parse(currentUserString);
     token = currentUser?.token;
   }
-  const { showModalUpdateUser, setShowModalUpdateUser, user, setUser } = props;
 
+  const validatePhoneNumber = (phoneNumber: string) => {
+    return validator.isMobilePhone(phoneNumber);
+  };
+
+  const { showModalUpdateUser, setShowModalUpdateUser, user, setUser } = props;
   const [dataUser, setDataUser] = useState({
     id: "",
     username: "",
@@ -47,6 +52,10 @@ function UpdateModalUser(props: Iprops) {
     const { username, phone, role, status } = dataUser;
     if (!username || !phone || !role || !status) {
       toast.error("Please complete all information");
+      return;
+    }
+    if (!validatePhoneNumber(phone)) {
+      toast.error("Please enter valid phone number");
       return;
     }
     const { data } = await axios.put(

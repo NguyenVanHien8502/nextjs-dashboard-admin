@@ -41,7 +41,6 @@ function UpdateModalMovie(props: Iprops) {
   const [dataMovie, setDataMovie] = useState({
     id: "",
     name: "",
-    slug: "",
     category: "",
     link: "",
     status: "",
@@ -53,7 +52,6 @@ function UpdateModalMovie(props: Iprops) {
       setDataMovie({
         id: movie._id,
         name: movie.name,
-        slug: movie.slug,
         category: movie.category,
         link: movie.link,
         status: movie.status,
@@ -63,8 +61,8 @@ function UpdateModalMovie(props: Iprops) {
   }, [movie]);
 
   const handleSubmitForm = async () => {
-    const { name, slug, category, link, status, desc } = dataMovie;
-    if (!name || !slug || !category || !link || !status || !desc) {
+    const { name, category, link, status, desc } = dataMovie;
+    if (!name || !category || !link || !status || !desc) {
       toast.error("Please complete all information");
       return;
     }
@@ -72,7 +70,6 @@ function UpdateModalMovie(props: Iprops) {
       `${process.env.BASE_URL}/movie/${dataMovie.id}`,
       {
         name: name,
-        slug: slug,
         category: category,
         link: link,
         status: status,
@@ -95,7 +92,6 @@ function UpdateModalMovie(props: Iprops) {
     setDataMovie({
       id: "",
       name: "",
-      slug: "",
       category: "",
       link: "",
       status: "",
@@ -130,20 +126,6 @@ function UpdateModalMovie(props: Iprops) {
                   setDataMovie((prevData) => ({
                     ...prevData,
                     name: e.target.value,
-                  }))
-                }
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Slug</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Nhập slug"
-                value={dataMovie.slug}
-                onChange={(e) =>
-                  setDataMovie((prevData) => ({
-                    ...prevData,
-                    slug: e.target.value,
                   }))
                 }
               />
