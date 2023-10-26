@@ -59,7 +59,7 @@ export default function Admin() {
     <>
       <title>Home Admin Page</title>
       <h1>Dashboard Admin</h1>
-      <h4>check valid for link; add sort by category, name; fillter by name, datatable sort and fillter fe</h4>
+      <h4>add sort by category, name; fillter by name, datatable sort and fillter fe</h4>
       <div className="d-flex justify-content-between align-items-center gap-3 mt-5">
         <div className="d-flex flex-grow-1 bg-custom-light p-3 roudned-3 gap-3 shadow">
           <div>

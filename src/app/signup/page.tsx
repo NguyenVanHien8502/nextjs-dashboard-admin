@@ -13,6 +13,7 @@ export default function Signup() {
     username: "",
     email: "",
     password: "",
+    role: "",
   });
   const handleSignUp = async () => {
     try {
@@ -22,6 +23,7 @@ export default function Signup() {
           username: data.username,
           email: data.email,
           password: data.password,
+          role: data.role,
         }
       );
       if (response.data?.status === true) {
@@ -80,6 +82,21 @@ export default function Signup() {
                 }))
               }
             />
+          </div>
+          <div>
+            <label>Your role:</label>
+            <select
+              name="role"
+              id="role"
+              placeholder="Chọn role"
+              value={data.role}
+              onChange={(e) =>
+                setData((prev) => ({ ...prev, role: e.target.value }))
+              }
+            >
+              <option value="admin">Admin</option>
+              <option value="user">User</option>
+            </select>
           </div>
         </div>
         <Button
