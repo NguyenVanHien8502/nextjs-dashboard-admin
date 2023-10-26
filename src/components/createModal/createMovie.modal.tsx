@@ -37,7 +37,7 @@ function CreateModalMovie(props: Iprops) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/category`);
+        const { data } = await axios.get(`${process.env.BASE_URL}/category`);
         setCategories(data);
       } catch (error) {
         throw new Error("error");
@@ -53,7 +53,7 @@ function CreateModalMovie(props: Iprops) {
       return;
     }
     const { data } = await axios.post(
-      "http://localhost:5000/api/movie/create-movie",
+      `${process.env.BASE_URL}/movie/create-movie`,
       {
         name: name,
         slug: slug,
@@ -72,7 +72,7 @@ function CreateModalMovie(props: Iprops) {
     if (data?.status === true) {
       toast.success("Created movie succeed!...");
       handleCloseModalMovie();
-      mutate("http://localhost:5000/api/movie");
+      mutate(`${process.env.BASE_URL}/movie`);
     }
   };
 

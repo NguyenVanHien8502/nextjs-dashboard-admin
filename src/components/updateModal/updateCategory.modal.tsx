@@ -55,7 +55,7 @@ function UpdateModalCategory(props: Iprops) {
       return;
     }
     const { data } = await axios.put(
-      `http://localhost:5000/api/category/${dataCategory.id}`,
+      `${process.env.BASE_URL}/category/${dataCategory.id}`,
       {
         name: name,
         slug: slug,
@@ -71,7 +71,7 @@ function UpdateModalCategory(props: Iprops) {
     if (data?.status === true) {
       toast.success("Updated category succeed !...");
       handleCloseModalCategory();
-      mutate("http://localhost:5000/api/category");
+      mutate(`${process.env.BASE_URL}/category`);
     }
   };
 

@@ -15,7 +15,7 @@ const ViewUserDetail = ({ params }: { params: { movieId: string } }) => {
   const fetcher: Fetcher<IMovie, string> = (url: string) =>
     axios.get(url).then((res) => res.data);
   const { data, error, isLoading } = useSWR(
-    `http://localhost:5000/api/movie/${params.movieId}`,
+    `${process.env.BASE_URL}/movie/${params.movieId}`,
     fetcher,
     {
       revalidateIfStale: false,
@@ -25,25 +25,27 @@ const ViewUserDetail = ({ params }: { params: { movieId: string } }) => {
   );
   const dataMovie: IMovie | any = data;
   const [author, setAuthor] = useState<IUser | any>({});
-  const fetchAuthor = async (userId: string | any) => {
-    const { data } = await axios.get(
-      `http://localhost:5000/api/user/${userId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    const authorName = data.username;
-    setAuthor((prev: any) => ({
-      ...prev,
-      [userId]: authorName,
-    }));
-  };
+
   useEffect(() => {
+    const fetchAuthor = async (userId: string | any) => {
+      const { data } = await axios.get(
+        `${process.env.BASE_URL}/user/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const authorName = data.username;
+      setAuthor((prev: any) => ({
+        ...prev,
+        [userId]: authorName,
+      }));
+    };
+
     const authorId: string | any = data?.author;
     fetchAuthor(authorId);
-  }, [dataMovie]);
+  }, [data, dataMovie, token]);
 
   if (isLoading) {
     return <h1>Loading...</h1>;

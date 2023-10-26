@@ -9,6 +9,7 @@ import { mutate } from "swr";
 import CreateModalMovie from "../createModal/createMovie.modal";
 import UpdateModalMovie from "../updateModal/updateMovie.modal";
 
+
 interface Iprops {
   movies: IMovie[];
 }
@@ -31,7 +32,7 @@ const MovieTable = (props: Iprops) => {
   const handleDeleteMovie = async (id: string) => {
     if (window.confirm("Are you sure want to delete this movie? ")) {
       const { data } = await axios.delete(
-        `http://localhost:5000/api/movie/${id}`,
+        `${process.env.BASE_URL}/movie/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -40,39 +41,38 @@ const MovieTable = (props: Iprops) => {
       );
       if (data?.status === true) {
         toast.success("Deleted movie succeed !...");
-        mutate("http://localhost:5000/api/movie");
+        mutate(`${process.env.BASE_URL}/movie`);
       }
     }
   };
 
   //fetchAuthor for each authorId
   const [author, setAuthor] = useState<IUser | any>({});
-  const fetchAuthor = async (authorId: string) => {
-    try {
-      const { data } = await axios.get(
-        `http://localhost:5000/api/user/${authorId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const authorName = data.username;
-      setAuthor((prev: any) => ({
-        ...prev,
-        [authorId]: authorName,
-      }));
-    } catch {
-      throw new Error("Not found this author");
-    }
-  };
-
   useEffect(() => {
+    const fetchAuthor = async (authorId: string) => {
+      try {
+        const { data } = await axios.get(
+          `${process.env.BASE_URL}/user/${authorId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const authorName = data.username;
+        setAuthor((prev: any) => ({
+          ...prev,
+          [authorId]: authorName,
+        }));
+      } catch {
+        throw new Error("Not found this author");
+      }
+    };
     movies.forEach((movie: IMovie) => {
       const authorId: string = movie.author;
       fetchAuthor(authorId);
     });
-  }, [movies]);
+  }, [movies, token]);
 
   return (
     <>

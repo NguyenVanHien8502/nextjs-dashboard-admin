@@ -15,18 +15,15 @@ export default function Login() {
   });
   const handleLogin = async () => {
     try {
-      const response = await axios.post(
-        `http://localhost:5000/api/user/login`,
-        {
-          email: data.email,
-          password: data.password,
-        }
-      );
+      const response = await axios.post(`${process.env.BASE_URL}/user/login`, {
+        email: data.email,
+        password: data.password,
+      });
       const currentUser = response.data?.user;
       if (response.data?.status === true && currentUser) {
+        router.push("/admin");
         toast.success("You have successfully loginned");
         localStorage.setItem("currentUser", JSON.stringify(currentUser));
-        router.push("/admin");
       } else {
         toast.error("Incorrect email or password information");
       }

@@ -37,7 +37,7 @@ function CreateModalCategory(props: Iprops) {
     }
 
     const { data } = await axios.post(
-      "http://localhost:5000/api/category/create-category",
+      `${process.env.BASE_URL}/category/create-category`,
       {
         name: name,
         slug: slug,
@@ -53,7 +53,7 @@ function CreateModalCategory(props: Iprops) {
     if (data?.status === true) {
       toast.success("Created category succeed!...");
       handleCloseModalCategory();
-      mutate("http://localhost:5000/api/category");
+      mutate(`${process.env.BASE_URL}/category`);
     }
   };
 

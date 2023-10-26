@@ -20,7 +20,7 @@ export default function User() {
       })
       .then((res) => res.data);
   const { data, error, isLoading } = useSWR(
-    "http://localhost:5000/api/user",
+    `${process.env.BASE_URL}/user`,
     fetcher,
     {
       revalidateIfStale: false,

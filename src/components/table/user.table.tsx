@@ -21,14 +21,17 @@ const UserTable = (props: Iprops) => {
 
   const handleDeleteUser = async (id: string) => {
     if (window.confirm("Are you sure want to delete this user? ")) {
-      const { data }= await axios.delete(`http://localhost:5000/api/user/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const { data } = await axios.delete(
+        `${process.env.BASE_URL}/user/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (data?.status === true) {
         toast.success("Deleted user succeed !...");
-        mutate("http://localhost:5000/api/user");
+        mutate(`${process.env.BASE_URL}/user`);
       }
     }
   };

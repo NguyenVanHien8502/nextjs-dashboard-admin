@@ -29,7 +29,7 @@ function UpdateModalMovie(props: Iprops) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/category`);
+        const { data } = await axios.get(`${process.env.BASE_URL}/category`);
         setCategories(data);
       } catch (error) {
         throw new Error("error");
@@ -69,7 +69,7 @@ function UpdateModalMovie(props: Iprops) {
       return;
     }
     const { data } = await axios.put(
-      `http://localhost:5000/api/movie/${dataMovie.id}`,
+      `${process.env.BASE_URL}/movie/${dataMovie.id}`,
       {
         name: name,
         slug: slug,
@@ -87,7 +87,7 @@ function UpdateModalMovie(props: Iprops) {
     if (data?.status === true) {
       toast.success("Updated movie succeed !...");
       handleCloseModalMovie();
-      mutate("http://localhost:5000/api/movie");
+      mutate(`${process.env.BASE_URL}/movie`);
     }
   };
 

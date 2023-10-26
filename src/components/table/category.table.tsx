@@ -31,7 +31,7 @@ const CategoryTable = (props: Iprops) => {
   const handleDeleteCategory = async (id: string) => {
     if (window.confirm("Are you sure want to delete this category? ")) {
       const { data } = await axios.delete(
-        `http://localhost:5000/api/category/${id}`,
+        `${process.env.BASE_URL}/category/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -40,7 +40,7 @@ const CategoryTable = (props: Iprops) => {
       );
       if (data?.status === true) {
         toast.success("Deleted category successfully");
-        mutate("http://localhost:5000/api/category");
+        mutate(`${process.env.BASE_URL}/category`);
       }
     }
   };

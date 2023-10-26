@@ -7,7 +7,7 @@ import useSWR from "swr";
 export default function Movie() {
   const fetcher = (url: string) => axios.get(url).then((res) => res.data);
   const { data, error, isLoading } = useSWR(
-    "http://localhost:5000/api/movie",
+    `${process.env.BASE_URL}/movie`,
     fetcher,
     {
       revalidateIfStale: false,

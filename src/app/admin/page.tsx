@@ -28,34 +28,34 @@ export default function Admin() {
   }
 
   const [totalUser, setTotalUser] = useState(0);
-  const fetchAllUser = async () => {
-    const { data } = await axios.get(`http://localhost:5000/api/user`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const totalUser = data?.allUsers?.length;
-    setTotalUser(totalUser);
-  };
-
   const [totalMovie, setTotalMovie] = useState(0);
-  const fetchAllMovie = async () => {
-    const { data } = await axios.get(`http://localhost:5000/api/movie`);
-    const totalMovie = data?.length;
-    setTotalMovie(totalMovie);
-  };
-
   const [totalCategory, setTotalCategory] = useState(0);
-  const fetchAllCategory = async () => {
-    const { data } = await axios.get(`http://localhost:5000/api/category`);
-    const totalCategory = data?.length;
-    setTotalCategory(totalCategory);
-  };
   useEffect(() => {
+    const fetchAllUser = async () => {
+      const { data } = await axios.get(`${process.env.BASE_URL}/user`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const totalUser = data?.allUsers?.length;
+      setTotalUser(totalUser);
+    };
     fetchAllUser();
+
+    const fetchAllMovie = async () => {
+      const { data } = await axios.get(`${process.env.BASE_URL}/movie`);
+      const totalMovie = data?.length;
+      setTotalMovie(totalMovie);
+    };
     fetchAllMovie();
+    
+    const fetchAllCategory = async () => {
+      const { data } = await axios.get(`${process.env.BASE_URL}/category`);
+      const totalCategory = data?.length;
+      setTotalCategory(totalCategory);
+    };
     fetchAllCategory();
-  }, []);
+  }, [token]);
   return (
     <>
       <title>Home Admin Page</title>

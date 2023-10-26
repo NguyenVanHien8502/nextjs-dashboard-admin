@@ -20,7 +20,7 @@ const ViewUserDetail = ({ params }: { params: { userId: string } }) => {
       })
       .then((res) => res.data);
   const { data, error, isLoading } = useSWR(
-    `http://localhost:5000/api/user/${params.userId}`,
+    `${process.env.BASE_URL}/user/${params.userId}`,
     fetcher,
     {
       revalidateIfStale: false,

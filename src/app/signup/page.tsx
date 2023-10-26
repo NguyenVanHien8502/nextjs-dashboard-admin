@@ -17,7 +17,7 @@ export default function Signup() {
   const handleSignUp = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/user/register`,
+        `${process.env.BASE_URL}/user/register`,
         {
           username: data.username,
           email: data.email,

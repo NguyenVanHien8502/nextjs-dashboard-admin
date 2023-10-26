@@ -7,7 +7,7 @@ import useSWR from "swr";
 export default function Category() {
   const fetcher = (url: string) => axios.get(url).then((res) => res.data);
   const { data, error, isLoading } = useSWR(
-    "http://localhost:5000/api/category",
+    `${process.env.BASE_URL}/category`,
     fetcher,
     {
       revalidateIfStale: false,

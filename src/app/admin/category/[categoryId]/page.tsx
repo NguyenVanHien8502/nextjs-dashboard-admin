@@ -14,7 +14,7 @@ const ViewUserDetail = ({ params }: { params: { categoryId: string } }) => {
   const fetcher: Fetcher<ICategory, string> = (url: string) =>
     axios.get(url).then((res) => res.data);
   const { data, error, isLoading } = useSWR(
-    `http://localhost:5000/api/category/${params.categoryId}`,
+    `${process.env.BASE_URL}/category/${params.categoryId}`,
     fetcher,
     {
       revalidateIfStale: false,
