@@ -43,12 +43,32 @@ function CreateModalMovie(props: Iprops) {
     fetchCategories();
   }, []);
 
+  //check validate link url
+  const isValidUrl = (urlString: string) => {
+    var urlPattern = new RegExp(
+      "^(https?:\\/\\/)?" + // validate protocol
+        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // validate domain name
+        "((\\d{1,3}\\.){3}\\d{1,3}))" + // validate OR ip (v4) address
+        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // validate port and path
+        "(\\?[;&a-z\\d%_.~+=-]*)?" + // validate query string
+        "(\\#[-a-z\\d_]*)?$",
+      "i"
+    ); // validate fragment locator
+    return !!urlPattern.test(urlString);
+  };
+
   const handleSubmitForm = async () => {
     const { name, category, link, status, desc } = dataMovie;
     if (!name || !category || !link || !status || !desc) {
       toast.error("Please complete all information");
       return;
     }
+
+    if (!isValidUrl(link)) {
+      toast.error("Please fill in the correct url link format");
+      return;
+    }
+
     const { data } = await axios.post(
       `${process.env.BASE_URL}/movie/create-movie`,
       {
