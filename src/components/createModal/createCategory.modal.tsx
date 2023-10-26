@@ -112,9 +112,9 @@ function CreateModalCategory(props: Iprops) {
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Status</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Nhập status"
+              <Form.Select
+                id="status"
+                placeholder="Chọn status"
                 value={dataCategory.status}
                 onChange={(e) =>
                   setDataCategory((prevData) => ({
@@ -122,7 +122,11 @@ function CreateModalCategory(props: Iprops) {
                     status: e.target.value,
                   }))
                 }
-              />
+              >
+                <option value="">Select Status</option>
+                <option value="private">Private</option>
+                <option value="public">Public</option>
+              </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Description</Form.Label>

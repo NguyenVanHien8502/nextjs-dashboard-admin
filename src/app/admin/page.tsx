@@ -1,11 +1,10 @@
 "use client";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { LineChart } from "@mui/x-charts/LineChart";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import CategoryIcon from "@mui/icons-material/Category";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
 import axios from "axios";
-import { mutate } from "swr";
 
 const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
 const pData = [2400, 1398, 9800, 3908, 4800, 3800, 4300];
@@ -48,7 +47,7 @@ export default function Admin() {
       setTotalMovie(totalMovie);
     };
     fetchAllMovie();
-    
+
     const fetchAllCategory = async () => {
       const { data } = await axios.get(`${process.env.BASE_URL}/category`);
       const totalCategory = data?.length;
@@ -60,6 +59,7 @@ export default function Admin() {
     <>
       <title>Home Admin Page</title>
       <h1>Dashboard Admin</h1>
+      <h4>check valid for link, phone; add sort by category, name; fillter by name, datatable sort and fillter fe</h4>
       <div className="d-flex justify-content-between align-items-center gap-3 mt-5">
         <div className="d-flex flex-grow-1 bg-custom-light p-3 roudned-3 gap-3 shadow">
           <div>

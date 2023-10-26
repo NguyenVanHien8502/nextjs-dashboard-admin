@@ -5,6 +5,8 @@ import Link from "next/link";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { mutate } from "swr";
+import UpdateModalUser from "../updateModal/updateUser.modal";
+import { useState } from "react";
 
 interface Iprops {
   users: IUser[];
@@ -18,6 +20,10 @@ const UserTable = (props: Iprops) => {
     const currentUser = JSON.parse(currentUserString);
     token = currentUser?.token;
   }
+
+  const [showModalUpdateUser, setShowModalUpdateUser] =
+    useState<boolean>(false);
+  const [user, setUser] = useState<IUser | null>(null);
 
   const handleDeleteUser = async (id: string) => {
     if (window.confirm("Are you sure want to delete this user? ")) {
@@ -69,13 +75,23 @@ const UserTable = (props: Iprops) => {
               <td>{user.status}</td>
               <td>{user.createdAt}</td>
               <td>{user.updatedAt}</td>
-              <td style={{ display: "flex", gap: "5px" }}>
+              <td style={{ display: "flex" }}>
                 <Link
                   href={`/admin/user/${user._id}`}
                   className="btn btn-primary"
                 >
                   View
                 </Link>
+                <Button
+                  variant="warning"
+                  className="mx-3"
+                  onClick={() => {
+                    setUser(user);
+                    setShowModalUpdateUser(true);
+                  }}
+                >
+                  Edit
+                </Button>
                 <Button
                   variant="danger"
                   onClick={() => handleDeleteUser(user._id)}
@@ -87,6 +103,12 @@ const UserTable = (props: Iprops) => {
           ))}
         </tbody>
       </Table>
+      <UpdateModalUser
+        showModalUpdateUser={showModalUpdateUser}
+        setShowModalUpdateUser={setShowModalUpdateUser}
+        user={user}
+        setUser={setUser}
+      />
     </>
   );
 };

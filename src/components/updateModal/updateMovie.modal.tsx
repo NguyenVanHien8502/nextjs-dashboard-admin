@@ -183,17 +183,22 @@ function UpdateModalMovie(props: Iprops) {
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Status</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Nhập status"
+              <Form.Select
+                id="movie"
+                placeholder="Chọn status"
                 value={dataMovie.status}
                 onChange={(e) =>
-                  setDataMovie((prevData) => ({
-                    ...prevData,
+                  setDataMovie((prev: any) => ({
+                    ...prev,
                     status: e.target.value,
                   }))
                 }
-              />
+              >
+                <option value="">Select Status</option>
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="done">Done</option>
+              </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Description</Form.Label>

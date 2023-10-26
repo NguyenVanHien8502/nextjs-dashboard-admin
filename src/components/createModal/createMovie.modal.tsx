@@ -21,7 +21,6 @@ function CreateModalMovie(props: Iprops) {
   }
 
   const { showModalCreateMovie, setShowModalCreateMovie } = props;
-
   const [dataMovie, setDataMovie] = useState<IMovie | any>({
     name: "",
     slug: "",
@@ -29,7 +28,6 @@ function CreateModalMovie(props: Iprops) {
     link: "",
     status: "",
     desc: "",
-    author: "",
   });
 
   //fetch all Category
@@ -84,7 +82,6 @@ function CreateModalMovie(props: Iprops) {
       link: "",
       status: "",
       desc: "",
-      author: "",
     });
     setShowModalCreateMovie(false);
   };
@@ -135,14 +132,14 @@ function CreateModalMovie(props: Iprops) {
             <Form.Group className="mb-3">
               <Form.Label>Category</Form.Label>
               <Form.Select
-                name="category"
                 id="category"
                 value={dataMovie.category}
-                onChange={(e) => {
-                  const newData: IMovie | any = { ...dataMovie };
-                  newData[e.target.id] = e.target.value;
-                  setDataMovie(newData);
-                }}
+                onChange={(e) =>
+                  setDataMovie((prev: any) => ({
+                    ...prev,
+                    category: e.target.value,
+                  }))
+                }
               >
                 <option value="">Select Category</option>
                 {categories.map((category: ICategory) => (
@@ -166,17 +163,22 @@ function CreateModalMovie(props: Iprops) {
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Status</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Nhập status"
+              <Form.Select
+                id="movie"
+                placeholder="Chọn status"
                 value={dataMovie.status}
                 onChange={(e) =>
-                  setDataMovie((prevData: IMovie) => ({
-                    ...prevData,
+                  setDataMovie((prev: any) => ({
+                    ...prev,
                     status: e.target.value,
                   }))
                 }
-              />
+              >
+                <option value="">Select Status</option>
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="done">Done</option>
+              </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Description</Form.Label>

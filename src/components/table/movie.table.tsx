@@ -9,7 +9,6 @@ import { mutate } from "swr";
 import CreateModalMovie from "../createModal/createMovie.modal";
 import UpdateModalMovie from "../updateModal/updateMovie.modal";
 
-
 interface Iprops {
   movies: IMovie[];
 }
@@ -117,7 +116,7 @@ const MovieTable = (props: Iprops) => {
               <td>{author[movie.author]}</td>
               <td>{movie.createdAt}</td>
               <td>{movie.updatedAt}</td>
-              <td style={{ display: "flex", gap: "5px" }}>
+              <td style={{ display: "flex" }}>
                 <Link href={`movie/${movie._id}`} className="btn btn-primary">
                   View
                 </Link>

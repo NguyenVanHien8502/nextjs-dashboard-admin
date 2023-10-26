@@ -82,7 +82,7 @@ const CategoryTable = (props: Iprops) => {
               <td>{category.desc}</td>
               <td>{category.createdAt}</td>
               <td>{category.updatedAt}</td>
-              <td style={{ display: "flex", gap: "5px" }}>
+              <td style={{ display: "flex" }}>
                 <Link
                   href={`category/${category._id}`}
                   className="btn btn-primary"
