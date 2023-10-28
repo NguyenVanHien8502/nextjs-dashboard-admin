@@ -73,41 +73,45 @@ const CategoryTable = (props: Iprops) => {
           </tr>
         </thead>
         <tbody>
-          {categories?.map((category, index) => (
-            <tr key={category._id}>
-              <td>{index + 1}</td>
-              <td>{category.name}</td>
-              <td>{category.slug}</td>
-              <td>{category.status}</td>
-              <td>{category.desc}</td>
-              <td>{category.createdAt}</td>
-              <td>{category.updatedAt}</td>
-              <td style={{ display: "flex" }}>
-                <Link
-                  href={`category/${category._id}`}
-                  className="btn btn-primary"
-                >
-                  View
-                </Link>
-                <Button
-                  variant="warning"
-                  className="mx-3"
-                  onClick={() => {
-                    setCategory(category);
-                    setShowModalUpdateCategory(true);
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => handleDeleteCategory(category._id)}
-                >
-                  Delete
-                </Button>
-              </td>
-            </tr>
-          ))}
+          {categories.length > 0 ? (
+            categories?.map((category, index) => (
+              <tr key={category._id}>
+                <td>{index + 1}</td>
+                <td>{category.name}</td>
+                <td>{category.slug}</td>
+                <td>{category.status}</td>
+                <td>{category.desc}</td>
+                <td>{category.createdAt}</td>
+                <td>{category.updatedAt}</td>
+                <td style={{ display: "flex" }}>
+                  <Link
+                    href={`category/${category._id}`}
+                    className="btn btn-primary"
+                  >
+                    View
+                  </Link>
+                  <Button
+                    variant="warning"
+                    className="mx-3"
+                    onClick={() => {
+                      setCategory(category);
+                      setShowModalUpdateCategory(true);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleDeleteCategory(category._id)}
+                  >
+                    Delete
+                  </Button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <h1>Nothing is here</h1>
+          )}
         </tbody>
       </Table>
       <CreateModalCategory

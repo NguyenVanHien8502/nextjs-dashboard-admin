@@ -164,9 +164,13 @@ function UpdateModalMovie(props: Iprops) {
                 }
               >
                 <option value="">Select Blog Category</option>
-                {categories.map((category: ICategory) => (
-                  <option key={category._id}>{category.name}</option>
-                ))}
+                {categories.length > 0 ? (
+                  categories?.map((category: ICategory) => (
+                    <option key={category._id}>{category.name}</option>
+                  ))
+                ) : (
+                  <option value="">No category is here</option>
+                )}
               </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">

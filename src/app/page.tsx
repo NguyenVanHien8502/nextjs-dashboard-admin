@@ -16,19 +16,23 @@ export default function Login() {
   const handleLogin = async () => {
     try {
       const response = await axios.post(`${process.env.BASE_URL}/user/login`, {
-        email: data.email,
-        password: data.password,
+        email: data?.email,
+        password: data?.password,
       });
-      const currentUser = response.data?.user;
-      if (response.data?.status === true && currentUser) {
-        router.push("/admin");
-        toast.success("You have successfully loginned");
-        localStorage.setItem("currentUser", JSON.stringify(currentUser));
-      } else {
-        toast.error("Incorrect email or password information");
+      
+      if (response?.data?.status === false) {
+        toast.warning(response?.data?.msg);
+        return;
       }
-    } catch (error) {
-      throw new Error("error");
+
+      const currentUser = response?.data?.user;
+      if (response?.data?.status === true && currentUser) {
+        router.push("/admin");
+        localStorage.setItem("currentUser", JSON.stringify(currentUser));
+        toast.success(response?.data?.msg);
+      }
+    } catch {
+      toast.error("Error! An error occurred. Please try again later");
     }
   };
   return (

@@ -26,12 +26,18 @@ export default function Signup() {
           role: data.role,
         }
       );
+
+      if (response?.data?.status === false) {
+        toast.warning(response?.data?.msg);
+        return;
+      }
+
       if (response.data?.status === true) {
-        toast.success("Congratulation!!! You have successfully registered.");
+        toast.success(response?.data?.msg);
         router.replace("/");
       }
-    } catch (error) {
-      throw new Error("error");
+    } catch {
+      toast.error("Error! An error occurred. Please try again later");
     }
   };
   return (
@@ -94,6 +100,7 @@ export default function Signup() {
                 setData((prev) => ({ ...prev, role: e.target.value }))
               }
             >
+              <option value="">Chọn role</option>
               <option value="admin">Admin</option>
               <option value="user">User</option>
             </select>

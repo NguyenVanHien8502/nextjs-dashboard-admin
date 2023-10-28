@@ -50,7 +50,7 @@ export default function Admin() {
 
     const fetchAllCategory = async () => {
       const { data } = await axios.get(`${process.env.BASE_URL}/category`);
-      const totalCategory = data?.length;
+      const totalCategory = data.data?.length;
       setTotalCategory(totalCategory);
     };
     fetchAllCategory();

@@ -22,7 +22,7 @@ export default function Category() {
   return (
     <>
       <Box height={100}>
-        <CategoryTable categories={data ?? []} />
+        <CategoryTable categories={data.data ?? []} />
       </Box>
     </>
   );
