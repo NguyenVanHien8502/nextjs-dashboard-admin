@@ -21,7 +21,7 @@ export default function Movie() {
   }
   return (
     <>
-      <Box height={100}>
+      <Box height={100} width={1000}>
         <MovieTable movies={data ?? []} />
       </Box>
     </>

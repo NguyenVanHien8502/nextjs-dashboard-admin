@@ -50,14 +50,6 @@ function UpdateModalUser(props: Iprops) {
 
   const handleSubmitForm = async () => {
     const { username, phone, role, status } = dataUser;
-    if (!username || !phone || !role || !status) {
-      toast.error("Please complete all information");
-      return;
-    }
-    if (!validatePhoneNumber(phone)) {
-      toast.error("Please enter valid phone number");
-      return;
-    }
     const { data } = await axios.put(
       `${process.env.BASE_URL}/user/${dataUser.id}`,
       {
@@ -72,8 +64,12 @@ function UpdateModalUser(props: Iprops) {
         },
       }
     );
+    if (data?.status === false) {
+      toast.warning(data?.msg);
+      return;
+    }
     if (data?.status === true) {
-      toast.success("Updated user succeed !...");
+      toast.success(data?.msg);
       handleCloseModalUser();
       mutate(`${process.env.BASE_URL}/user`);
     }

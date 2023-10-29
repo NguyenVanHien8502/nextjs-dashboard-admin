@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "react-bootstrap";
-import styles from "../styles/auth.module.css";
+import styles from "./app.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -9,74 +9,95 @@ import { toast } from "react-toastify";
 
 export default function Login() {
   const router = useRouter();
-  const [data, setData] = useState({
+  const [dataInput, setDataInput] = useState({
     email: "",
     password: "",
   });
-  const handleLogin = async () => {
+
+  const handleLogin = async (e: any) => {
     try {
-      const response = await axios.post(`${process.env.BASE_URL}/user/login`, {
-        email: data?.email,
-        password: data?.password,
+      e.preventDefault();
+      const { data } = await axios.post(`${process.env.BASE_URL}/user/login`, {
+        email: dataInput?.email,
+        password: dataInput?.password,
       });
-      
-      if (response?.data?.status === false) {
-        toast.warning(response?.data?.msg);
+
+      if (data?.status === false) {
+        toast.warning(data?.msg);
         return;
       }
 
-      const currentUser = response?.data?.user;
-      if (response?.data?.status === true && currentUser) {
+      const currentUser = data?.user;
+      if (data?.status === true && currentUser) {
         router.push("/admin");
         localStorage.setItem("currentUser", JSON.stringify(currentUser));
-        toast.success(response?.data?.msg);
+        toast.success(data?.msg);
       }
     } catch {
       toast.error("Error! An error occurred. Please try again later");
     }
   };
   return (
-    <main className={styles["container"]}>
-      <div className={styles["text-container"]}>
-        <p className={styles["text"]}>Login</p>
-      </div>
-      <div className={styles["inputs-container"]}>
-        <div className={styles["inputs"]}>
-          <label>Your email:</label>
-          <input
-            type="email"
-            placeholder="Email"
-            value={data.email}
-            onChange={(e) =>
-              setData((prevData) => ({ ...prevData, email: e.target.value }))
-            }
-          />
+    <div className={styles.main}>
+      <div className={styles.container}>
+        <div className={styles.title_container}>
+          <p className={styles.title}>Login</p>
         </div>
-        <div className={styles["inputs"]}>
-          <label>Your password:</label>
-          <input
-            type="password"
-            placeholder="Password"
-            value={data.password}
-            onChange={(e) =>
-              setData((prevData) => ({
-                ...prevData,
-                password: e.target.value,
-              }))
-            }
-          />
+        <form className={styles.form_container}>
+          <div className={styles.inputs_container}>
+            <div className={styles.inputs}>
+              <label className={styles.label}>Your email:</label>
+              <input
+                className={styles.input}
+                type="email"
+                placeholder="Enter your email"
+                value={dataInput.email}
+                onChange={(e) =>
+                  setDataInput((prevData) => ({
+                    ...prevData,
+                    email: e.target.value,
+                  }))
+                }
+              />
+            </div>
+            <div className={styles.inputs}>
+              <label className={styles.label}>Your password:</label>
+              <input
+                className={styles.input}
+                type="password"
+                placeholder="Enter your password"
+                value={dataInput.password}
+                onChange={(e) =>
+                  setDataInput((prevData) => ({
+                    ...prevData,
+                    password: e.target.value,
+                  }))
+                }
+              />
+            </div>
+          </div>
+          <div className={styles.forgot_password_container}>
+            <Link href={"forgotpassword"} className={styles.forgot_password}>
+              Forgot password?
+            </Link>
+          </div>
+          <div className={styles.button_container}>
+            <Button
+              type="submit"
+              onClick={(e) => handleLogin(e)}
+              className={styles.button}
+            >
+              Login
+            </Button>
+          </div>
+        </form>
+        <div className={styles.text_last_container}>
+          <p className={styles.text_last}>Haven`t you already account?</p>
+          <Link href={"signup"} className={styles.signup_link}>
+            Sign up
+          </Link>
         </div>
       </div>
-      <div className={styles["forgot-password"]}>
-        <Link href={"forgotpassword"}>Forgot password?</Link>
-      </div>
-      <Button style={{ width: "100%" }} onClick={() => handleLogin()}>
-        Login
-      </Button>
-      <div className={styles["text-last-container"]}>
-        <p>Haven`t you already account?</p>
-        <Link href={"signup"}>Sign up</Link>
-      </div>
-    </main>
+    </div>
   );
 }

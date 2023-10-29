@@ -30,7 +30,7 @@ function UpdateModalMovie(props: Iprops) {
     const fetchCategories = async () => {
       try {
         const { data } = await axios.get(`${process.env.BASE_URL}/category`);
-        setCategories(data);
+        setCategories(data?.data);
       } catch (error) {
         throw new Error("error");
       }
@@ -41,6 +41,7 @@ function UpdateModalMovie(props: Iprops) {
   const [dataMovie, setDataMovie] = useState({
     id: "",
     name: "",
+    slug: "",
     category: "",
     link: "",
     status: "",
@@ -52,6 +53,7 @@ function UpdateModalMovie(props: Iprops) {
       setDataMovie({
         id: movie._id,
         name: movie.name,
+        slug: movie.slug,
         category: movie.category,
         link: movie.link,
         status: movie.status,
@@ -60,36 +62,14 @@ function UpdateModalMovie(props: Iprops) {
     }
   }, [movie]);
 
-  //check validate link url
-  const isValidUrl = (urlString: string) => {
-    var urlPattern = new RegExp(
-      "^(https?:\\/\\/)?" + // validate protocol
-        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // validate domain name
-        "((\\d{1,3}\\.){3}\\d{1,3}))" + // validate OR ip (v4) address
-        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // validate port and path
-        "(\\?[;&a-z\\d%_.~+=-]*)?" + // validate query string
-        "(\\#[-a-z\\d_]*)?$",
-      "i"
-    ); // validate fragment locator
-    return !!urlPattern.test(urlString);
-  };
-
   const handleSubmitForm = async () => {
-    const { name, category, link, status, desc } = dataMovie;
-    if (!name || !category || !link || !status || !desc) {
-      toast.error("Please complete all information");
-      return;
-    }
-
-    if (!isValidUrl(link)) {
-      toast.error("Please fill in the correct url link format");
-      return;
-    }
+    const { name, slug, category, link, status, desc } = dataMovie;
 
     const { data } = await axios.put(
       `${process.env.BASE_URL}/movie/${dataMovie.id}`,
       {
         name: name,
+        slug: slug,
         category: category,
         link: link,
         status: status,
@@ -101,8 +81,14 @@ function UpdateModalMovie(props: Iprops) {
         },
       }
     );
+
+    if (data?.status === false) {
+      toast.error(data?.msg);
+      return;
+    }
+
     if (data?.status === true) {
-      toast.success("Updated movie succeed !...");
+      toast.success(data?.msg);
       handleCloseModalMovie();
       mutate(`${process.env.BASE_URL}/movie`);
     }
@@ -112,6 +98,7 @@ function UpdateModalMovie(props: Iprops) {
     setDataMovie({
       id: "",
       name: "",
+      slug: "",
       category: "",
       link: "",
       status: "",
@@ -137,7 +124,7 @@ function UpdateModalMovie(props: Iprops) {
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Name</Form.Label>
+              <Form.Label>Name*</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Nhập tên movie"
@@ -151,7 +138,21 @@ function UpdateModalMovie(props: Iprops) {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Category</Form.Label>
+              <Form.Label>Slug*</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Nhập slug"
+                value={dataMovie.slug}
+                onChange={(e) =>
+                  setDataMovie((prevData) => ({
+                    ...prevData,
+                    slug: e.target.value,
+                  }))
+                }
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Category*</Form.Label>
               <Form.Select
                 id="category"
                 placeholder="Chọn category"
@@ -174,7 +175,7 @@ function UpdateModalMovie(props: Iprops) {
               </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Link</Form.Label>
+              <Form.Label>Link*</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Nhập link"
@@ -188,7 +189,7 @@ function UpdateModalMovie(props: Iprops) {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Status</Form.Label>
+              <Form.Label>Status*</Form.Label>
               <Form.Select
                 id="movie"
                 placeholder="Chọn status"

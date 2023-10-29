@@ -33,6 +33,7 @@ import Link from "next/link";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SearchIcon from "@mui/icons-material/Search";
+import styles from "./admin.module.css";
 
 const drawerWidth = 240;
 
@@ -121,9 +122,9 @@ export default function MainLayout({
   const [openDropdown, setOpenDropdown] = useState(false);
   const handleProfile = () => {};
   const handleLogout = () => {
+    router.replace("/");
     localStorage.removeItem("currentUser");
     toast.success("You have successfully logouted");
-    router.replace("/");
   };
 
   const [openNotification, setOpenNotification] = useState(false);
@@ -141,13 +142,7 @@ export default function MainLayout({
             color: "#2f2f2f",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
+          <div className={styles.appbar_container}>
             <Toolbar>
               <IconButton
                 color="inherit"
@@ -161,47 +156,25 @@ export default function MainLayout({
                 variant="h6"
                 noWrap
                 component="div"
-                style={{ display: "flex", alignItems: "center", gap: "3px" }}
+                className="d-flex align-items-center gap-1 mx-2"
               >
                 <LogoDevSharpIcon />
                 <div>NiceAdmin</div>
               </Typography>
             </Toolbar>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "40px",
-                marginRight: "20px",
-              }}
-            >
-              <div
-                style={{
-                  border: "1px solid #ccc",
-                  borderRadius: "8px",
-                  padding: "10px",
-                  backgroundColor: "#E9FFE1",
-                  width: "300px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
+            <div className="d-flex align-items-center gap-5 mx-2">
+              <div className={styles.search_container}>
                 <input
+                  className={styles.search}
                   type="text"
                   placeholder="Search..."
-                  style={{
-                    border: "none",
-                    backgroundColor: "#E9FFE1",
-                    outline: "none",
-                    width: "240px",
-                  }}
                 />
-                <span style={{ cursor: "pointer" }}>
+                <span className={styles.span}>
                   <SearchIcon />
                 </span>
               </div>
-              <div
-                style={{ cursor: "pointer" }}
+              <span
+                className={styles.span}
                 onClick={() => setOpenNotification(!openNotification)}
               >
                 <div role="button" className="position-relative">
@@ -215,7 +188,7 @@ export default function MainLayout({
                     id="menu-appbar"
                     anchorOrigin={{
                       vertical: 20,
-                      horizontal: 1225,
+                      horizontal: 1150,
                     }}
                     open={Boolean(openNotification)}
                     keepMounted
@@ -223,65 +196,23 @@ export default function MainLayout({
                       vertical: "top",
                       horizontal: "right",
                     }}
-                    style={{
-                      marginTop: "40px",
-                    }}
+                    className="mt-5"
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        padding: "10px 20px",
-                        gap: "10px",
-                      }}
-                    >
+                    <div className={styles.title_container}>
                       <p>You have 4 news notifications</p>
-                      <button
-                        style={{
-                          marginBottom: "14px",
-                          border: "none",
-                          borderRadius: "12px",
-                          backgroundColor: "blue",
-                        }}
-                      >
-                        View All
-                      </button>
+                      <button className={styles.buttonViewAll}>View All</button>
                     </div>
-                    <MenuItem
-                      style={{
-                        height: "100px",
-                        width: "400px",
-                        display: "flex",
-                        justifyContent: "flex-start",
-                        borderTop: "1px solid #ccc",
-                      }}
-                    >
-                      <div
-                        style={{
-                          marginTop: "10px",
-                          display: "flex",
-                          alignItems: "flex-start",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <div style={{ marginRight: "15px" }}>
+                    <MenuItem className={styles.menuItem_container}>
+                      <div className="d-flex mt-2 align-items-start justify-content-center">
+                        <div className="me-3">
                           <CampaignIcon />
                         </div>
-                        <div
-                          style={{
-                            marginLeft: "15px",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "center",
-                            alignItems: "flex-start",
-                          }}
-                        >
+                        <div className="ms-3 d-flex flex-column justify-content-center align-items-start">
                           <div>
                             <h5>Hary Maxguire</h5>
                           </div>
                           <div>
-                            <p style={{ fontSize: "14px" }}>
+                            <p className="fs-6">
                               I want to remind everyone that ...
                             </p>
                           </div>
@@ -291,40 +222,17 @@ export default function MainLayout({
                         </div>
                       </div>
                     </MenuItem>
-                    <MenuItem
-                      style={{
-                        height: "100px",
-                        width: "400px",
-                        display: "flex",
-                        justifyContent: "flex-start",
-                        borderTop: "1px solid #ccc",
-                      }}
-                    >
-                      <div
-                        style={{
-                          marginTop: "10px",
-                          display: "flex",
-                          alignItems: "flex-start",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <div style={{ marginRight: "15px" }}>
+                    <MenuItem className={styles.menuItem_container}>
+                      <div className="d-flex mt-2 align-items-start justify-content-center">
+                        <div className="me-3">
                           <CampaignIcon />
                         </div>
-                        <div
-                          style={{
-                            marginLeft: "15px",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "center",
-                            alignItems: "flex-start",
-                          }}
-                        >
+                        <div className="ms-3 d-flex flex-column justify-content-center align-items-start">
                           <div>
                             <h5>Dicta reprehenderit</h5>
                           </div>
                           <div>
-                            <p style={{ fontSize: "14px" }}>
+                            <p className="fs-6">
                               Quae dolorem earum veritatis oditseno
                             </p>
                           </div>
@@ -334,40 +242,17 @@ export default function MainLayout({
                         </div>
                       </div>
                     </MenuItem>
-                    <MenuItem
-                      style={{
-                        height: "100px",
-                        width: "400px",
-                        display: "flex",
-                        justifyContent: "flex-start",
-                        borderTop: "1px solid #ccc",
-                      }}
-                    >
-                      <div
-                        style={{
-                          marginTop: "10px",
-                          display: "flex",
-                          alignItems: "flex-start",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <div style={{ marginRight: "15px" }}>
+                    <MenuItem className={styles.menuItem_container}>
+                      <div className="d-flex mt-2 align-items-start justify-content-center">
+                        <div className="me-3">
                           <CampaignIcon />
                         </div>
-                        <div
-                          style={{
-                            marginLeft: "15px",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "center",
-                            alignItems: "flex-start",
-                          }}
-                        >
+                        <div className="ms-3 d-flex flex-column justify-content-center align-items-start">
                           <div>
                             <h5>Lorem Ipsum</h5>
                           </div>
                           <div>
-                            <p style={{ fontSize: "14px" }}>
+                            <p className="fs-6">
                               Quae dolorem earum veritatis oditseno
                             </p>
                           </div>
@@ -377,40 +262,17 @@ export default function MainLayout({
                         </div>
                       </div>
                     </MenuItem>
-                    <MenuItem
-                      style={{
-                        height: "100px",
-                        width: "400px",
-                        display: "flex",
-                        justifyContent: "flex-start",
-                        borderTop: "1px solid #ccc",
-                      }}
-                    >
-                      <div
-                        style={{
-                          marginTop: "10px",
-                          display: "flex",
-                          alignItems: "flex-start",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <div style={{ marginRight: "15px" }}>
+                    <MenuItem className={styles.menuItem_container}>
+                      <div className="d-flex mt-2 align-items-start justify-content-center">
+                        <div className="me-3">
                           <CampaignIcon />
                         </div>
-                        <div
-                          style={{
-                            marginLeft: "15px",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "center",
-                            alignItems: "flex-start",
-                          }}
-                        >
+                        <div className="ms-3 d-flex flex-column justify-content-center align-items-start">
                           <div>
                             <h5>Atque rerum nesciunt</h5>
                           </div>
                           <div>
-                            <p style={{ fontSize: "14px" }}>
+                            <p className="fs-6">
                               Quae dolorem earum veritatis oditseno
                             </p>
                           </div>
@@ -420,20 +282,14 @@ export default function MainLayout({
                         </div>
                       </div>
                     </MenuItem>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
+                    <div className="d-flex justify-content-center align-items-center">
                       <Link href={"/admin"}>Show all notifications</Link>
                     </div>
                   </Menu>
                 )}
-              </div>
-              <div
-                style={{ cursor: "pointer" }}
+              </span>
+              <span
+                className={styles.span}
                 onClick={() => setOpenMessenger(!openMessenger)}
               >
                 <div role="button" className="position-relative">
@@ -447,7 +303,7 @@ export default function MainLayout({
                     id="menu-appbar"
                     anchorOrigin={{
                       vertical: 20,
-                      horizontal: 1275,
+                      horizontal: 1220,
                     }}
                     open={Boolean(openMessenger)}
                     keepMounted
@@ -455,48 +311,14 @@ export default function MainLayout({
                       vertical: "top",
                       horizontal: "right",
                     }}
-                    style={{
-                      marginTop: "40px",
-                    }}
+                    className="mt-5"
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        padding: "10px 20px",
-                        gap: "10px",
-                      }}
-                    >
+                    <div className={styles.title_container}>
                       <p>You have 3 news messages</p>
-                      <button
-                        style={{
-                          marginBottom: "14px",
-                          border: "none",
-                          borderRadius: "12px",
-                          backgroundColor: "blue",
-                        }}
-                      >
-                        View All
-                      </button>
+                      <button className={styles.buttonViewAll}>View All</button>
                     </div>
-                    <MenuItem
-                      style={{
-                        height: "100px",
-                        width: "400px",
-                        display: "flex",
-                        justifyContent: "flex-start",
-                        borderTop: "1px solid #ccc",
-                      }}
-                    >
-                      <div
-                        style={{
-                          marginTop: "10px",
-                          display: "flex",
-                          alignItems: "flex-start",
-                          justifyContent: "center",
-                        }}
-                      >
+                    <MenuItem className={styles.menuItem_container}>
+                      <div className="d-flex mt-2 align-items-start justify-content-center">
                         <div>
                           <Image
                             src="/images/avatar.jpg"
@@ -506,20 +328,12 @@ export default function MainLayout({
                             style={{ borderRadius: "50%" }}
                           />
                         </div>
-                        <div
-                          style={{
-                            marginLeft: "15px",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "center",
-                            alignItems: "flex-start",
-                          }}
-                        >
+                        <div className="ms-3 d-flex flex-column justify-content-center align-items-start">
                           <div>
                             <h5>Hary Maxguire</h5>
                           </div>
                           <div>
-                            <p style={{ fontSize: "14px" }}>Hello everyone</p>
+                            <p className="fs-6">Hello everyone</p>
                           </div>
                           <div>
                             <p style={{ fontSize: "10px" }}>6 hours ago</p>
@@ -527,23 +341,8 @@ export default function MainLayout({
                         </div>
                       </div>
                     </MenuItem>
-                    <MenuItem
-                      style={{
-                        height: "100px",
-                        width: "400px",
-                        display: "flex",
-                        justifyContent: "flex-start",
-                        borderTop: "1px solid #ccc",
-                      }}
-                    >
-                      <div
-                        style={{
-                          marginTop: "10px",
-                          display: "flex",
-                          alignItems: "flex-start",
-                          justifyContent: "center",
-                        }}
-                      >
+                    <MenuItem className={styles.menuItem_container}>
+                      <div className="d-flex mt-2 align-items-start justify-content-center">
                         <div>
                           <Image
                             src="/images/avatar.jpg"
@@ -553,20 +352,12 @@ export default function MainLayout({
                             style={{ borderRadius: "50%" }}
                           />
                         </div>
-                        <div
-                          style={{
-                            marginLeft: "15px",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "center",
-                            alignItems: "flex-start",
-                          }}
-                        >
+                        <div className="ms-3 d-flex flex-column justify-content-center align-items-start">
                           <div>
                             <h5>Paul Pogba</h5>
                           </div>
                           <div>
-                            <p style={{ fontSize: "14px" }}>Hi everyone</p>
+                            <p className="fs-6">Hi everyone</p>
                           </div>
                           <div>
                             <p style={{ fontSize: "10px" }}>8 hours ago</p>
@@ -574,23 +365,8 @@ export default function MainLayout({
                         </div>
                       </div>
                     </MenuItem>
-                    <MenuItem
-                      style={{
-                        height: "100px",
-                        width: "400px",
-                        display: "flex",
-                        justifyContent: "flex-start",
-                        borderTop: "1px solid #ccc",
-                      }}
-                    >
-                      <div
-                        style={{
-                          marginTop: "10px",
-                          display: "flex",
-                          alignItems: "flex-start",
-                          justifyContent: "center",
-                        }}
-                      >
+                    <MenuItem className={styles.menuItem_container}>
+                      <div className="d-flex mt-2 align-items-start justify-content-center">
                         <div>
                           <Image
                             src="/images/avatar.jpg"
@@ -600,46 +376,27 @@ export default function MainLayout({
                             style={{ borderRadius: "50%" }}
                           />
                         </div>
-                        <div
-                          style={{
-                            marginLeft: "15px",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "center",
-                            alignItems: "flex-start",
-                          }}
-                        >
+                        <div className="ms-3 d-flex flex-column justify-content-center align-items-start">
                           <div>
                             <h5>Hary Kane</h5>
                           </div>
                           <div>
-                            <p style={{ fontSize: "14px" }}>Hello world</p>
+                            <p className="fs-6">Hello world</p>
                           </div>
                           <div>
-                            <p style={{ fontSize: "10px" }}>9 hours ago</p>
+                            <p style={{ fontSize: "10px" }}>10 hours ago</p>
                           </div>
                         </div>
                       </div>
                     </MenuItem>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
+                    <div className="d-flex justify-content-center align-items-center">
                       <Link href={"/admin"}>Show all messages</Link>
                     </div>
                   </Menu>
                 )}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
-                  cursor: "pointer",
-                }}
+              </span>
+              <span
+                className={`d-flex align-items-center gap-1 ${styles.span}`}
                 onClick={() => setOpenDropdown(!openDropdown)}
               >
                 <Image
@@ -664,39 +421,28 @@ export default function MainLayout({
                       vertical: "top",
                       horizontal: "right",
                     }}
-                    style={{
-                      marginTop: "40px",
-                    }}
+                    className="mt-5"
                   >
                     <MenuItem
                       onClick={handleProfile}
-                      style={{
-                        height: "40px",
-                        width: "200px",
-                        display: "flex",
-                        justifyContent: "center",
-                      }}
+                      className="d-flex justify-content-center"
+                      style={{ height: "40px", width: "170px" }}
                     >
                       <div>Profile</div>
                     </MenuItem>
                     <MenuItem
                       onClick={handleLogout}
-                      style={{
-                        height: "40px",
-                        width: "200px",
-                        display: "flex",
-                        justifyContent: "center",
-                      }}
+                      className="d-flex justify-content-center"
+                      style={{ height: "40px", width: "170px" }}
                     >
                       Logout
                     </MenuItem>
                   </Menu>
                 )}
-              </div>
+              </span>
             </div>
           </div>
         </AppBar>
-
         <Drawer variant="permanent" open={open}>
           <DrawerHeader>
             <IconButton onClick={handleDrawerClose}>
@@ -811,7 +557,11 @@ export default function MainLayout({
           </List>
           <Divider />
         </Drawer>
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <Box
+          component="main"
+          sx={{ flexGrow: 1, p: 3 }}
+          style={{ backgroundColor: "white" }}
+        >
           <DrawerHeader />
           {children}
         </Box>

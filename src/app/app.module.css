@@ -1,0 +1,112 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 100px;
+}
+.container {
+  width: 500px;
+  height: 500px;
+  background-color: rgb(237, 121, 121);
+  padding: 40px;
+  border-radius: 16px;
+}
+
+.title_container {
+  display: flex;
+  justify-content: center;
+}
+.title {
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.form_container {
+  padding: 30px;
+}
+
+.inputs_container {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.label {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.input {
+  border-radius: 12px;
+  height: 50px;
+  padding: 5px 15px;
+  border: 1px solid #ccc;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.input::placeholder {
+  font-style: italic;
+}
+
+.forgot_password_container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 2px;
+}
+
+.forgot_password {
+  text-decoration: none;
+  font-style: italic;
+  color: rgb(0, 0, 255);
+}
+
+.button_container {
+  padding: 30px 0px 10px 0px;
+}
+
+.button {
+  width: 100%;
+  height: 50px;
+  border-radius: 12px;
+  background-color: blue;
+  font-size: 24px;
+  color: black;
+  font-weight: bold;
+  outline: none;
+}
+
+.button:hover {
+  font-size: 24px;
+  color: black;
+  font-weight: bold;
+  outline: none;
+}
+
+.text_last_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.text_last {
+  color: black;
+  font-size: 14px;
+}
+
+.signup_link {
+  text-decoration: none;
+  font-style: italic;
+  color: rgb(0, 0, 255);
+  margin-bottom: 15px;
+}

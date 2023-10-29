@@ -31,6 +31,7 @@ function UpdateModalCategory(props: Iprops) {
   const [dataCategory, setDataCategory] = useState({
     id: "",
     name: "",
+    slug: "",
     status: "",
     desc: "",
   });
@@ -40,6 +41,7 @@ function UpdateModalCategory(props: Iprops) {
       setDataCategory({
         id: category._id,
         name: category.name,
+        slug: category.slug,
         status: category.status,
         desc: category.desc,
       });
@@ -47,15 +49,12 @@ function UpdateModalCategory(props: Iprops) {
   }, [category]);
 
   const handleSubmitForm = async () => {
-    const { name, status, desc } = dataCategory;
-    if (!name || !status || !desc) {
-      toast.error("Please complete all information");
-      return;
-    }
+    const { name, slug, status, desc } = dataCategory;
     const { data } = await axios.put(
       `${process.env.BASE_URL}/category/${dataCategory.id}`,
       {
         name: name,
+        slug: slug,
         status: status,
         desc: desc,
       },
@@ -65,8 +64,12 @@ function UpdateModalCategory(props: Iprops) {
         },
       }
     );
+    if (data?.status === false) {
+      toast.error(data?.msg);
+      return;
+    }
     if (data?.status === true) {
-      toast.success("Updated category succeed !...");
+      toast.success(data?.msg);
       handleCloseModalCategory();
       mutate(`${process.env.BASE_URL}/category`);
     }
@@ -76,6 +79,7 @@ function UpdateModalCategory(props: Iprops) {
     setDataCategory({
       id: "",
       name: "",
+      slug: "",
       status: "",
       desc: "",
     });
@@ -99,10 +103,10 @@ function UpdateModalCategory(props: Iprops) {
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Name</Form.Label>
+              <Form.Label>Name*</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Nhập tên movie"
+                placeholder="Nhập tên category"
                 value={dataCategory.name}
                 onChange={(e) =>
                   setDataCategory((prevData) => ({
@@ -113,7 +117,21 @@ function UpdateModalCategory(props: Iprops) {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Status</Form.Label>
+              <Form.Label>Slug*</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Nhập slug"
+                value={dataCategory.slug}
+                onChange={(e) =>
+                  setDataCategory((prevData) => ({
+                    ...prevData,
+                    slug: e.target.value,
+                  }))
+                }
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Status*</Form.Label>
               <Form.Select
                 id="status"
                 placeholder="Chọn status"

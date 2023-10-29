@@ -33,7 +33,7 @@ export default function User() {
   }
   return (
     <>
-      <Box height={100}>
+      <Box height={100} width={1000}>
         <UserTable users={data?.allUsers ?? []} />
       </Box>
     </>

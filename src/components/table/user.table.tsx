@@ -35,8 +35,12 @@ const UserTable = (props: Iprops) => {
           },
         }
       );
+      if (data?.status === false) {
+        toast.warning(data?.msg);
+        return;
+      }
       if (data?.status === true) {
-        toast.success("Deleted user succeed !...");
+        toast.success(data?.msg);
         mutate(`${process.env.BASE_URL}/user`);
       }
     }
@@ -45,64 +49,71 @@ const UserTable = (props: Iprops) => {
   return (
     <>
       <div
-        className="mb-3 mt-5"
+        className="mb-3"
         style={{ display: "flex", justifyContent: "space-between" }}
       >
         <h2>User Table</h2>
       </div>
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Created at</th>
-            <th>Updated at</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users?.map((user, index) => (
-            <tr key={user._id}>
-              <td>{index + 1}</td>
-              <td>{user.username}</td>
-              <td>{user.email}</td>
-              <td>{user.phone}</td>
-              <td>{user.role}</td>
-              <td>{user.status}</td>
-              <td>{user.createdAt}</td>
-              <td>{user.updatedAt}</td>
-              <td style={{ display: "flex" }}>
-                <Link
-                  href={`/admin/user/${user._id}`}
-                  className="btn btn-primary"
-                >
-                  View
-                </Link>
-                <Button
-                  variant="warning"
-                  className="mx-3"
-                  onClick={() => {
-                    setUser(user);
-                    setShowModalUpdateUser(true);
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => handleDeleteUser(user._id)}
-                >
-                  Delete
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <div
+        className="container"
+        style={{ maxHeight: "520px", maxWidth: "1000px", overflow: "auto" }}
+      >
+        <div className="table-responsive">
+          <table className="table table-bordered table-hover">
+            <thead className="table-dark">
+              <tr>
+                <th>No.</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Created at</th>
+                <th>Updated at</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users?.map((user, index) => (
+                <tr key={user._id}>
+                  <td>{index + 1}</td>
+                  <td>{user.username}</td>
+                  <td>{user.email}</td>
+                  <td>{user.phone}</td>
+                  <td>{user.role}</td>
+                  <td>{user.status}</td>
+                  <td>{user.createdAt}</td>
+                  <td>{user.updatedAt}</td>
+                  <td style={{ display: "flex" }}>
+                    <Link
+                      href={`/admin/user/${user._id}`}
+                      className="btn btn-primary"
+                    >
+                      View
+                    </Link>
+                    <Button
+                      variant="warning"
+                      className="mx-3"
+                      onClick={() => {
+                        setUser(user);
+                        setShowModalUpdateUser(true);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={() => handleDeleteUser(user._id)}
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
       <UpdateModalUser
         showModalUpdateUser={showModalUpdateUser}
         setShowModalUpdateUser={setShowModalUpdateUser}

@@ -38,8 +38,12 @@ const MovieTable = (props: Iprops) => {
           },
         }
       );
+      if (data?.status === false) {
+        toast.warning(data?.msg);
+        return;
+      }
       if (data?.status === true) {
-        toast.success("Deleted movie succeed !...");
+        toast.success(data?.msg);
         mutate(`${process.env.BASE_URL}/movie`);
       }
     }
@@ -76,7 +80,7 @@ const MovieTable = (props: Iprops) => {
   return (
     <>
       <div
-        className="mb-3 mt-5"
+        className="mb-3"
         style={{ display: "flex", justifyContent: "space-between" }}
       >
         <h2>Movie Table</h2>
@@ -87,60 +91,70 @@ const MovieTable = (props: Iprops) => {
           Create movie
         </Button>
       </div>
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>Name</th>
-            <th>Slug</th>
-            <th>Category</th>
-            <th>Link</th>
-            <th>Status</th>
-            <th>Description</th>
-            <th>Author</th>
-            <th>Created at</th>
-            <th>Updated at</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {movies?.map((movie, index) => (
-            <tr key={movie._id}>
-              <td>{index + 1}</td>
-              <td>{movie.name}</td>
-              <td>{movie.slug}</td>
-              <td>{movie.category}</td>
-              <td>{movie.link}</td>
-              <td>{movie.status}</td>
-              <td>{movie.desc}</td>
-              <td>{author[movie.author]}</td>
-              <td>{movie.createdAt}</td>
-              <td>{movie.updatedAt}</td>
-              <td style={{ display: "flex" }}>
-                <Link href={`movie/${movie._id}`} className="btn btn-primary">
-                  View
-                </Link>
-                <Button
-                  variant="warning"
-                  className="mx-3"
-                  onClick={() => {
-                    setMovie(movie);
-                    setShowModalUpdateMovie(true);
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => handleDeleteMovie(movie._id)}
-                >
-                  Delete
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <div
+        className="container"
+        style={{ maxHeight: "520px", maxWidth: "1000px", overflow:"auto" }}
+      >
+        <div className="table-responsive">
+          <table className="table table-bordered table-hover">
+            <thead className="table-dark">
+              <tr>
+                <th>No.</th>
+                <th>Name</th>
+                <th>Slug</th>
+                <th>Category</th>
+                <th>Link</th>
+                <th>Status</th>
+                <th>Description</th>
+                <th>Author</th>
+                <th>Created at</th>
+                <th>Updated at</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {movies?.map((movie, index) => (
+                <tr key={movie._id}>
+                  <td>{index + 1}</td>
+                  <td>{movie.name}</td>
+                  <td>{movie.slug}</td>
+                  <td>{movie.category}</td>
+                  <td>{movie.link}</td>
+                  <td>{movie.status}</td>
+                  <td>{movie.desc}</td>
+                  <td>{author[movie.author]}</td>
+                  <td>{movie.createdAt}</td>
+                  <td>{movie.updatedAt}</td>
+                  <td style={{ display: "flex" }}>
+                    <Link
+                      href={`movie/${movie._id}`}
+                      className="btn btn-primary"
+                    >
+                      View
+                    </Link>
+                    <Button
+                      variant="warning"
+                      className="mx-3"
+                      onClick={() => {
+                        setMovie(movie);
+                        setShowModalUpdateMovie(true);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={() => handleDeleteMovie(movie._id)}
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
       <CreateModalMovie
         showModalCreateMovie={showModalCreateMovie}
         setShowModalCreateMovie={setShowModalCreateMovie}
