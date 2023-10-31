@@ -1,29 +1,41 @@
 "use client";
 import { Button } from "react-bootstrap";
-import Table from "react-bootstrap/Table";
 import Link from "next/link";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { mutate } from "swr";
+import DataTable, { TableColumn } from "react-data-table-component";
 import UpdateModalUser from "../updateModal/updateUser.modal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import styles from "../../app/admin/user/user.module.css";
 
 interface Iprops {
+  loading: boolean;
+  setLoading: (value: boolean | any) => void;
   users: IUser[];
+  currentPage: number;
+  setCurrentPage: (value: number | any) => void;
+  itemsPerPage: number;
+  setItemsPerPage: (value: number | any) => void;
+  setSorts: (value: {} | any) => void;
 }
 
 const UserTable = (props: Iprops) => {
-  const { users } = props;
+  const {
+    loading,
+    setLoading,
+    users,
+    currentPage,
+    setCurrentPage,
+    itemsPerPage,
+    setItemsPerPage,
+    setSorts,
+  } = props;
   const currentUserString = localStorage.getItem("currentUser");
   let token: string | null = null;
   if (currentUserString !== null) {
     const currentUser = JSON.parse(currentUserString);
     token = currentUser?.token;
   }
-
-  const [showModalUpdateUser, setShowModalUpdateUser] =
-    useState<boolean>(false);
-  const [user, setUser] = useState<IUser | null>(null);
 
   const handleDeleteUser = async (id: string) => {
     if (window.confirm("Are you sure want to delete this user? ")) {
@@ -41,10 +53,153 @@ const UserTable = (props: Iprops) => {
       }
       if (data?.status === true) {
         toast.success(data?.msg);
-        mutate(`${process.env.BASE_URL}/user`);
+        const res = await axios.get(
+          `${process.env.BASE_URL}/user?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setRecords(res?.data?.data);
+        setAllRows(res.data?.totalUsers);
       }
     }
   };
+
+  const [allRows, setAllRows] = useState(0);
+  useEffect(() => {
+    const fetchTotalRows = async () => {
+      const { data } = await axios.get(`${process.env.BASE_URL}/user`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const allRows = data?.data.length;
+      setAllRows(allRows);
+    };
+    fetchTotalRows();
+  }, [token]);
+
+  const startIndex: number = (currentPage - 1) * itemsPerPage + 1;
+
+  const columns: TableColumn<IUser>[] = [
+    {
+      name: "No.",
+      cell: (row: IUser, rowIndex: number): JSX.Element => (
+        <div className={styles.custom}>{startIndex + rowIndex}</div>
+      ),
+      sortable: true,
+    },
+    {
+      name: "username",
+      sortable: true,
+      cell: (row: IUser) => <div className={styles.custom}>{row.username}</div>,
+    },
+    {
+      name: "email",
+      sortable: true,
+      cell: (row: IUser) => <div className={styles.custom}>{row.email}</div>,
+    },
+    {
+      name: "phone",
+      sortable: true,
+      cell: (row: IUser) => <div className={styles.custom}>{row.phone}</div>,
+    },
+    {
+      name: "role",
+      sortable: true,
+      cell: (row: IUser) => <div className={styles.custom}>{row.role}</div>,
+    },
+    {
+      name: "status",
+      selector: (row: IUser) => row.status,
+      sortable: true,
+      cell: (row: IUser) => <div className={styles.custom}>{row.status}</div>,
+    },
+    {
+      name: "createdAt",
+      sortable: true,
+      cell: (row: IUser) => (
+        <div className={styles.custom}>{row.createdAt}</div>
+      ),
+    },
+    {
+      name: "updatedAt",
+      sortable: true,
+      cell: (row: IUser) => (
+        <div className={styles.custom}>{row.updatedAt}</div>
+      ),
+    },
+    {
+      name: "Actions",
+      minWidth: "250px",
+      cell: (row: IUser): JSX.Element => (
+        <div className="d-flex">
+          <Link href={`user/${row._id}`}>
+            <Button variant="primary" className="mx-1">
+              View
+            </Button>
+          </Link>
+          <Button
+            variant="warning"
+            className="mx-1"
+            onClick={() => {
+              setUser(row);
+              setShowModalUpdateUser(true);
+            }}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="danger"
+            className="mx-1"
+            onClick={() => handleDeleteUser(row._id)}
+          >
+            Delete
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  const handlePerRowsChange = async (perPage: number, page: number) => {
+    setLoading(true);
+    setItemsPerPage(perPage);
+    setLoading(false);
+  };
+
+  const handlePageChange = (page: number): void => {
+    setCurrentPage(page);
+  };
+
+  const [records, setRecords] = useState<IUser[]>(users);
+  useEffect(() => {
+    if (users.length) setRecords(users);
+  }, [users]);
+  const [keyWordSearch, setKeyWordSearch] = useState("");
+  const handleSearch = async () => {
+    // const newData: IUser[] = users.filter((row) => {
+    //   return row.name.toLowerCase().includes(e.target.value.toLowerCase());
+    // });
+    const { data } = await axios.get(
+      `${process.env.BASE_URL}/user?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    setRecords(data?.data);
+  };
+
+  const handleSort = async (column: TableColumn<IUser>, sortOrder: string) => {
+    setSorts(`sort[${column.name}]=${sortOrder}`);
+  };
+
+  const [showModalUpdateUser, setShowModalUpdateUser] =
+    useState<boolean>(false);
+  const [user, setUser] = useState<IUser | null>(null);
 
   return (
     <>
@@ -54,64 +209,37 @@ const UserTable = (props: Iprops) => {
       >
         <h2>User Table</h2>
       </div>
-      <div
-        className="container"
-        style={{ maxHeight: "520px", maxWidth: "1000px", overflow: "auto" }}
-      >
+      <div className={styles.search_container}>
+        <input
+          className={styles.search_input}
+          placeholder="Search here..."
+          type="text"
+          value={keyWordSearch}
+          onChange={(e) => {
+            setKeyWordSearch(e.target.value);
+            handleSearch();
+          }}
+        />
+      </div>
+      <div className={`container ${styles.container_table}`}>
         <div className="table-responsive">
-          <table className="table table-bordered table-hover">
-            <thead className="table-dark">
-              <tr>
-                <th>No.</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Created at</th>
-                <th>Updated at</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users?.map((user, index) => (
-                <tr key={user._id}>
-                  <td>{index + 1}</td>
-                  <td>{user.username}</td>
-                  <td>{user.email}</td>
-                  <td>{user.phone}</td>
-                  <td>{user.role}</td>
-                  <td>{user.status}</td>
-                  <td>{user.createdAt}</td>
-                  <td>{user.updatedAt}</td>
-                  <td style={{ display: "flex" }}>
-                    <Link
-                      href={`/admin/user/${user._id}`}
-                      className="btn btn-primary"
-                    >
-                      View
-                    </Link>
-                    <Button
-                      variant="warning"
-                      className="mx-3"
-                      onClick={() => {
-                        setUser(user);
-                        setShowModalUpdateUser(true);
-                      }}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="danger"
-                      onClick={() => handleDeleteUser(user._id)}
-                    >
-                      Delete
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <DataTable
+            columns={columns}
+            data={records}
+            progressPending={loading}
+            selectableRows
+            fixedHeader
+            fixedHeaderScrollHeight="450px"
+            pagination
+            paginationPerPage={itemsPerPage}
+            onChangeRowsPerPage={handlePerRowsChange}
+            paginationTotalRows={allRows}
+            paginationServer={true}
+            onChangePage={handlePageChange}
+            onSort={(column, sortOrder) => {
+              handleSort(column, sortOrder);
+            }}
+          />
         </div>
       </div>
       <UpdateModalUser
@@ -119,6 +247,10 @@ const UserTable = (props: Iprops) => {
         setShowModalUpdateUser={setShowModalUpdateUser}
         user={user}
         setUser={setUser}
+        setRecords={setRecords}
+        currentPage={currentPage}
+        itemsPerPage={itemsPerPage}
+        setAllRows={setAllRows}
       />
     </>
   );

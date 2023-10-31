@@ -5,11 +5,14 @@ import Modal from "react-bootstrap/Modal";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { mutate } from "swr";
 
 interface Iprops {
   showModalCreateMovie: boolean;
   setShowModalCreateMovie: (value: boolean) => void;
+  setRecords: (value: IMovie[]) => void;
+  currentPage: number;
+  itemsPerPage: number;
+  setAllRows: (value: number | any) => void;
 }
 
 function CreateModalMovie(props: Iprops) {
@@ -20,7 +23,15 @@ function CreateModalMovie(props: Iprops) {
     token = currentUser?.token;
   }
 
-  const { showModalCreateMovie, setShowModalCreateMovie } = props;
+  const {
+    showModalCreateMovie,
+    setShowModalCreateMovie,
+    setRecords,
+    currentPage,
+    itemsPerPage,
+    setAllRows,
+  } = props;
+
   const [dataMovie, setDataMovie] = useState<IMovie | any>({
     name: "",
     slug: "",
@@ -72,7 +83,12 @@ function CreateModalMovie(props: Iprops) {
     if (data?.status === true) {
       toast.success(data?.msg);
       handleCloseModalMovie();
-      mutate(`${process.env.BASE_URL}/movie`);
+      const res = await axios.get(
+        `${process.env.BASE_URL}/movie?page=${currentPage}&limit=${itemsPerPage}`
+      );
+      setRecords(res.data?.data);
+      const allRows = res?.data?.totalMovies;
+      setAllRows(allRows);
     }
   };
 

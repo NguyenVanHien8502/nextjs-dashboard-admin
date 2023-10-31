@@ -36,21 +36,21 @@ export default function Admin() {
           Authorization: `Bearer ${token}`,
         },
       });
-      const totalUser = data?.allUsers?.length;
+      const totalUser = data?.data.length;
       setTotalUser(totalUser);
     };
     fetchAllUser();
 
     const fetchAllMovie = async () => {
       const { data } = await axios.get(`${process.env.BASE_URL}/movie`);
-      const totalMovie = data?.length;
+      const totalMovie = data?.data.length;
       setTotalMovie(totalMovie);
     };
     fetchAllMovie();
 
     const fetchAllCategory = async () => {
       const { data } = await axios.get(`${process.env.BASE_URL}/category`);
-      const totalCategory = data.data?.length;
+      const totalCategory = data?.data.length;
       setTotalCategory(totalCategory);
     };
     fetchAllCategory();
@@ -59,7 +59,6 @@ export default function Admin() {
     <>
       <title>Home Admin Page</title>
       <h1>Dashboard Admin</h1>
-      <h4>add sort by category, name; fillter by name, datatable sort and fillter fe</h4>
       <div className="d-flex justify-content-between align-items-center gap-3 mt-5">
         <div className="d-flex flex-grow-1 bg-custom-light p-3 roudned-3 gap-3 shadow">
           <div>

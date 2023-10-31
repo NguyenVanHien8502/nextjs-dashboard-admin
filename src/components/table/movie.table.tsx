@@ -1,32 +1,42 @@
 "use client";
 import { Button } from "react-bootstrap";
-import Table from "react-bootstrap/Table";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { mutate } from "swr";
 import CreateModalMovie from "../createModal/createMovie.modal";
 import UpdateModalMovie from "../updateModal/updateMovie.modal";
+import DataTable, { TableColumn } from "react-data-table-component";
+import styles from "../../app/admin/movie/movie.module.css";
 
 interface Iprops {
+  loading: boolean;
+  setLoading: (value: boolean | any) => void;
   movies: IMovie[];
+  currentPage: number;
+  setCurrentPage: (value: number | any) => void;
+  itemsPerPage: number;
+  setItemsPerPage: (value: number | any) => void;
+  setSorts: (value: {} | any) => void;
 }
 
 const MovieTable = (props: Iprops) => {
-  const { movies } = props;
+  const {
+    loading,
+    setLoading,
+    movies,
+    currentPage,
+    setCurrentPage,
+    itemsPerPage,
+    setItemsPerPage,
+    setSorts,
+  } = props;
   const currentUserString = localStorage.getItem("currentUser");
   let token: string | null = null;
   if (currentUserString !== null) {
     const currentUser = JSON.parse(currentUserString);
     token = currentUser?.token;
   }
-
-  const [movie, setMovie] = useState<IMovie | null>(null);
-  const [showModalCreateMovie, setShowModalCreateMovie] =
-    useState<boolean>(false);
-  const [showModalUpdateMovie, setShowModalUpdateMovie] =
-    useState<boolean>(false);
 
   const handleDeleteMovie = async (id: string) => {
     if (window.confirm("Are you sure want to delete this movie? ")) {
@@ -44,10 +54,156 @@ const MovieTable = (props: Iprops) => {
       }
       if (data?.status === true) {
         toast.success(data?.msg);
-        mutate(`${process.env.BASE_URL}/movie`);
+        const res = await axios.get(
+          `${process.env.BASE_URL}/movie?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`
+        );
+        setRecords(res?.data?.data);
+        setAllRows(res.data?.totalCategories);
       }
     }
   };
+
+  const [allRows, setAllRows] = useState(0);
+  useEffect(() => {
+    const fetchTotalRows = async () => {
+      const { data } = await axios.get(`${process.env.BASE_URL}/movie`);
+      const allRows = data?.data.length;
+      setAllRows(allRows);
+    };
+    fetchTotalRows();
+  }, []);
+
+  const startIndex: number = (currentPage - 1) * itemsPerPage + 1;
+
+  const columns: TableColumn<IMovie>[] = [
+    {
+      name: "No.",
+      cell: (row: IMovie, rowIndex: number): JSX.Element => (
+        <div className={styles.custom}>{startIndex + rowIndex}</div>
+      ),
+      sortable: true,
+      maxWidth: "20px",
+    },
+    {
+      name: "name",
+      sortable: true,
+      cell: (row: IMovie) => <div className={styles.custom}>{row.name}</div>,
+    },
+    {
+      name: "slug",
+      sortable: true,
+      cell: (row: IMovie) => <div className={styles.custom}>{row.slug}</div>,
+    },
+    {
+      name: "category",
+      sortable: true,
+      cell: (row: IMovie) => (
+        <div className={styles.custom}>{row.category}</div>
+      ),
+    },
+    {
+      name: "link",
+      sortable: true,
+      cell: (row: IMovie) => (
+        <div className={styles.custom_link}>{row.link}</div>
+      ),
+    },
+    {
+      name: "status",
+      sortable: true,
+      cell: (row: IMovie) => <div className={styles.custom}>{row.status}</div>,
+    },
+    {
+      name: "desc",
+      sortable: true,
+      cell: (row: IMovie) => <div className={styles.custom}>{row.desc}</div>,
+    },
+    {
+      name: "author",
+      sortable: true,
+      cell: (row: IMovie) => (
+        <div className={styles.custom}>{author[row.author]}</div>
+      ),
+    },
+    {
+      name: "createdAt",
+      sortable: true,
+      cell: (row: IMovie) => (
+        <div className={styles.custom}>{row.createdAt}</div>
+      ),
+    },
+    {
+      name: "updatedAt",
+      sortable: true,
+      cell: (row: IMovie) => (
+        <div className={styles.custom}>{row.updatedAt}</div>
+      ),
+    },
+    {
+      name: "Actions",
+      minWidth: "250px",
+      cell: (row: IMovie): JSX.Element => (
+        <div className="d-flex">
+          <Link href={`movie/${row._id}`}>
+            <Button variant="primary" className="mx-1">
+              View
+            </Button>
+          </Link>
+          <Button
+            variant="warning"
+            className="mx-1"
+            onClick={() => {
+              setMovie(row);
+              setShowModalUpdateMovie(true);
+            }}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="danger"
+            className="mx-1"
+            onClick={() => handleDeleteMovie(row._id)}
+          >
+            Delete
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  const handlePerRowsChange = async (perPage: number, page: number) => {
+    setLoading(true);
+    setItemsPerPage(perPage);
+    setLoading(false);
+  };
+
+  const handlePageChange = (page: number): void => {
+    setCurrentPage(page);
+  };
+
+  const [records, setRecords] = useState<IMovie[]>(movies);
+  useEffect(() => {
+    if (movies.length) setRecords(movies);
+  }, [movies]);
+  const [keyWordSearch, setKeyWordSearch] = useState("");
+  const handleSearch = async () => {
+    const { data } = await axios.get(
+      `${process.env.BASE_URL}/movie?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`
+    );
+    setRecords(data?.data);
+  };
+
+  const handleSort = async (column: TableColumn<IMovie>, sortOrder: string) => {
+    console.log(column.name, sortOrder);
+
+    setSorts(`sort[${column.name}]=${sortOrder}`);
+  };
+
+  const [movie, setMovie] = useState<IMovie | null>(null);
+  const [showModalCreateMovie, setShowModalCreateMovie] =
+    useState<boolean>(false);
+  const [showModalUpdateMovie, setShowModalUpdateMovie] =
+    useState<boolean>(false);
 
   //fetchAuthor for each authorId
   const [author, setAuthor] = useState<IUser | any>({});
@@ -91,79 +247,56 @@ const MovieTable = (props: Iprops) => {
           Create movie
         </Button>
       </div>
-      <div
-        className="container"
-        style={{ maxHeight: "520px", maxWidth: "1000px", overflow:"auto" }}
-      >
+      <div className={styles.search_container}>
+        <input
+          className={styles.search_input}
+          placeholder="Search here..."
+          type="text"
+          value={keyWordSearch}
+          onChange={(e) => {
+            setKeyWordSearch(e.target.value);
+            handleSearch();
+          }}
+        />
+      </div>
+      <div className={`container ${styles.container_table}`}>
         <div className="table-responsive">
-          <table className="table table-bordered table-hover">
-            <thead className="table-dark">
-              <tr>
-                <th>No.</th>
-                <th>Name</th>
-                <th>Slug</th>
-                <th>Category</th>
-                <th>Link</th>
-                <th>Status</th>
-                <th>Description</th>
-                <th>Author</th>
-                <th>Created at</th>
-                <th>Updated at</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {movies?.map((movie, index) => (
-                <tr key={movie._id}>
-                  <td>{index + 1}</td>
-                  <td>{movie.name}</td>
-                  <td>{movie.slug}</td>
-                  <td>{movie.category}</td>
-                  <td>{movie.link}</td>
-                  <td>{movie.status}</td>
-                  <td>{movie.desc}</td>
-                  <td>{author[movie.author]}</td>
-                  <td>{movie.createdAt}</td>
-                  <td>{movie.updatedAt}</td>
-                  <td style={{ display: "flex" }}>
-                    <Link
-                      href={`movie/${movie._id}`}
-                      className="btn btn-primary"
-                    >
-                      View
-                    </Link>
-                    <Button
-                      variant="warning"
-                      className="mx-3"
-                      onClick={() => {
-                        setMovie(movie);
-                        setShowModalUpdateMovie(true);
-                      }}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="danger"
-                      onClick={() => handleDeleteMovie(movie._id)}
-                    >
-                      Delete
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <DataTable
+            columns={columns}
+            data={records}
+            progressPending={loading}
+            selectableRows
+            fixedHeader
+            fixedHeaderScrollHeight="450px"
+            pagination
+            paginationPerPage={itemsPerPage}
+            onChangeRowsPerPage={handlePerRowsChange}
+            paginationTotalRows={allRows}
+            paginationServer={true}
+            onChangePage={handlePageChange}
+            onSort={(column, sortOrder) => {
+              handleSort(column, sortOrder);
+            }}
+          />
         </div>
       </div>
       <CreateModalMovie
         showModalCreateMovie={showModalCreateMovie}
         setShowModalCreateMovie={setShowModalCreateMovie}
+        setRecords={setRecords}
+        currentPage={currentPage}
+        itemsPerPage={itemsPerPage}
+        setAllRows={setAllRows}
       />
       <UpdateModalMovie
         showModalUpdateMovie={showModalUpdateMovie}
         setShowModalUpdateMovie={setShowModalUpdateMovie}
         movie={movie}
         setMovie={setMovie}
+        setRecords={setRecords}
+        currentPage={currentPage}
+        itemsPerPage={itemsPerPage}
+        setAllRows={setAllRows}
       />
     </>
   );

@@ -5,14 +5,16 @@ import Modal from "react-bootstrap/Modal";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { mutate } from "swr";
-import validator from "validator";
 
 interface Iprops {
   showModalUpdateUser: boolean;
   setShowModalUpdateUser: (value: boolean) => void;
   user: IUser | null;
   setUser: (value: IUser | null) => void;
+  setRecords: (value: IUser[]) => void;
+  currentPage: number;
+  itemsPerPage: number;
+  setAllRows: (value: number | any) => void;
 }
 
 function UpdateModalUser(props: Iprops) {
@@ -23,11 +25,16 @@ function UpdateModalUser(props: Iprops) {
     token = currentUser?.token;
   }
 
-  const validatePhoneNumber = (phoneNumber: string) => {
-    return validator.isMobilePhone(phoneNumber);
-  };
-
-  const { showModalUpdateUser, setShowModalUpdateUser, user, setUser } = props;
+  const {
+    showModalUpdateUser,
+    setShowModalUpdateUser,
+    user,
+    setUser,
+    setRecords,
+    currentPage,
+    itemsPerPage,
+    setAllRows,
+  } = props;
   const [dataUser, setDataUser] = useState({
     id: "",
     username: "",
@@ -71,7 +78,17 @@ function UpdateModalUser(props: Iprops) {
     if (data?.status === true) {
       toast.success(data?.msg);
       handleCloseModalUser();
-      mutate(`${process.env.BASE_URL}/user`);
+      const res = await axios.get(
+        `${process.env.BASE_URL}/user?page=${currentPage}&limit=${itemsPerPage}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setRecords(res.data?.data);
+      const allRows = res.data?.totalUsers;
+      setAllRows(allRows);
     }
   };
 

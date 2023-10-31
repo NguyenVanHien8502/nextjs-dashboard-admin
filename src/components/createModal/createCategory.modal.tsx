@@ -5,11 +5,14 @@ import Modal from "react-bootstrap/Modal";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { mutate } from "swr";
 
 interface Iprops {
   showModalCreateCategory: boolean;
   setShowModalCreateCategory: (value: boolean) => void;
+  setRecords: (value: ICategory[]) => void;
+  currentPage: number;
+  itemsPerPage: number;
+  setAllRows: (value: number | any) => void;
 }
 
 function CreateModalCategory(props: Iprops) {
@@ -20,7 +23,14 @@ function CreateModalCategory(props: Iprops) {
     token = currentUser?.token;
   }
 
-  const { showModalCreateCategory, setShowModalCreateCategory } = props;
+  const {
+    showModalCreateCategory,
+    setShowModalCreateCategory,
+    setRecords,
+    currentPage,
+    itemsPerPage,
+    setAllRows,
+  } = props;
 
   const [dataCategory, setDataCategory] = useState({
     name: "",
@@ -53,7 +63,12 @@ function CreateModalCategory(props: Iprops) {
     if (data?.status === true) {
       toast.success(data?.msg);
       handleCloseModalCategory();
-      mutate(`${process.env.BASE_URL}/category`);
+      const res = await axios.get(
+        `${process.env.BASE_URL}/category?page=${currentPage}&limit=${itemsPerPage}`
+      );
+      setRecords(res.data?.data);
+      const allRows = res?.data?.totalCategories;
+      setAllRows(allRows);
     }
   };
 

@@ -1,8 +1,8 @@
 "use client";
 import UserTable from "@/components/table/user.table";
 import Box from "@mui/material/Box";
-import useSWR from "swr";
 import axios from "axios";
+import { useEffect, useState } from "react";
 
 export default function User() {
   const currentUserString = localStorage.getItem("currentUser");
@@ -11,30 +11,43 @@ export default function User() {
     const currentUser = JSON.parse(currentUserString);
     token = currentUser?.token;
   }
-  const fetcher = (url: string) =>
-    axios
-      .get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => res.data);
-  const { data, error, isLoading } = useSWR(
-    `${process.env.BASE_URL}/user`,
-    fetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
-  );
-  if (isLoading) {
-    return <h1>Loading...</h1>;
-  }
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const [sorts, setSorts] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      const { data } = await axios.get(
+        `${process.env.BASE_URL}/user?${sorts}&page=${currentPage}&limit=${itemsPerPage}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUsers(data?.data);
+      setLoading(false);
+    };
+    fetchUsers();
+  }, [sorts, currentPage, itemsPerPage, token]);
+
   return (
     <>
       <Box height={100} width={1000}>
-        <UserTable users={data?.allUsers ?? []} />
+        <UserTable
+          loading={loading}
+          setLoading={setLoading}
+          users={users ?? []}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          itemsPerPage={itemsPerPage}
+          setItemsPerPage={setItemsPerPage}
+          setSorts={setSorts}
+        />
       </Box>
     </>
   );

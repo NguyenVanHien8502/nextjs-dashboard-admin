@@ -5,13 +5,16 @@ import Modal from "react-bootstrap/Modal";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { mutate } from "swr";
 
 interface Iprops {
   showModalUpdateMovie: boolean;
   setShowModalUpdateMovie: (value: boolean) => void;
   movie: IMovie | null;
   setMovie: (value: IMovie | null) => void;
+  setRecords: (value: IMovie[]) => void;
+  currentPage: number;
+  itemsPerPage: number;
+  setAllRows: (value: number | any) => void;
 }
 
 function UpdateModalMovie(props: Iprops) {
@@ -21,8 +24,16 @@ function UpdateModalMovie(props: Iprops) {
     const currentUser = JSON.parse(currentUserString);
     token = currentUser?.token;
   }
-  const { showModalUpdateMovie, setShowModalUpdateMovie, movie, setMovie } =
-    props;
+  const {
+    showModalUpdateMovie,
+    setShowModalUpdateMovie,
+    movie,
+    setMovie,
+    setRecords,
+    currentPage,
+    itemsPerPage,
+    setAllRows,
+  } = props;
 
   //fetch all category
   const [categories, setCategories] = useState<ICategory | any>([]);
@@ -90,7 +101,12 @@ function UpdateModalMovie(props: Iprops) {
     if (data?.status === true) {
       toast.success(data?.msg);
       handleCloseModalMovie();
-      mutate(`${process.env.BASE_URL}/movie`);
+      const res = await axios.get(
+        `${process.env.BASE_URL}/movie?page=${currentPage}&limit=${itemsPerPage}`
+      );
+      setRecords(res.data?.data);
+      const allRows = res.data?.totalMovies;
+      setAllRows(allRows);
     }
   };
 

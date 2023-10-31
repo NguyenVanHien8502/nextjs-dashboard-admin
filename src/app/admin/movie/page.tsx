@@ -2,27 +2,39 @@
 import MovieTable from "@/components/table/movie.table";
 import Box from "@mui/material/Box";
 import axios from "axios";
-import useSWR from "swr";
+import { useEffect, useState } from "react";
 
 export default function Movie() {
-  const fetcher = (url: string) => axios.get(url).then((res) => res.data);
-  const { data, error, isLoading } = useSWR(
-    `${process.env.BASE_URL}/movie`,
-    fetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
-  );
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const [sorts, setSorts] = useState({});
+  const [loading, setLoading] = useState(false);
 
-  if (isLoading) {
-    return <h1>Loading...</h1>;
-  }
+  const [movies, setMovies] = useState([]);
+  useEffect(() => {
+    const fetchMovies = async () => {
+      setLoading(true);
+      const { data } = await axios.get(
+        `${process.env.BASE_URL}/movie?${sorts}&page=${currentPage}&limit=${itemsPerPage}`
+      );
+      setMovies(data?.data);
+      setLoading(false);
+    };
+    fetchMovies();
+  }, [sorts, currentPage, itemsPerPage]);
   return (
     <>
       <Box height={100} width={1000}>
-        <MovieTable movies={data ?? []} />
+        <MovieTable
+          loading={loading}
+          setLoading={setLoading}
+          movies={movies ?? []}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          itemsPerPage={itemsPerPage}
+          setItemsPerPage={setItemsPerPage}
+          setSorts={setSorts}
+        />
       </Box>
     </>
   );

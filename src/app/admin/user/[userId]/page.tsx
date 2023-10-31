@@ -49,6 +49,7 @@ const ViewUserDetail = ({ params }: { params: { userId: string } }) => {
           <Card.Text>Email: {data?.email}</Card.Text>
           <Card.Text>Phone Number: {data?.phone}</Card.Text>
           <Card.Text>Role: {data?.role}</Card.Text>
+          <Card.Text>Status: {data?.status}</Card.Text>
         </Card.Body>
         <Card.Footer className="text-muted">
           <Card.Text>CreatedAt: {data?.createdAt}</Card.Text>

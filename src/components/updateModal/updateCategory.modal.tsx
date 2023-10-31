@@ -5,13 +5,16 @@ import Modal from "react-bootstrap/Modal";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { mutate } from "swr";
 
 interface Iprops {
   showModalUpdateCategory: boolean;
   setShowModalUpdateCategory: (value: boolean) => void;
   category: ICategory | null;
   setCategory: (value: ICategory | null) => void;
+  setRecords: (value: ICategory[]) => void;
+  currentPage: number;
+  itemsPerPage: number;
+  setAllRows: (value: number | any) => void;
 }
 
 function UpdateModalCategory(props: Iprops) {
@@ -26,6 +29,10 @@ function UpdateModalCategory(props: Iprops) {
     setShowModalUpdateCategory,
     category,
     setCategory,
+    setRecords,
+    currentPage,
+    itemsPerPage,
+    setAllRows,
   } = props;
 
   const [dataCategory, setDataCategory] = useState({
@@ -71,7 +78,12 @@ function UpdateModalCategory(props: Iprops) {
     if (data?.status === true) {
       toast.success(data?.msg);
       handleCloseModalCategory();
-      mutate(`${process.env.BASE_URL}/category`);
+      const res = await axios.get(
+        `${process.env.BASE_URL}/category?page=${currentPage}&limit=${itemsPerPage}`
+      );
+      setRecords(res.data?.data);
+      const allRows = res.data?.totalCategories;
+      setAllRows(allRows);
     }
   };
 
