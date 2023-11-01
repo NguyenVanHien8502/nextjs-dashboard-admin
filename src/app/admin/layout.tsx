@@ -34,6 +34,7 @@ import CampaignIcon from "@mui/icons-material/Campaign";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SearchIcon from "@mui/icons-material/Search";
 import styles from "./admin.module.css";
+import { Popover } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -113,22 +114,68 @@ export default function MainLayout({
 }) {
   const router = useRouter();
   const theme = useTheme();
-  const [open, setOpen] = useState(true);
+  const [openDrawer, setOpenDrawer] = useState(true);
 
   const handleDrawerClose = () => {
-    setOpen(false);
+    setOpenDrawer(false);
   };
 
-  const [openDropdown, setOpenDropdown] = useState(false);
-  const handleProfile = () => {};
+  const [anchorElMenu, setAnchorElMenu] = useState<HTMLButtonElement | null>(
+    null
+  );
+  const openDropdown = Boolean(anchorElMenu);
+  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorElMenu(event.currentTarget);
+    event.stopPropagation(); // Ngăn chặn sự kiện click lan ra ngoài menu
+  };
+  const handleMenuClose = () => {
+    setAnchorElMenu(null);
+  };
+  const handleProfile = () => {
+    router.replace("/admin/profile");
+  };
   const handleLogout = () => {
     router.replace("/");
     localStorage.removeItem("currentUser");
     toast.success("You have successfully logouted");
   };
 
-  const [openNotification, setOpenNotification] = useState(false);
-  const [openMessenger, setOpenMessenger] = useState(false);
+  const [anchorElNotification, setAnchorElNotification] =
+    useState<HTMLButtonElement | null>(null);
+  const openNotification = Boolean(anchorElNotification);
+  const handleNotificationClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setAnchorElNotification(event.currentTarget);
+    event.stopPropagation(); // Ngăn chặn sự kiện click lan ra ngoài menu
+  };
+  const handleNotificationClose = () => {
+    setAnchorElNotification(null);
+  };
+
+  const [anchorElMessenger, setAnchorElMessenger] =
+    useState<HTMLButtonElement | null>(null);
+  const openMessenger = Boolean(anchorElMessenger);
+  const handleMessengerClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorElMessenger(event.currentTarget);
+    event.stopPropagation(); // Ngăn chặn sự kiện click lan ra ngoài menu
+  };
+  const handleMessengerClose = () => {
+    setAnchorElMessenger(null);
+  };
+
+  let fetchCurrentUser: string | null = null;
+  let currentUserName: string | null = null;
+  let currentUserEmail: string | null = null;
+  if (typeof localStorage !== "undefined") {
+    fetchCurrentUser = localStorage.getItem("currentUser");
+    if (fetchCurrentUser !== null) {
+      currentUserName = JSON.parse(fetchCurrentUser)?.username;
+      currentUserEmail = JSON.parse(fetchCurrentUser)?.email;
+    }
+  } else {
+    console.error("error: localStorage is undefined");
+  }
 
   return (
     <>
@@ -147,7 +194,7 @@ export default function MainLayout({
               <IconButton
                 color="inherit"
                 aria-label="open drawer"
-                onClick={() => setOpen(!open)}
+                onClick={() => setOpenDrawer(!openDrawer)}
                 edge="start"
               >
                 <MenuIcon />
@@ -173,10 +220,7 @@ export default function MainLayout({
                   <SearchIcon />
                 </span>
               </div>
-              <span
-                className={styles.span}
-                onClick={() => setOpenNotification(!openNotification)}
-              >
+              <span className={styles.span} onClick={handleNotificationClick}>
                 <div role="button" className="position-relative">
                   <NotificationsNoneSharpIcon className="fs-4" />
                   <span className="badge bg-primary rounded-circle p-1 position-absolute translate-middle">
@@ -185,15 +229,18 @@ export default function MainLayout({
                 </div>
                 {openNotification && (
                   <Menu
-                    id="menu-appbar"
+                    id="menu-appbar-notification"
                     anchorOrigin={{
-                      vertical: 20,
-                      horizontal: 1150,
+                      vertical: "bottom",
+                      horizontal: "center",
                     }}
-                    open={Boolean(openNotification)}
+                    open={openNotification}
+                    anchorEl={anchorElNotification}
+                    onBlur={handleNotificationClose}
+                    onClose={handleNotificationClose}
                     keepMounted
                     transformOrigin={{
-                      vertical: "top",
+                      vertical: "center",
                       horizontal: "right",
                     }}
                     className="mt-5"
@@ -288,10 +335,7 @@ export default function MainLayout({
                   </Menu>
                 )}
               </span>
-              <span
-                className={styles.span}
-                onClick={() => setOpenMessenger(!openMessenger)}
-              >
+              <span className={styles.span} onClick={handleMessengerClick}>
                 <div role="button" className="position-relative">
                   <MessageSharpIcon className="fs-4" />
                   <span className="badge bg-primary rounded-circle p-1 position-absolute translate-middle">
@@ -300,15 +344,18 @@ export default function MainLayout({
                 </div>
                 {openMessenger && (
                   <Menu
-                    id="menu-appbar"
+                    id="menu-appbar-messenger"
                     anchorOrigin={{
-                      vertical: 20,
-                      horizontal: 1220,
+                      vertical: "bottom",
+                      horizontal: "center",
                     }}
-                    open={Boolean(openMessenger)}
+                    open={openMessenger}
+                    anchorEl={anchorElMessenger}
+                    onBlur={handleMessengerClose}
+                    onClose={handleMessengerClose}
                     keepMounted
                     transformOrigin={{
-                      vertical: "top",
+                      vertical: "center",
                       horizontal: "right",
                     }}
                     className="mt-5"
@@ -396,8 +443,8 @@ export default function MainLayout({
                 )}
               </span>
               <span
-                className={`d-flex align-items-center gap-1 ${styles.span}`}
-                onClick={() => setOpenDropdown(!openDropdown)}
+                className={`d-flex align-items-center gap-3 ${styles.span}`}
+                onClick={handleMenuClick}
               >
                 <Image
                   src="/images/avatar.jpg"
@@ -406,20 +453,42 @@ export default function MainLayout({
                   width={35}
                   style={{ borderRadius: "50%" }}
                 />
-                <div>James Cameron</div>
-                <ArrowDropDownIcon />
+                <div
+                  style={{
+                    width: "150px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <div>{currentUserName}</div>
+                    <div>{currentUserEmail}</div>
+                  </div>
+                  <ArrowDropDownIcon />
+                </div>
                 {openDropdown && (
                   <Menu
-                    id="menu-appbar"
+                    id="menu-appbar-dropdown"
                     anchorOrigin={{
-                      vertical: "top",
-                      horizontal: "right",
+                      vertical: "bottom",
+                      horizontal: "center",
                     }}
-                    open={Boolean(openDropdown)}
+                    anchorEl={anchorElMenu} // Set anchorEl to the state value
+                    open={openDropdown}
+                    onBlur={handleMenuClose}
+                    onClose={handleMenuClose}
                     keepMounted
                     transformOrigin={{
-                      vertical: "top",
-                      horizontal: "right",
+                      vertical: "center",
+                      horizontal: "center",
                     }}
                     className="mt-5"
                   >
@@ -443,7 +512,7 @@ export default function MainLayout({
             </div>
           </div>
         </AppBar>
-        <Drawer variant="permanent" open={open}>
+        <Drawer variant="permanent" open={openDrawer}>
           <DrawerHeader>
             <IconButton onClick={handleDrawerClose}>
               {theme.direction === "rtl" ? (
@@ -464,14 +533,13 @@ export default function MainLayout({
             <ListItemButton
               sx={{
                 minHeight: 48,
-                justifyContent: open ? "initial" : "center",
+                justifyContent: openDrawer ? "initial" : "center",
                 px: 2.5,
               }}
             >
               <ListItemIcon
                 sx={{
-                  minWidth: 0,
-                  mr: open ? 3 : "auto",
+                  mr: openDrawer ? 3 : "auto",
                   justifyContent: "center",
                 }}
               >
@@ -482,22 +550,18 @@ export default function MainLayout({
           </ListItem>
           <Divider />
           <List>
-            <ListItem
-              disablePadding
-              sx={{ display: "block" }}
-              onClick={() => router.replace("/admin/user")}
-            >
+            <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton
+                onClick={() => router.replace("/admin/user")}
                 sx={{
                   minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
+                  justifyContent: openDrawer ? "initial" : "center",
                   px: 2.5,
                 }}
               >
                 <ListItemIcon
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
+                    mr: openDrawer ? 3 : "auto",
                     justifyContent: "center",
                   }}
                 >
@@ -514,14 +578,13 @@ export default function MainLayout({
               <ListItemButton
                 sx={{
                   minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
+                  justifyContent: openDrawer ? "initial" : "center",
                   px: 2.5,
                 }}
               >
                 <ListItemIcon
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
+                    mr: openDrawer ? 3 : "auto",
                     justifyContent: "center",
                   }}
                 >
@@ -538,14 +601,13 @@ export default function MainLayout({
               <ListItemButton
                 sx={{
                   minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
+                  justifyContent: openDrawer ? "initial" : "center",
                   px: 2.5,
                 }}
               >
                 <ListItemIcon
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
+                    mr: openDrawer ? 3 : "auto",
                     justifyContent: "center",
                   }}
                 >

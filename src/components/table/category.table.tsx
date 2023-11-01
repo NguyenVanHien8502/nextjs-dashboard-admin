@@ -31,11 +31,15 @@ const CategoryTable = (props: Iprops) => {
     setItemsPerPage,
     setSorts,
   } = props;
-  const currentUserString = localStorage.getItem("currentUser");
   let token: string | null = null;
-  if (currentUserString !== null) {
-    const currentUser = JSON.parse(currentUserString);
-    token = currentUser?.token;
+  if (typeof localStorage !== undefined) {
+    const currentUserString = localStorage.getItem("currentUser");
+    if (currentUserString !== null) {
+      const currentUser = JSON.parse(currentUserString);
+      token = currentUser?.token;
+    }
+  } else {
+    console.error("error: localStorage is undefined");
   }
 
   const handleDeleteCategory = async (id: string) => {
@@ -96,7 +100,9 @@ const CategoryTable = (props: Iprops) => {
     {
       name: "status",
       sortable: true,
-      cell: (row: ICategory) => <div className={styles.custom}>{row.status}</div>,
+      cell: (row: ICategory) => (
+        <div className={styles.custom}>{row.status}</div>
+      ),
     },
     {
       name: "desc",
@@ -106,16 +112,20 @@ const CategoryTable = (props: Iprops) => {
     {
       name: "createdAt",
       sortable: true,
-      cell: (row: ICategory) => <div className={styles.custom}>{row.createdAt}</div>,
+      cell: (row: ICategory) => (
+        <div className={styles.custom}>{row.createdAt}</div>
+      ),
     },
     {
       name: "updatedAt",
       sortable: true,
-      cell: (row: ICategory) => <div className={styles.custom}>{row.updatedAt}</div>,
+      cell: (row: ICategory) => (
+        <div className={styles.custom}>{row.updatedAt}</div>
+      ),
     },
     {
       name: "Actions",
-      minWidth: "250px",
+      width: "250px",
       cell: (row: ICategory): JSX.Element => (
         <div className="d-flex">
           <Link href={`category/${row._id}`}>

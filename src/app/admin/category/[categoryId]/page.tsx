@@ -5,11 +5,15 @@ import useSWR, { Fetcher } from "swr";
 import axios from "axios";
 
 const ViewUserDetail = ({ params }: { params: { categoryId: string } }) => {
-  const currentUserString = localStorage.getItem("currentUser");
   let token: string | null = null;
-  if (currentUserString !== null) {
-    const currentUser = JSON.parse(currentUserString);
-    token = currentUser?.token;
+  if (typeof localStorage !== undefined) {
+    const currentUserString = localStorage.getItem("currentUser");
+    if (currentUserString !== null) {
+      const currentUser = JSON.parse(currentUserString);
+      token = currentUser?.token;
+    }
+  } else {
+    console.error("error: localStorage is undefined");
   }
   const fetcher: Fetcher<ICategory, string> = (url: string) =>
     axios.get(url).then((res) => res.data);

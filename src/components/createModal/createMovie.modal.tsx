@@ -16,11 +16,15 @@ interface Iprops {
 }
 
 function CreateModalMovie(props: Iprops) {
-  const currentUserString = localStorage.getItem("currentUser");
   let token: string | null = null;
-  if (currentUserString !== null) {
-    const currentUser = JSON.parse(currentUserString);
-    token = currentUser?.token;
+  if (typeof localStorage !== undefined) {
+    const currentUserString = localStorage.getItem("currentUser");
+    if (currentUserString !== null) {
+      const currentUser = JSON.parse(currentUserString);
+      token = currentUser?.token;
+    }
+  } else {
+    console.error("error: localStorage is undefined");
   }
 
   const {

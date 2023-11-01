@@ -6,11 +6,15 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 const ViewUserDetail = ({ params }: { params: { movieId: string } }) => {
-  const currentUserString = localStorage.getItem("currentUser");
   let token: string | null = null;
-  if (currentUserString !== null) {
-    const currentUser = JSON.parse(currentUserString);
-    token = currentUser?.token;
+  if (typeof localStorage !== undefined) {
+    const currentUserString = localStorage.getItem("currentUser");
+    if (currentUserString !== null) {
+      const currentUser = JSON.parse(currentUserString);
+      token = currentUser?.token;
+    }
+  } else {
+    console.error("error: localStorage is undefined");
   }
   const fetcher: Fetcher<IMovie, string> = (url: string) =>
     axios.get(url).then((res) => res.data);

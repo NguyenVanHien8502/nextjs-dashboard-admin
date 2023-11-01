@@ -3,7 +3,10 @@ import { Button } from "react-bootstrap";
 import Link from "next/link";
 import axios from "axios";
 import { toast } from "react-toastify";
-import DataTable, { TableColumn } from "react-data-table-component";
+import DataTable, {
+  TableColumn,
+  TableStyles,
+} from "react-data-table-component";
 import UpdateModalUser from "../updateModal/updateUser.modal";
 import { useEffect, useState } from "react";
 import styles from "../../app/admin/user/user.module.css";
@@ -30,11 +33,15 @@ const UserTable = (props: Iprops) => {
     setItemsPerPage,
     setSorts,
   } = props;
-  const currentUserString = localStorage.getItem("currentUser");
   let token: string | null = null;
-  if (currentUserString !== null) {
-    const currentUser = JSON.parse(currentUserString);
-    token = currentUser?.token;
+  if (typeof localStorage !== undefined) {
+    const currentUserString = localStorage.getItem("currentUser");
+    if (currentUserString !== null) {
+      const currentUser = JSON.parse(currentUserString);
+      token = currentUser?.token;
+    }
+  } else {
+    console.error("error: localStorage is undefined");
   }
 
   const handleDeleteUser = async (id: string) => {
@@ -83,7 +90,7 @@ const UserTable = (props: Iprops) => {
 
   const startIndex: number = (currentPage - 1) * itemsPerPage + 1;
 
-  const columns: TableColumn<IUser>[] = [
+  const columns: TableColumn<IUser>[] | undefined = [
     {
       name: "No.",
       cell: (row: IUser, rowIndex: number): JSX.Element => (
@@ -133,7 +140,7 @@ const UserTable = (props: Iprops) => {
     },
     {
       name: "Actions",
-      minWidth: "250px",
+      width: "250px",
       cell: (row: IUser): JSX.Element => (
         <div className="d-flex">
           <Link href={`user/${row._id}`}>
@@ -162,6 +169,23 @@ const UserTable = (props: Iprops) => {
       ),
     },
   ];
+  const tableCustomStyles: TableStyles | undefined = {
+    headCells: {
+      style: {
+        fontSize: "16px",
+        textTransform: "capitalize",
+        fontWeight: "bold",
+        justifyContent: "center",
+        backgroundColor: "pink",
+      },
+    },
+    rows: {
+      style: {
+        fontSize: "14px",
+        cursor: "pointer",
+      },
+    },
+  };
 
   const handlePerRowsChange = async (perPage: number, page: number) => {
     setLoading(true);
@@ -226,6 +250,7 @@ const UserTable = (props: Iprops) => {
           <DataTable
             columns={columns}
             data={records}
+            customStyles={tableCustomStyles}
             progressPending={loading}
             selectableRows
             fixedHeader

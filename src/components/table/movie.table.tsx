@@ -31,11 +31,15 @@ const MovieTable = (props: Iprops) => {
     setItemsPerPage,
     setSorts,
   } = props;
-  const currentUserString = localStorage.getItem("currentUser");
   let token: string | null = null;
-  if (currentUserString !== null) {
-    const currentUser = JSON.parse(currentUserString);
-    token = currentUser?.token;
+  if (typeof localStorage !== undefined) {
+    const currentUserString = localStorage.getItem("currentUser");
+    if (currentUserString !== null) {
+      const currentUser = JSON.parse(currentUserString);
+      token = currentUser?.token;
+    }
+  } else {
+    console.error("error: localStorage is undefined");
   }
 
   const handleDeleteMovie = async (id: string) => {
@@ -82,7 +86,6 @@ const MovieTable = (props: Iprops) => {
         <div className={styles.custom}>{startIndex + rowIndex}</div>
       ),
       sortable: true,
-      maxWidth: "20px",
     },
     {
       name: "name",
@@ -141,7 +144,7 @@ const MovieTable = (props: Iprops) => {
     },
     {
       name: "Actions",
-      minWidth: "250px",
+      width: "250px",
       cell: (row: IMovie): JSX.Element => (
         <div className="d-flex">
           <Link href={`movie/${row._id}`}>
@@ -194,8 +197,6 @@ const MovieTable = (props: Iprops) => {
   };
 
   const handleSort = async (column: TableColumn<IMovie>, sortOrder: string) => {
-    console.log(column.name, sortOrder);
-
     setSorts(`sort[${column.name}]=${sortOrder}`);
   };
 
