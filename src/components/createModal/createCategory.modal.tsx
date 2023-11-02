@@ -5,6 +5,8 @@ import Modal from "react-bootstrap/Modal";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { getStogare } from "@/app/helper/stogare";
+import slugify from "slugify";
 
 interface Iprops {
   showModalCreateCategory: boolean;
@@ -16,16 +18,12 @@ interface Iprops {
 }
 
 function CreateModalCategory(props: Iprops) {
-  let token: string | null = null;
-  if (typeof localStorage !== undefined) {
-    const currentUserString = localStorage.getItem("currentUser");
-    if (currentUserString !== null) {
-      const currentUser = JSON.parse(currentUserString);
-      token = currentUser?.token;
-    }
-  } else {
-    console.error("error: localStorage is undefined");
-  }
+   let token: string | null = null;
+   const currentUserString = getStogare("currentUser")?.trim();
+   if (currentUserString) {
+     const currentUser = JSON.parse(currentUserString);
+     token = currentUser?.token;
+   }
 
   const {
     showModalCreateCategory,
@@ -42,6 +40,8 @@ function CreateModalCategory(props: Iprops) {
     status: "",
     desc: "",
   });
+  
+  const [isChangedInputSlug, setIsChangedInputSlug] = useState(false);
 
   const handleSubmitForm = async () => {
     const { name, slug, status, desc } = dataCategory;
@@ -68,7 +68,12 @@ function CreateModalCategory(props: Iprops) {
       toast.success(data?.msg);
       handleCloseModalCategory();
       const res = await axios.get(
-        `${process.env.BASE_URL}/category?page=${currentPage}&limit=${itemsPerPage}`
+        `${process.env.BASE_URL}/category?page=${currentPage}&limit=${itemsPerPage}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setRecords(res.data?.data);
       const allRows = res?.data?.totalCategories;
@@ -116,16 +121,23 @@ function CreateModalCategory(props: Iprops) {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Slug*</Form.Label>
+              <Form.Label>Slug</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Nhập slug"
-                value={dataCategory.slug}
+                value={
+                  isChangedInputSlug
+                    ? dataCategory.slug
+                    : slugify(dataCategory.name)
+                }
                 onChange={(e) =>
+                {
+                  setIsChangedInputSlug(true);
                   setDataCategory((prevData) => ({
                     ...prevData,
                     slug: e.target.value,
-                  }))
+                  }));
+                  }
                 }
               />
             </Form.Group>

@@ -35,6 +35,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SearchIcon from "@mui/icons-material/Search";
 import styles from "./admin.module.css";
 import { Popover } from "@mui/material";
+import { getStogare } from "../helper/stogare";
 
 const drawerWidth = 240;
 
@@ -126,9 +127,11 @@ export default function MainLayout({
   const openDropdown = Boolean(anchorElMenu);
   const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorElMenu(event.currentTarget);
-    event.stopPropagation(); // Ngăn chặn sự kiện click lan ra ngoài menu
+    // event.stopPropagation(); // Ngăn chặn sự kiện click lan ra ngoài menu
   };
   const handleMenuClose = () => {
+    console.log("vcl");
+
     setAnchorElMenu(null);
   };
   const handleProfile = () => {
@@ -167,14 +170,11 @@ export default function MainLayout({
   let fetchCurrentUser: string | null = null;
   let currentUserName: string | null = null;
   let currentUserEmail: string | null = null;
-  if (typeof localStorage !== "undefined") {
-    fetchCurrentUser = localStorage.getItem("currentUser");
-    if (fetchCurrentUser !== null) {
-      currentUserName = JSON.parse(fetchCurrentUser)?.username;
-      currentUserEmail = JSON.parse(fetchCurrentUser)?.email;
-    }
-  } else {
-    console.error("error: localStorage is undefined");
+
+  fetchCurrentUser = getStogare("currentUser")?.trim();
+  if (fetchCurrentUser) {
+    currentUserName = JSON.parse(fetchCurrentUser)?.username;
+    currentUserEmail = JSON.parse(fetchCurrentUser)?.email;
   }
 
   return (
@@ -504,7 +504,7 @@ export default function MainLayout({
                       className="d-flex justify-content-center"
                       style={{ height: "40px", width: "170px" }}
                     >
-                      Logout
+                      <div>Logout</div>
                     </MenuItem>
                   </Menu>
                 )}

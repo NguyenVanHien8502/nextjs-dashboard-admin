@@ -5,6 +5,7 @@ import Modal from "react-bootstrap/Modal";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { getStogare } from "@/app/helper/stogare";
 
 interface Iprops {
   showModalUpdateUser: boolean;
@@ -19,14 +20,10 @@ interface Iprops {
 
 function UpdateModalUser(props: Iprops) {
   let token: string | null = null;
-  if (typeof localStorage !== undefined) {
-    const currentUserString = localStorage.getItem("currentUser");
-    if (currentUserString !== null) {
-      const currentUser = JSON.parse(currentUserString);
-      token = currentUser?.token;
-    }
-  } else {
-    console.error("error: localStorage is undefined");
+  const currentUserString = getStogare("currentUser")?.trim();
+  if (currentUserString) {
+    const currentUser = JSON.parse(currentUserString);
+    token = currentUser?.token;
   }
 
   const {

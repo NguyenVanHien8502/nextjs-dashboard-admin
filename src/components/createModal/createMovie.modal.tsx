@@ -5,6 +5,8 @@ import Modal from "react-bootstrap/Modal";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { getStogare } from "@/app/helper/stogare";
+import slugify from "slugify";
 
 interface Iprops {
   showModalCreateMovie: boolean;
@@ -17,14 +19,10 @@ interface Iprops {
 
 function CreateModalMovie(props: Iprops) {
   let token: string | null = null;
-  if (typeof localStorage !== undefined) {
-    const currentUserString = localStorage.getItem("currentUser");
-    if (currentUserString !== null) {
-      const currentUser = JSON.parse(currentUserString);
-      token = currentUser?.token;
-    }
-  } else {
-    console.error("error: localStorage is undefined");
+  const currentUserString = getStogare("currentUser")?.trim();
+  if (currentUserString) {
+    const currentUser = JSON.parse(currentUserString);
+    token = currentUser?.token;
   }
 
   const {
@@ -41,23 +39,29 @@ function CreateModalMovie(props: Iprops) {
     slug: "",
     category: "",
     link: "",
-    status: "",
+    status: "pending",
     desc: "",
   });
+
+  const [isChangedInputSlug, setIsChangedInputSlug] = useState(false);
 
   //fetch all Category
   const [categories, setCategories] = useState<ICategory | any>([]);
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data } = await axios.get(`${process.env.BASE_URL}/category`);
+        const { data } = await axios.get(`${process.env.BASE_URL}/category`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setCategories(data?.data);
       } catch (error) {
         throw new Error("error");
       }
     };
     fetchCategories();
-  }, []);
+  }, [token]);
 
   const handleSubmitForm = async () => {
     const { name, slug, category, link, status, desc } = dataMovie;
@@ -88,7 +92,12 @@ function CreateModalMovie(props: Iprops) {
       toast.success(data?.msg);
       handleCloseModalMovie();
       const res = await axios.get(
-        `${process.env.BASE_URL}/movie?page=${currentPage}&limit=${itemsPerPage}`
+        `${process.env.BASE_URL}/movie?page=${currentPage}&limit=${itemsPerPage}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setRecords(res.data?.data);
       const allRows = res?.data?.totalMovies;
@@ -138,17 +147,22 @@ function CreateModalMovie(props: Iprops) {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Slug*</Form.Label>
+              <Form.Label>Slug</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Nhập slug"
-                value={dataMovie.slug}
-                onChange={(e) =>
+                value={
+                  isChangedInputSlug
+                    ? dataMovie.slug
+                    : slugify(dataMovie.name)
+                }
+                onChange={(e) => {
+                  setIsChangedInputSlug(true);
                   setDataMovie((prevData: IMovie) => ({
                     ...prevData,
                     slug: e.target.value,
-                  }))
-                }
+                  }));
+                }}
               />
             </Form.Group>
             <Form.Group className="mb-3">
@@ -200,10 +214,9 @@ function CreateModalMovie(props: Iprops) {
                   }))
                 }
               >
-                <option value="">Select Status</option>
                 <option value="pending">Pending</option>
                 <option value="processing">Processing</option>
-                <option value="done">Done</option>
+                <option value="active">Active</option>
               </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">

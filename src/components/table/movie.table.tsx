@@ -1,13 +1,17 @@
 "use client";
 import { Button } from "react-bootstrap";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { toast } from "react-toastify";
 import CreateModalMovie from "../createModal/createMovie.modal";
 import UpdateModalMovie from "../updateModal/updateMovie.modal";
-import DataTable, { TableColumn } from "react-data-table-component";
+import DataTable, {
+  TableColumn,
+  TableStyles,
+} from "react-data-table-component";
 import styles from "../../app/admin/movie/movie.module.css";
+import { getStogare } from "@/app/helper/stogare";
 
 interface Iprops {
   loading: boolean;
@@ -31,15 +35,12 @@ const MovieTable = (props: Iprops) => {
     setItemsPerPage,
     setSorts,
   } = props;
+
   let token: string | null = null;
-  if (typeof localStorage !== undefined) {
-    const currentUserString = localStorage.getItem("currentUser");
-    if (currentUserString !== null) {
-      const currentUser = JSON.parse(currentUserString);
-      token = currentUser?.token;
-    }
-  } else {
-    console.error("error: localStorage is undefined");
+  const currentUserString = getStogare("currentUser")?.trim();
+  if (currentUserString) {
+    const currentUser = JSON.parse(currentUserString);
+    token = currentUser?.token;
   }
 
   const handleDeleteMovie = async (id: string) => {
@@ -59,10 +60,50 @@ const MovieTable = (props: Iprops) => {
       if (data?.status === true) {
         toast.success(data?.msg);
         const res = await axios.get(
-          `${process.env.BASE_URL}/movie?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`
+          `${process.env.BASE_URL}/movie?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setRecords(res?.data?.data);
-        setAllRows(res.data?.totalCategories);
+        setAllRows(res.data?.totalMovies);
+      }
+    }
+  };
+
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const handleDeleteManyMovie = async () => {
+    if (
+      window.confirm(
+        `Are you sure want to delete ${selectedRows.length} movies below? `
+      )
+    ) {
+      const { data } = await axios.delete(`${process.env.BASE_URL}/movie`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: {
+          movieIds: selectedRows,
+        },
+      });
+      if (data?.status === false) {
+        toast.warning(data?.msg);
+        return;
+      }
+      if (data?.status === true) {
+        toast.success(data?.msg);
+        const res = await axios.get(
+          `${process.env.BASE_URL}/movie?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setRecords(res?.data?.data);
+        setAllRows(res.data?.totalMovies);
       }
     }
   };
@@ -70,32 +111,22 @@ const MovieTable = (props: Iprops) => {
   const [allRows, setAllRows] = useState(0);
   useEffect(() => {
     const fetchTotalRows = async () => {
-      const { data } = await axios.get(`${process.env.BASE_URL}/movie`);
+      const { data } = await axios.get(`${process.env.BASE_URL}/movie`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const allRows = data?.data.length;
       setAllRows(allRows);
     };
     fetchTotalRows();
-  }, []);
-
-  const startIndex: number = (currentPage - 1) * itemsPerPage + 1;
+  }, [token]);
 
   const columns: TableColumn<IMovie>[] = [
-    {
-      name: "No.",
-      cell: (row: IMovie, rowIndex: number): JSX.Element => (
-        <div className={styles.custom}>{startIndex + rowIndex}</div>
-      ),
-      sortable: true,
-    },
     {
       name: "name",
       sortable: true,
       cell: (row: IMovie) => <div className={styles.custom}>{row.name}</div>,
-    },
-    {
-      name: "slug",
-      sortable: true,
-      cell: (row: IMovie) => <div className={styles.custom}>{row.slug}</div>,
     },
     {
       name: "category",
@@ -105,22 +136,11 @@ const MovieTable = (props: Iprops) => {
       ),
     },
     {
-      name: "link",
-      sortable: true,
-      cell: (row: IMovie) => (
-        <div className={styles.custom_link}>{row.link}</div>
-      ),
-    },
-    {
       name: "status",
       sortable: true,
       cell: (row: IMovie) => <div className={styles.custom}>{row.status}</div>,
     },
-    {
-      name: "desc",
-      sortable: true,
-      cell: (row: IMovie) => <div className={styles.custom}>{row.desc}</div>,
-    },
+
     {
       name: "author",
       sortable: true,
@@ -173,6 +193,26 @@ const MovieTable = (props: Iprops) => {
       ),
     },
   ];
+  const tableCustomStyles: TableStyles | undefined = {
+    headCells: {
+      style: {
+        fontSize: "16px",
+        textTransform: "capitalize",
+        fontWeight: "bold",
+        justifyContent: "center",
+        backgroundColor: "pink",
+      },
+    },
+    rows: {
+      style: {
+        fontSize: "14px",
+        "&:hover": {
+          cursor: "pointer",
+          backgroundColor: "#EAEEFF",
+        },
+      },
+    },
+  };
 
   const handlePerRowsChange = async (perPage: number, page: number) => {
     setLoading(true);
@@ -191,10 +231,19 @@ const MovieTable = (props: Iprops) => {
   const [keyWordSearch, setKeyWordSearch] = useState("");
   const handleSearch = async () => {
     const { data } = await axios.get(
-      `${process.env.BASE_URL}/movie?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`
+      `${process.env.BASE_URL}/movie?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     setRecords(data?.data);
   };
+  useEffect(() => {
+    handleSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keyWordSearch]);
 
   const handleSort = async (column: TableColumn<IMovie>, sortOrder: string) => {
     setSorts(`sort[${column.name}]=${sortOrder}`);
@@ -248,7 +297,10 @@ const MovieTable = (props: Iprops) => {
           Create movie
         </Button>
       </div>
-      <div className={styles.search_container}>
+      <div className={styles.options_container}>
+        <Button variant="danger" onClick={() => handleDeleteManyMovie()}>
+          Delete Selected
+        </Button>
         <input
           className={styles.search_input}
           placeholder="Search here..."
@@ -265,8 +317,8 @@ const MovieTable = (props: Iprops) => {
           <DataTable
             columns={columns}
             data={records}
+            customStyles={tableCustomStyles}
             progressPending={loading}
-            selectableRows
             fixedHeader
             fixedHeaderScrollHeight="450px"
             pagination
@@ -277,6 +329,18 @@ const MovieTable = (props: Iprops) => {
             onChangePage={handlePageChange}
             onSort={(column, sortOrder) => {
               handleSort(column, sortOrder);
+            }}
+            onRowClicked={(row, e) => {
+              setMovie(row);
+              setShowModalUpdateMovie(true);
+            }}
+            selectableRows
+            selectableRowSelected={useCallback((row: IMovie) => {
+              return selectedRows.includes(row._id);
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            }, [])}
+            onSelectedRowsChange={({ selectedRows }) => {
+              setSelectedRows(selectedRows.map((row: IMovie) => row._id));
             }}
           />
         </div>

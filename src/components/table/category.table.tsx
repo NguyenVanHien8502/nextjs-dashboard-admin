@@ -1,13 +1,17 @@
 "use client";
 import { Button } from "react-bootstrap";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import CreateModalCategory from "../createModal/createCategory.modal";
 import UpdateModalCategory from "../updateModal/updateCategory.modal";
-import DataTable, { TableColumn } from "react-data-table-component";
+import DataTable, {
+  TableColumn,
+  TableStyles,
+} from "react-data-table-component";
 import styles from "../../app/admin/category/category.module.css";
+import { getStogare } from "@/app/helper/stogare";
 
 interface Iprops {
   loading: boolean;
@@ -31,15 +35,12 @@ const CategoryTable = (props: Iprops) => {
     setItemsPerPage,
     setSorts,
   } = props;
+
   let token: string | null = null;
-  if (typeof localStorage !== undefined) {
-    const currentUserString = localStorage.getItem("currentUser");
-    if (currentUserString !== null) {
-      const currentUser = JSON.parse(currentUserString);
-      token = currentUser?.token;
-    }
-  } else {
-    console.error("error: localStorage is undefined");
+  const currentUserString = getStogare("currentUser")?.trim();
+  if (currentUserString) {
+    const currentUser = JSON.parse(currentUserString);
+    token = currentUser?.token;
   }
 
   const handleDeleteCategory = async (id: string) => {
@@ -59,7 +60,47 @@ const CategoryTable = (props: Iprops) => {
       if (data?.status === true) {
         toast.success(data?.msg);
         const res = await axios.get(
-          `${process.env.BASE_URL}/category?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`
+          `${process.env.BASE_URL}/category?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setRecords(res?.data?.data);
+        setAllRows(res.data?.totalCategories);
+      }
+    }
+  };
+
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const handleDeleteManyCategory = async () => {
+    if (
+      window.confirm(
+        `Are you sure want to delete ${selectedRows.length} categories below? `
+      )
+    ) {
+      const { data } = await axios.delete(`${process.env.BASE_URL}/category`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: {
+          categoryIds: selectedRows,
+        },
+      });
+      if (data?.status === false) {
+        toast.warning(data?.msg);
+        return;
+      }
+      if (data?.status === true) {
+        toast.success(data?.msg);
+        const res = await axios.get(
+          `${process.env.BASE_URL}/category?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setRecords(res?.data?.data);
         setAllRows(res.data?.totalCategories);
@@ -70,32 +111,22 @@ const CategoryTable = (props: Iprops) => {
   const [allRows, setAllRows] = useState(0);
   useEffect(() => {
     const fetchTotalRows = async () => {
-      const { data } = await axios.get(`${process.env.BASE_URL}/category`);
+      const { data } = await axios.get(`${process.env.BASE_URL}/category`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const allRows = data?.data.length;
       setAllRows(allRows);
     };
     fetchTotalRows();
-  }, []);
-
-  const startIndex: number = (currentPage - 1) * itemsPerPage + 1;
+  }, [token]);
 
   const columns: TableColumn<ICategory>[] = [
-    {
-      name: "No.",
-      cell: (row: ICategory, rowIndex: number): JSX.Element => (
-        <div className={styles.custom}>{startIndex + rowIndex}</div>
-      ),
-      sortable: true,
-    },
     {
       name: "name",
       sortable: true,
       cell: (row: ICategory) => <div className={styles.custom}>{row.name}</div>,
-    },
-    {
-      name: "slug",
-      sortable: true,
-      cell: (row: ICategory) => <div className={styles.custom}>{row.slug}</div>,
     },
     {
       name: "status",
@@ -103,11 +134,6 @@ const CategoryTable = (props: Iprops) => {
       cell: (row: ICategory) => (
         <div className={styles.custom}>{row.status}</div>
       ),
-    },
-    {
-      name: "desc",
-      sortable: true,
-      cell: (row: ICategory) => <div className={styles.custom}>{row.desc}</div>,
     },
     {
       name: "createdAt",
@@ -154,6 +180,26 @@ const CategoryTable = (props: Iprops) => {
       ),
     },
   ];
+  const tableCustomStyles: TableStyles | undefined = {
+    headCells: {
+      style: {
+        fontSize: "16px",
+        textTransform: "capitalize",
+        fontWeight: "bold",
+        justifyContent: "center",
+        backgroundColor: "pink",
+      },
+    },
+    rows: {
+      style: {
+        fontSize: "14px",
+        "&:hover": {
+          cursor: "pointer",
+          backgroundColor: "#EAEEFF",
+        },
+      },
+    },
+  };
 
   const handlePerRowsChange = async (perPage: number, page: number) => {
     setLoading(true);
@@ -175,10 +221,19 @@ const CategoryTable = (props: Iprops) => {
     //   return row.name.toLowerCase().includes(e.target.value.toLowerCase());
     // });
     const { data } = await axios.get(
-      `${process.env.BASE_URL}/category?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`
+      `${process.env.BASE_URL}/category?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     setRecords(data?.data);
   };
+  useEffect(() => {
+    handleSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keyWordSearch]);
 
   const handleSort = async (
     column: TableColumn<ICategory>,
@@ -204,7 +259,10 @@ const CategoryTable = (props: Iprops) => {
           Create category
         </Button>
       </div>
-      <div className={styles.search_container}>
+      <div className={styles.options_container}>
+        <Button variant="danger" onClick={() => handleDeleteManyCategory()}>
+          Delete Selected
+        </Button>
         <input
           className={styles.search_input}
           placeholder="Search here..."
@@ -221,8 +279,8 @@ const CategoryTable = (props: Iprops) => {
           <DataTable
             columns={columns}
             data={records}
+            customStyles={tableCustomStyles}
             progressPending={loading}
-            selectableRows
             fixedHeader
             fixedHeaderScrollHeight="450px"
             pagination
@@ -233,6 +291,18 @@ const CategoryTable = (props: Iprops) => {
             onChangePage={handlePageChange}
             onSort={(column, sortOrder) => {
               handleSort(column, sortOrder);
+            }}
+            onRowClicked={(row, e) => {
+              setCategory(row);
+              setShowModalUpdateCategory(true);
+            }}
+            selectableRows
+            selectableRowSelected={useCallback((row: ICategory) => {
+              return selectedRows.includes(row._id);
+              // eslint-disable-next-line react-hooks/exhaustive-deps
+            }, [])}
+            onSelectedRowsChange={({ selectedRows }) => {
+              setSelectedRows(selectedRows.map((row: ICategory) => row._id));
             }}
           />
         </div>

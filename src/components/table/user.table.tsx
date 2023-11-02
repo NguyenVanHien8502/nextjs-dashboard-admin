@@ -8,8 +8,9 @@ import DataTable, {
   TableStyles,
 } from "react-data-table-component";
 import UpdateModalUser from "../updateModal/updateUser.modal";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import styles from "../../app/admin/user/user.module.css";
+import { getStogare } from "@/app/helper/stogare";
 
 interface Iprops {
   loading: boolean;
@@ -33,15 +34,12 @@ const UserTable = (props: Iprops) => {
     setItemsPerPage,
     setSorts,
   } = props;
+
   let token: string | null = null;
-  if (typeof localStorage !== undefined) {
-    const currentUserString = localStorage.getItem("currentUser");
-    if (currentUserString !== null) {
-      const currentUser = JSON.parse(currentUserString);
-      token = currentUser?.token;
-    }
-  } else {
-    console.error("error: localStorage is undefined");
+  const currentUserString = getStogare("currentUser")?.trim();
+  if (currentUserString) {
+    const currentUser = JSON.parse(currentUserString);
+    token = currentUser?.token;
   }
 
   const handleDeleteUser = async (id: string) => {
@@ -54,6 +52,41 @@ const UserTable = (props: Iprops) => {
           },
         }
       );
+      if (data?.status === false) {
+        toast.warning(data?.msg);
+        return;
+      }
+      if (data?.status === true) {
+        toast.success(data?.msg);
+        const res = await axios.get(
+          `${process.env.BASE_URL}/user?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setRecords(res?.data?.data);
+        setAllRows(res.data?.totalUsers);
+      }
+    }
+  };
+
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const handleDeleteManyUser =async () => {
+    if (
+      window.confirm(
+        `Are you sure want to delete ${selectedRows.length} users below? `
+      )
+    ) {
+      const { data } = await axios.delete(`${process.env.BASE_URL}/user`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: {
+          userIds: selectedRows,
+        },
+      });
       if (data?.status === false) {
         toast.warning(data?.msg);
         return;
@@ -88,16 +121,7 @@ const UserTable = (props: Iprops) => {
     fetchTotalRows();
   }, [token]);
 
-  const startIndex: number = (currentPage - 1) * itemsPerPage + 1;
-
   const columns: TableColumn<IUser>[] | undefined = [
-    {
-      name: "No.",
-      cell: (row: IUser, rowIndex: number): JSX.Element => (
-        <div className={styles.custom}>{startIndex + rowIndex}</div>
-      ),
-      sortable: true,
-    },
     {
       name: "username",
       sortable: true,
@@ -107,11 +131,6 @@ const UserTable = (props: Iprops) => {
       name: "email",
       sortable: true,
       cell: (row: IUser) => <div className={styles.custom}>{row.email}</div>,
-    },
-    {
-      name: "phone",
-      sortable: true,
-      cell: (row: IUser) => <div className={styles.custom}>{row.phone}</div>,
     },
     {
       name: "role",
@@ -182,7 +201,10 @@ const UserTable = (props: Iprops) => {
     rows: {
       style: {
         fontSize: "14px",
-        cursor: "pointer",
+        "&:hover": {
+          cursor: "pointer",
+          backgroundColor: "#EAEEFF",
+        },
       },
     },
   };
@@ -216,6 +238,10 @@ const UserTable = (props: Iprops) => {
     );
     setRecords(data?.data);
   };
+  useEffect(() => {
+    handleSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keyWordSearch]);
 
   const handleSort = async (column: TableColumn<IUser>, sortOrder: string) => {
     setSorts(`sort[${column.name}]=${sortOrder}`);
@@ -233,7 +259,10 @@ const UserTable = (props: Iprops) => {
       >
         <h2>User Table</h2>
       </div>
-      <div className={styles.search_container}>
+      <div className={styles.options_container}>
+        <Button variant="danger" onClick={() => handleDeleteManyUser()}>
+          Delete Selected
+        </Button>
         <input
           className={styles.search_input}
           placeholder="Search here..."
@@ -252,7 +281,6 @@ const UserTable = (props: Iprops) => {
             data={records}
             customStyles={tableCustomStyles}
             progressPending={loading}
-            selectableRows
             fixedHeader
             fixedHeaderScrollHeight="450px"
             pagination
@@ -263,6 +291,18 @@ const UserTable = (props: Iprops) => {
             onChangePage={handlePageChange}
             onSort={(column, sortOrder) => {
               handleSort(column, sortOrder);
+            }}
+            onRowClicked={(row, e) => {
+              setUser(row);
+              setShowModalUpdateUser(true);
+            }}
+            selectableRows
+            selectableRowSelected={useCallback((row: IUser) => {
+              return selectedRows.includes(row._id);
+              // eslint-disable-next-line react-hooks/exhaustive-deps
+            }, [])}
+            onSelectedRowsChange={({ selectedRows }) => {
+              setSelectedRows(selectedRows.map((row: IUser) => row._id));
             }}
           />
         </div>

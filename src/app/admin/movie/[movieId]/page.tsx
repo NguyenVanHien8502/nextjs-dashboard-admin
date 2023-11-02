@@ -4,18 +4,16 @@ import Card from "react-bootstrap/Card";
 import useSWR, { Fetcher } from "swr";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { getStogare } from "@/app/helper/stogare";
 
 const ViewUserDetail = ({ params }: { params: { movieId: string } }) => {
   let token: string | null = null;
-  if (typeof localStorage !== undefined) {
-    const currentUserString = localStorage.getItem("currentUser");
-    if (currentUserString !== null) {
-      const currentUser = JSON.parse(currentUserString);
-      token = currentUser?.token;
-    }
-  } else {
-    console.error("error: localStorage is undefined");
+  const currentUserString = getStogare("currentUser")?.trim();
+  if (currentUserString) {
+    const currentUser = JSON.parse(currentUserString);
+    token = currentUser?.token;
   }
+
   const fetcher: Fetcher<IMovie, string> = (url: string) =>
     axios.get(url).then((res) => res.data);
   const { data, error, isLoading } = useSWR(

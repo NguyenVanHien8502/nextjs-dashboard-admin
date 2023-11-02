@@ -5,6 +5,7 @@ import Modal from "react-bootstrap/Modal";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { getStogare } from "@/app/helper/stogare";
 
 interface Iprops {
   showModalUpdateMovie: boolean;
@@ -19,14 +20,10 @@ interface Iprops {
 
 function UpdateModalMovie(props: Iprops) {
   let token: string | null = null;
-  if (typeof localStorage !== undefined) {
-    const currentUserString = localStorage.getItem("currentUser");
-    if (currentUserString !== null) {
-      const currentUser = JSON.parse(currentUserString);
-      token = currentUser?.token;
-    }
-  } else {
-    console.error("error: localStorage is undefined");
+  const currentUserString = getStogare("currentUser")?.trim();
+  if (currentUserString) {
+    const currentUser = JSON.parse(currentUserString);
+    token = currentUser?.token;
   }
 
   const {
@@ -45,14 +42,18 @@ function UpdateModalMovie(props: Iprops) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data } = await axios.get(`${process.env.BASE_URL}/category`);
+        const { data } = await axios.get(`${process.env.BASE_URL}/category`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setCategories(data?.data);
       } catch (error) {
         throw new Error("error");
       }
     };
     fetchCategories();
-  }, []);
+  }, [token]);
 
   const [dataMovie, setDataMovie] = useState({
     id: "",
@@ -107,7 +108,12 @@ function UpdateModalMovie(props: Iprops) {
       toast.success(data?.msg);
       handleCloseModalMovie();
       const res = await axios.get(
-        `${process.env.BASE_URL}/movie?page=${currentPage}&limit=${itemsPerPage}`
+        `${process.env.BASE_URL}/movie?page=${currentPage}&limit=${itemsPerPage}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setRecords(res.data?.data);
       const allRows = res.data?.totalMovies;
@@ -159,7 +165,7 @@ function UpdateModalMovie(props: Iprops) {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Slug*</Form.Label>
+              <Form.Label>Slug</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Nhập slug"
@@ -222,10 +228,9 @@ function UpdateModalMovie(props: Iprops) {
                   }))
                 }
               >
-                <option value="">Select Status</option>
                 <option value="pending">Pending</option>
                 <option value="processing">Processing</option>
-                <option value="done">Done</option>
+                <option value="active">Active</option>
               </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">

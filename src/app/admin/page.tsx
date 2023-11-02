@@ -5,6 +5,7 @@ import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import CategoryIcon from "@mui/icons-material/Category";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
 import axios from "axios";
+import { getStogare } from "../helper/stogare";
 
 const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
 const pData = [2400, 1398, 9800, 3908, 4800, 3800, 4300];
@@ -20,14 +21,10 @@ const xLabels = [
 
 export default function Admin() {
   let token: string | null = null;
-  if (typeof localStorage !== undefined) {
-    const currentUserString = localStorage.getItem("currentUser");
-    if (currentUserString !== null) {
-      const currentUser = JSON.parse(currentUserString);
-      token = currentUser?.token;
-    }
-  } else {
-    console.error("error: localStorage is undefined");
+  const currentUserString = getStogare("currentUser")?.trim();
+  if (currentUserString) {
+    const currentUser = JSON.parse(currentUserString);
+    token = currentUser?.token;
   }
 
   const [totalUser, setTotalUser] = useState(0);
@@ -46,14 +43,22 @@ export default function Admin() {
     fetchAllUser();
 
     const fetchAllMovie = async () => {
-      const { data } = await axios.get(`${process.env.BASE_URL}/movie`);
+      const { data } = await axios.get(`${process.env.BASE_URL}/movie`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const totalMovie = data?.data.length;
       setTotalMovie(totalMovie);
     };
     fetchAllMovie();
 
     const fetchAllCategory = async () => {
-      const { data } = await axios.get(`${process.env.BASE_URL}/category`);
+      const { data } = await axios.get(`${process.env.BASE_URL}/category`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const totalCategory = data?.data.length;
       setTotalCategory(totalCategory);
     };
@@ -63,6 +68,7 @@ export default function Admin() {
     <>
       <title>Home Admin Page</title>
       <h1>Dashboard Admin</h1>
+      <h6>redux toolkit</h6>
       <div className="d-flex justify-content-between align-items-center gap-3 mt-5">
         <div className="d-flex flex-grow-1 bg-custom-light p-3 roudned-3 gap-3 shadow">
           <div>

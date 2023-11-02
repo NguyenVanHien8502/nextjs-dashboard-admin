@@ -1,20 +1,17 @@
 "use client";
+import { getStogare } from "@/app/helper/stogare";
 import UserTable from "@/components/table/user.table";
 import Box from "@mui/material/Box";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
 export default function User() {
-  let token: string | null = null;
-  if (typeof localStorage !== undefined) {
-    const currentUserString = localStorage.getItem("currentUser");
-    if (currentUserString !== null) {
-      const currentUser = JSON.parse(currentUserString);
-      token = currentUser?.token;
-    }
-  } else {
-    console.error("error: localStorage is undefined");
-  }
+   let token: string | null = null;
+   const currentUserString = getStogare("currentUser")?.trim();
+   if (currentUserString) {
+     const currentUser = JSON.parse(currentUserString);
+     token = currentUser?.token;
+   }
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);

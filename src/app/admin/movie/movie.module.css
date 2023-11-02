@@ -1,5 +1,8 @@
-.search_container {
-  text-align: end;
+.options_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 10px;
 }
 .search_input {
   border: 1px solid #ccc;

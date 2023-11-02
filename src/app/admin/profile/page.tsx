@@ -1,17 +1,15 @@
 "use client";
+import { getStogare } from "@/app/helper/stogare";
 import Link from "next/link";
 import Card from "react-bootstrap/Card";
 
 const MyProfile = () => {
   let currentUser: IUser | null = null;
-  if (typeof localStorage !== undefined) {
-    const currentUserString = localStorage.getItem("currentUser");
-    if (currentUserString !== null) {
-      currentUser = JSON.parse(currentUserString);
-    }
-  } else {
-    console.error("error: localStorage is undefined");
+  const currentUserString = getStogare("currentUser")?.trim();
+  if (currentUserString) {
+    currentUser = JSON.parse(currentUserString);
   }
+
   return (
     <>
       <div className="my-3">
