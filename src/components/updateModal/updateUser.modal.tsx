@@ -57,39 +57,44 @@ function UpdateModalUser(props: Iprops) {
   }, [user]);
 
   const handleSubmitForm = async () => {
-    const { username, phone, role, status } = dataUser;
-    const { data } = await axios.put(
-      `${process.env.BASE_URL}/user/${dataUser.id}`,
-      {
-        username: username,
-        phone: phone,
-        role: role,
-        status: status,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    try {
+      const { username, phone, role, status } = dataUser;
+      const { data } = await axios.put(
+        `${process.env.BASE_URL}/user/${dataUser.id}`,
+        {
+          username: username,
+          phone: phone,
+          role: role,
+          status: status,
         },
-      }
-    );
-    if (data?.status === false) {
-      toast.warning(data?.msg);
-      return;
-    }
-    if (data?.status === true) {
-      toast.success(data?.msg);
-      handleCloseModalUser();
-      const res = await axios.get(
-        `${process.env.BASE_URL}/user?page=${currentPage}&limit=${itemsPerPage}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      setRecords(res.data?.data);
-      const allRows = res.data?.totalUsers;
-      setAllRows(allRows);
+      if (data?.status === false) {
+        toast.warning(data?.msg);
+        return;
+      }
+      if (data?.status === true) {
+        toast.success(data?.msg);
+        handleCloseModalUser();
+        const res = await axios.get(
+          `${process.env.BASE_URL}/user?page=${currentPage}&limit=${itemsPerPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setRecords(res.data?.data);
+        const allRows = res.data?.totalUsers;
+        setAllRows(allRows);
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
+      return;
     }
   };
 

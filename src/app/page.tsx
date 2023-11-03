@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { setStogare } from "./helper/stogare";
 
 export default function Login() {
   const router = useRouter();
@@ -30,11 +31,12 @@ export default function Login() {
       const currentUser = data?.user;
       if (data?.status === true && currentUser) {
         router.push("/admin");
-        localStorage.setItem("currentUser", JSON.stringify(currentUser));
+        setStogare("currentUser", JSON.stringify(currentUser));
         toast.success(data?.msg);
       }
     } catch {
       toast.error("Error! An error occurred. Please try again later");
+      return;
     }
   };
   return (

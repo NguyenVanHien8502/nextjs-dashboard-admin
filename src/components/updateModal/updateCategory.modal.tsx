@@ -58,39 +58,44 @@ function UpdateModalCategory(props: Iprops) {
   }, [category]);
 
   const handleSubmitForm = async () => {
-    const { name, slug, status, desc } = dataCategory;
-    const { data } = await axios.put(
-      `${process.env.BASE_URL}/category/${dataCategory.id}`,
-      {
-        name: name,
-        slug: slug,
-        status: status,
-        desc: desc,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    try {
+      const { name, slug, status, desc } = dataCategory;
+      const { data } = await axios.put(
+        `${process.env.BASE_URL}/category/${dataCategory.id}`,
+        {
+          name: name,
+          slug: slug,
+          status: status,
+          desc: desc,
         },
-      }
-    );
-    if (data?.status === false) {
-      toast.error(data?.msg);
-      return;
-    }
-    if (data?.status === true) {
-      toast.success(data?.msg);
-      handleCloseModalCategory();
-      const res = await axios.get(
-        `${process.env.BASE_URL}/category?page=${currentPage}&limit=${itemsPerPage}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      setRecords(res.data?.data);
-      const allRows = res.data?.totalCategories;
-      setAllRows(allRows);
+      if (data?.status === false) {
+        toast.error(data?.msg);
+        return;
+      }
+      if (data?.status === true) {
+        toast.success(data?.msg);
+        handleCloseModalCategory();
+        const res = await axios.get(
+          `${process.env.BASE_URL}/category?page=${currentPage}&limit=${itemsPerPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setRecords(res.data?.data);
+        const allRows = res.data?.totalCategories;
+        setAllRows(allRows);
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
+      return;
     }
   };
 

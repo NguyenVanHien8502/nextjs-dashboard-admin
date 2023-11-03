@@ -80,44 +80,48 @@ function UpdateModalMovie(props: Iprops) {
   }, [movie]);
 
   const handleSubmitForm = async () => {
-    const { name, slug, category, link, status, desc } = dataMovie;
-
-    const { data } = await axios.put(
-      `${process.env.BASE_URL}/movie/${dataMovie.id}`,
-      {
-        name: name,
-        slug: slug,
-        category: category,
-        link: link,
-        status: status,
-        desc: desc,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    try {
+      const { name, slug, category, link, status, desc } = dataMovie;
+      const { data } = await axios.put(
+        `${process.env.BASE_URL}/movie/${dataMovie.id}`,
+        {
+          name: name,
+          slug: slug,
+          category: category,
+          link: link,
+          status: status,
+          desc: desc,
         },
-      }
-    );
-
-    if (data?.status === false) {
-      toast.error(data?.msg);
-      return;
-    }
-
-    if (data?.status === true) {
-      toast.success(data?.msg);
-      handleCloseModalMovie();
-      const res = await axios.get(
-        `${process.env.BASE_URL}/movie?page=${currentPage}&limit=${itemsPerPage}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      setRecords(res.data?.data);
-      const allRows = res.data?.totalMovies;
-      setAllRows(allRows);
+
+      if (data?.status === false) {
+        toast.error(data?.msg);
+        return;
+      }
+
+      if (data?.status === true) {
+        toast.success(data?.msg);
+        handleCloseModalMovie();
+        const response = await axios.get(
+          `${process.env.BASE_URL}/movie?page=${currentPage}&limit=${itemsPerPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setRecords(response.data?.data);
+        const allRows = response.data?.totalMovies;
+        setAllRows(allRows);
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
+      return;
     }
   };
 

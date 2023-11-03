@@ -18,12 +18,12 @@ interface Iprops {
 }
 
 function CreateModalCategory(props: Iprops) {
-   let token: string | null = null;
-   const currentUserString = getStogare("currentUser")?.trim();
-   if (currentUserString) {
-     const currentUser = JSON.parse(currentUserString);
-     token = currentUser?.token;
-   }
+  let token: string | null = null;
+  const currentUserString = getStogare("currentUser")?.trim();
+  if (currentUserString) {
+    const currentUser = JSON.parse(currentUserString);
+    token = currentUser?.token;
+  }
 
   const {
     showModalCreateCategory,
@@ -40,44 +40,49 @@ function CreateModalCategory(props: Iprops) {
     status: "",
     desc: "",
   });
-  
+
   const [isChangedInputSlug, setIsChangedInputSlug] = useState(false);
 
   const handleSubmitForm = async () => {
-    const { name, slug, status, desc } = dataCategory;
+    try {
+      const { name, slug, status, desc } = dataCategory;
 
-    const { data } = await axios.post(
-      `${process.env.BASE_URL}/category/create-category`,
-      {
-        name: name,
-        slug: slug,
-        status: status,
-        desc: desc,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const { data } = await axios.post(
+        `${process.env.BASE_URL}/category/create-category`,
+        {
+          name: name,
+          slug: slug,
+          status: status,
+          desc: desc,
         },
-      }
-    );
-    if (data?.status == false) {
-      toast.error(data?.msg);
-      return;
-    }
-    if (data?.status === true) {
-      toast.success(data?.msg);
-      handleCloseModalCategory();
-      const res = await axios.get(
-        `${process.env.BASE_URL}/category?page=${currentPage}&limit=${itemsPerPage}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      setRecords(res.data?.data);
-      const allRows = res?.data?.totalCategories;
-      setAllRows(allRows);
+      if (data?.status == false) {
+        toast.error(data?.msg);
+        return;
+      }
+      if (data?.status === true) {
+        toast.success(data?.msg);
+        handleCloseModalCategory();
+        const res = await axios.get(
+          `${process.env.BASE_URL}/category?page=${currentPage}&limit=${itemsPerPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setRecords(res.data?.data);
+        const allRows = res?.data?.totalCategories;
+        setAllRows(allRows);
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
+      return;
     }
   };
 
@@ -130,15 +135,13 @@ function CreateModalCategory(props: Iprops) {
                     ? dataCategory.slug
                     : slugify(dataCategory.name)
                 }
-                onChange={(e) =>
-                {
+                onChange={(e) => {
                   setIsChangedInputSlug(true);
                   setDataCategory((prevData) => ({
                     ...prevData,
                     slug: e.target.value,
                   }));
-                  }
-                }
+                }}
               />
             </Form.Group>
             <Form.Group className="mb-3">

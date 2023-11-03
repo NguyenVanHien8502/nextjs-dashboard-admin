@@ -45,30 +45,35 @@ const MovieTable = (props: Iprops) => {
 
   const handleDeleteMovie = async (id: string) => {
     if (window.confirm("Are you sure want to delete this movie? ")) {
-      const { data } = await axios.delete(
-        `${process.env.BASE_URL}/movie/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (data?.status === false) {
-        toast.warning(data?.msg);
-        return;
-      }
-      if (data?.status === true) {
-        toast.success(data?.msg);
-        const res = await axios.get(
-          `${process.env.BASE_URL}/movie?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+      try {
+        const { data } = await axios.delete(
+          `${process.env.BASE_URL}/movie/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        setRecords(res?.data?.data);
-        setAllRows(res.data?.totalMovies);
+        if (data?.status === false) {
+          toast.warning(data?.msg);
+          return;
+        }
+        if (data?.status === true) {
+          toast.success(data?.msg);
+          const res = await axios.get(
+            `${process.env.BASE_URL}/movie?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          setRecords(res?.data?.data);
+          setAllRows(res.data?.totalMovies);
+        }
+      } catch (error: any) {
+        toast.error(error?.response?.data?.message);
+        return;
       }
     }
   };
@@ -80,30 +85,35 @@ const MovieTable = (props: Iprops) => {
         `Are you sure want to delete ${selectedRows.length} movies below? `
       )
     ) {
-      const { data } = await axios.delete(`${process.env.BASE_URL}/movie`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        data: {
-          movieIds: selectedRows,
-        },
-      });
-      if (data?.status === false) {
-        toast.warning(data?.msg);
+      try {
+        const { data } = await axios.delete(`${process.env.BASE_URL}/movie`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          data: {
+            movieIds: selectedRows,
+          },
+        });
+        if (data?.status === false) {
+          toast.warning(data?.msg);
+          return;
+        }
+        if (data?.status === true) {
+          toast.success(data?.msg);
+          const res = await axios.get(
+            `${process.env.BASE_URL}/movie?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          setRecords(res?.data?.data);
+          setAllRows(res.data?.totalMovies);
+        }
+      } catch (error: any) {
+        toast.error(error?.response?.data?.message);
         return;
-      }
-      if (data?.status === true) {
-        toast.success(data?.msg);
-        const res = await axios.get(
-          `${process.env.BASE_URL}/movie?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setRecords(res?.data?.data);
-        setAllRows(res.data?.totalMovies);
       }
     }
   };
@@ -337,7 +347,7 @@ const MovieTable = (props: Iprops) => {
             selectableRows
             selectableRowSelected={useCallback((row: IMovie) => {
               return selectedRows.includes(row._id);
-            // eslint-disable-next-line react-hooks/exhaustive-deps
+              // eslint-disable-next-line react-hooks/exhaustive-deps
             }, [])}
             onSelectedRowsChange={({ selectedRows }) => {
               setSelectedRows(selectedRows.map((row: IMovie) => row._id));
