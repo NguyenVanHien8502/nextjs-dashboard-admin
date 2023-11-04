@@ -4,41 +4,34 @@ import styles from "./app.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import axios from "axios";
+import { useDispatch } from "react-redux";
+import { RootState, useAppSelector } from "@/redux/store";
+import { logIn } from "@/redux/features/auth/authService";
 import { toast } from "react-toastify";
-import { setStogare } from "./helper/stogare";
 
 export default function Login() {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const user: IUser | any = useAppSelector((state: RootState) => {
+    state.userReducer?.login?.currentUser;
+  });
   const [dataInput, setDataInput] = useState({
-    email: "",
-    password: "",
+    email: user?.email || "",
+    password: user?.password || "",
   });
 
   const handleLogin = async (e: any) => {
     try {
       e.preventDefault();
-      const { data } = await axios.post(`${process.env.BASE_URL}/user/login`, {
-        email: dataInput?.email,
-        password: dataInput?.password,
-      });
-
-      if (data?.status === false) {
-        toast.warning(data?.msg);
-        return;
-      }
-
-      const currentUser = data?.user;
-      if (data?.status === true && currentUser) {
+      const response = await logIn(dataInput, dispatch);
+      if (response?.status === true && response?.user) {
         router.push("/admin");
-        setStogare("currentUser", JSON.stringify(currentUser));
-        toast.success(data?.msg);
       }
-    } catch {
+    } catch (error) {
       toast.error("Error! An error occurred. Please try again later");
-      return;
     }
   };
+
   return (
     <div className={styles.main}>
       <div className={styles.container}>

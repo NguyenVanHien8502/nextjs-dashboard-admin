@@ -4,8 +4,12 @@ import { LineChart } from "@mui/x-charts/LineChart";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import CategoryIcon from "@mui/icons-material/Category";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
-import axios from "axios";
 import { getStogare } from "../helper/stogare";
+import { getAllUsers } from "@/redux/features/user/userService";
+import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
+import { getAllMovies } from "@/redux/features/movie/movieService";
+import { getAllCategories } from "@/redux/features/category/categoryService";
 
 const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
 const pData = [2400, 1398, 9800, 3908, 4800, 3800, 4300];
@@ -26,49 +30,42 @@ export default function Admin() {
     const currentUser = JSON.parse(currentUserString);
     token = currentUser?.token;
   }
+  const router = useRouter();
+  const dispatch = useDispatch();
 
   const [totalUser, setTotalUser] = useState(0);
   const [totalMovie, setTotalMovie] = useState(0);
   const [totalCategory, setTotalCategory] = useState(0);
   useEffect(() => {
-    const fetchAllUser = async () => {
-      const { data } = await axios.get(`${process.env.BASE_URL}/user`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const totalUser = data?.data.length;
-      setTotalUser(totalUser);
-    };
-    fetchAllUser();
+    if (token) {
+      const fetchAllUser = async () => {
+        const response = await getAllUsers(token, dispatch);
+        const totalUser = response?.length;
+        setTotalUser(totalUser);
+      };
+      fetchAllUser();
 
-    const fetchAllMovie = async () => {
-      const { data } = await axios.get(`${process.env.BASE_URL}/movie`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const totalMovie = data?.data.length;
-      setTotalMovie(totalMovie);
-    };
-    fetchAllMovie();
+      const fetchAllMovie = async () => {
+        const response = await getAllMovies(token, dispatch);
+        const totalMovie = response?.length;
+        setTotalMovie(totalMovie);
+      };
+      fetchAllMovie();
 
-    const fetchAllCategory = async () => {
-      const { data } = await axios.get(`${process.env.BASE_URL}/category`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const totalCategory = data?.data.length;
-      setTotalCategory(totalCategory);
-    };
-    fetchAllCategory();
-  }, [token]);
+      const fetchAllCategory = async () => {
+        const response = await getAllCategories(token, dispatch);
+        const totalCategory = response?.length;
+        setTotalCategory(totalCategory);
+      };
+      fetchAllCategory();
+    } else {
+      router.replace("/");
+    }
+  }, [dispatch, router, token]);
   return (
     <>
       <title>Home Admin Page</title>
       <h1>Dashboard Admin</h1>
-      <h6>redux toolkit</h6>
       <div className="d-flex justify-content-between align-items-center gap-3 mt-5">
         <div className="d-flex flex-grow-1 bg-custom-light p-3 roudned-3 gap-3 shadow">
           <div>

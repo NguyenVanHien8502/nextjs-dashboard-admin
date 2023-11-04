@@ -2,13 +2,15 @@
 import { Button } from "react-bootstrap";
 import styles from "./signup.module.css";
 import Link from "next/link";
-import axios from "axios";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { registerUser } from "@/redux/features/auth/authService";
+import { useDispatch } from "react-redux";
 
 export default function Signup() {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [data, setData] = useState({
     username: "",
     email: "",
@@ -18,23 +20,15 @@ export default function Signup() {
   const handleSignUp = async (e: any) => {
     try {
       e.preventDefault();
-      const response = await axios.post(
-        `${process.env.BASE_URL}/user/register`,
-        {
-          username: data.username,
-          email: data.email,
-          password: data.password,
-          role: data.role,
-        }
-      );
-
-      if (response?.data?.status === false) {
-        toast.warning(response?.data?.msg);
-        return;
-      }
-
-      if (response.data?.status === true) {
-        toast.success(response?.data?.msg);
+      const newUser = {
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        role: data.role,
+      };
+      const response = await registerUser(newUser, dispatch);
+      if (response?.status === true && response?.newUser) {
+        toast.success("Please navigate to login page to login to use service!")
         router.replace("/");
       }
     } catch {
