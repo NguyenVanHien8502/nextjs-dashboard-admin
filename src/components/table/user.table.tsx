@@ -125,7 +125,7 @@ const UserTable = (props: Iprops) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      const allRows = data?.data.length;
+      const allRows = data?.data?.length;
       setAllRows(allRows);
     };
     fetchTotalRows();
@@ -253,7 +253,7 @@ const UserTable = (props: Iprops) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keyWordSearch]);
 
-  const handleSort = async (column: TableColumn<IUser>, sortOrder: string) => {
+  const handleSort = (column: TableColumn<IUser>, sortOrder: string) => {
     setSorts(`sort[${column.name}]=${sortOrder}`);
   };
 

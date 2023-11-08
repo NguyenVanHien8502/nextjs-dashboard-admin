@@ -20,7 +20,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SearchIcon from "@mui/icons-material/Search";
 import styles from "../app/admin/admin.module.css";
 import { RootState, useAppSelector } from "@/redux/store";
-import { removeStogare } from "@/app/helper/stogare";
+import { getStogare, removeStogare } from "@/app/helper/stogare";
 
 const drawerWidth = 240;
 
@@ -50,7 +50,6 @@ const AppHeader = () => {
   const router = useRouter();
 
   const [openDrawer, setOpenDrawer] = useState(true);
-  const [user, setUser] = useState<IUser | null>(null);
 
   const [anchorElMenu, setAnchorElMenu] = useState<HTMLButtonElement | null>(
     null
@@ -98,11 +97,12 @@ const AppHeader = () => {
     setAnchorElMessenger(null);
   };
 
-  const currentUserString: string | any = useAppSelector(
-    (state: RootState) => state?.userReducer?.getProfile?.profile
-  );
+  const [currentUser, setCurrentUser] = useState<IUser | null>(null);
+  const currentUserString = getStogare("currentUser");
   useEffect(() => {
-    setUser(JSON.parse(currentUserString));
+    if (currentUserString) {
+      setCurrentUser(JSON.parse(currentUserString));
+    }
   }, [currentUserString]);
 
   return (
@@ -393,8 +393,8 @@ const AppHeader = () => {
                   justifyContent: "center",
                 }}
               >
-                <div>{user?.username}</div>
-                <div>{user?.email}</div>
+                <div>{currentUser?.username}</div>
+                <div>{currentUser?.email}</div>
               </div>
               <ArrowDropDownIcon />
             </div>

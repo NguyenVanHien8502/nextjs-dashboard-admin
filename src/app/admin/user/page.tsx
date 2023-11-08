@@ -10,9 +10,15 @@ import {
 import { RootState, useAppSelector } from "@/redux/store";
 import Box from "@mui/material/Box";
 import { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 
-export default function User() {
+interface IProps {
+  sorts: {} | null;
+  itemsPerPage: number;
+  currentPage: number;
+  allUsers: IUser[] | null;
+}
+function User(props: IProps) {
   let token: string | null = null;
   const currentUserString = getStogare("currentUser")?.trim();
   if (currentUserString) {
@@ -22,28 +28,24 @@ export default function User() {
 
   const dispatch = useDispatch();
 
-  const sortsRedux: {} | any = useAppSelector(
-    (state: RootState) => state.userReducer?.getAllUsers?.sorts
-  );
-  const currentPageRedux: number | any = useAppSelector(
-    (state: RootState) => state.userReducer?.getAllUsers?.currentPage
-  );
-  const itemsPerPageRedux: number | any = useAppSelector(
-    (state: RootState) => state.userReducer?.getAllUsers?.itemsPerPage
-  );
+  const sortsRedux: {} | any = props?.sorts;
+  const currentPageRedux: number = props?.currentPage;
+  const itemsPerPageRedux: number = props?.itemsPerPage;
+  const users: IUser[] | null = props?.allUsers;
 
   const [currentPage, setCurrentPage] = useState<number>(
     currentPageRedux ? currentPageRedux : 1
   );
+
   const [itemsPerPage, setItemsPerPage] = useState<number>(
     itemsPerPageRedux ? itemsPerPageRedux : 10
   );
-  const [sorts, setSorts] = useState<{}>(sortsRedux ? sortsRedux : {});
-  const [loading, setLoading] = useState<boolean>(false);
 
-  const users: IUser[] | any = useAppSelector(
-    (state: RootState) => state.userReducer?.getAllUsers?.allUsers
-  );
+  // console.log(sortsRedux);
+
+  const [sorts, setSorts] = useState<{}>(sortsRedux ? sortsRedux : {});
+  // console.log(sorts);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -55,6 +57,7 @@ export default function User() {
         currentPage,
         itemsPerPage
       );
+
       if (response?.status === true) {
         dispatch(getAllUsersSuccess(response));
       }
@@ -66,6 +69,9 @@ export default function User() {
 
   useEffect(() => {
     fetchUsers();
+    console.log(sortsRedux);
+    console.log(sorts);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sorts, currentPage, itemsPerPage]);
 
@@ -86,3 +92,14 @@ export default function User() {
     </>
   );
 }
+
+const mapStateToProps = (state: RootState) => {
+  return {
+    sorts: state?.userReducer?.getAllUsers?.sorts,
+    itemsPerPage: state?.userReducer?.getAllUsers?.itemsPerPage,
+    currentPage: state?.userReducer?.getAllUsers?.currentPage,
+    allUsers: state?.userReducer?.getAllUsers?.allUsers,
+  };
+};
+
+export default connect(mapStateToProps)(User);

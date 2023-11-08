@@ -32,7 +32,7 @@ const initialState = {
   } as GetProfileState,
   getAllUsers: {
     allUsers: null,
-    sorts: null,
+    sorts: {},
     currentPage: 1,
     itemsPerPage: 10,
     isLoading: false,
@@ -78,7 +78,7 @@ export const userSlice = createSlice({
       state.getAllUsers.isLoading = false;
       state.getAllUsers.isError = false;
       state.getAllUsers.isSuccess = true;
-      state.getAllUsers.allUsers = action.payload;
+      state.getAllUsers.allUsers = action.payload?.data;
       state.getAllUsers.sorts = action.payload?.sortOrder;
       state.getAllUsers.currentPage = action.payload?.page;
       state.getAllUsers.itemsPerPage = action.payload?.limit;
