@@ -3,7 +3,9 @@ import { getStogare } from "@/app/helper/stogare";
 import CategoryTable from "@/components/table/category.table";
 import Box from "@mui/material/Box";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 export default function Category() {
   let token: string | null = null;
@@ -13,6 +15,8 @@ export default function Category() {
     token = currentUser?.token;
   }
 
+  const router = useRouter();
+
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const [sorts, setSorts] = useState({});
@@ -20,21 +24,26 @@ export default function Category() {
 
   const [categories, setCategories] = useState([]);
   useEffect(() => {
-    const fetchCategories = async () => {
-      setLoading(true);
-      const { data } = await axios.get(
-        `${process.env.BASE_URL}/category?${sorts}&page=${currentPage}&limit=${itemsPerPage}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setCategories(data?.data);
-      setLoading(false);
-    };
-    fetchCategories();
-  }, [sorts, currentPage, itemsPerPage, token]);
+    if (token) {
+      const fetchCategories = async () => {
+        setLoading(true);
+        const { data } = await axios.get(
+          `${process.env.BASE_URL}/category?${sorts}&page=${currentPage}&limit=${itemsPerPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setCategories(data?.data);
+        setLoading(false);
+      };
+      fetchCategories();
+    } else {
+      router.replace("/");
+      toast.error("JWT has expired. Please login again to use service");
+    }
+  }, [sorts, currentPage, itemsPerPage, token, router]);
   return (
     <>
       <Box height={100} width={1000}>

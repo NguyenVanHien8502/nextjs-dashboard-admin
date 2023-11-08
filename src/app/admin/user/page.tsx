@@ -1,40 +1,73 @@
 "use client";
 import { getStogare } from "@/app/helper/stogare";
 import UserTable from "@/components/table/user.table";
+import { getAllUsers } from "@/redux/features/user/userService";
+import {
+  getAllUsersError,
+  getAllUsersStart,
+  getAllUsersSuccess,
+} from "@/redux/features/user/userSlice";
+import { RootState, useAppSelector } from "@/redux/store";
 import Box from "@mui/material/Box";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 
 export default function User() {
-   let token: string | null = null;
-   const currentUserString = getStogare("currentUser")?.trim();
-   if (currentUserString) {
-     const currentUser = JSON.parse(currentUserString);
-     token = currentUser?.token;
-   }
+  let token: string | null = null;
+  const currentUserString = getStogare("currentUser")?.trim();
+  if (currentUserString) {
+    const currentUser = JSON.parse(currentUserString);
+    token = currentUser?.token;
+  }
 
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
-  const [sorts, setSorts] = useState({});
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
-  const [users, setUsers] = useState([]);
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      const { data } = await axios.get(
-        `${process.env.BASE_URL}/user?${sorts}&page=${currentPage}&limit=${itemsPerPage}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+  const sortsRedux: {} | any = useAppSelector(
+    (state: RootState) => state.userReducer?.getAllUsers?.sorts
+  );
+  const currentPageRedux: number | any = useAppSelector(
+    (state: RootState) => state.userReducer?.getAllUsers?.currentPage
+  );
+  const itemsPerPageRedux: number | any = useAppSelector(
+    (state: RootState) => state.userReducer?.getAllUsers?.itemsPerPage
+  );
+
+  const [currentPage, setCurrentPage] = useState<number>(
+    currentPageRedux ? currentPageRedux : 1
+  );
+  const [itemsPerPage, setItemsPerPage] = useState<number>(
+    itemsPerPageRedux ? itemsPerPageRedux : 10
+  );
+  const [sorts, setSorts] = useState<{}>(sortsRedux ? sortsRedux : {});
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const users: IUser[] | any = useAppSelector(
+    (state: RootState) => state.userReducer?.getAllUsers?.allUsers
+  );
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    dispatch(getAllUsersStart());
+    try {
+      const response = await getAllUsers(
+        token,
+        sorts,
+        currentPage,
+        itemsPerPage
       );
-      setUsers(data?.data);
-      setLoading(false);
-    };
+      if (response?.status === true) {
+        dispatch(getAllUsersSuccess(response));
+      }
+    } catch (error) {
+      dispatch(getAllUsersError());
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
     fetchUsers();
-  }, [sorts, currentPage, itemsPerPage, token]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sorts, currentPage, itemsPerPage]);
 
   return (
     <>

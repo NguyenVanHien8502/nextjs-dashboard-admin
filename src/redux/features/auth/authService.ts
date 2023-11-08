@@ -22,7 +22,6 @@ export const logIn = async (dataInput: any, dispatch: Dispatch) => {
     );
     const currentUser = data?.user;
     if (data?.status === true && currentUser) {
-      setStogare("currentUser", JSON.stringify(currentUser));
       toast.success(data?.msg);
       dispatch(logInSuccess(data?.user));
       return data;

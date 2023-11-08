@@ -1,15 +1,13 @@
 "use client";
-import { getStogare } from "@/app/helper/stogare";
+import { RootState, useAppSelector } from "@/redux/store";
 import Link from "next/link";
 import Card from "react-bootstrap/Card";
 
 const MyProfile = () => {
-  let currentUser: IUser | null = null;
-  const currentUserString = getStogare("currentUser")?.trim();
-  if (currentUserString) {
-    currentUser = JSON.parse(currentUserString);
-  }
-
+  const currentUserString: string | any = useAppSelector(
+    (state: RootState) => state?.userReducer?.getProfile?.profile
+  );
+  const currentUser = JSON.parse(currentUserString);
   return (
     <>
       <div className="my-3">

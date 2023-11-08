@@ -4,7 +4,7 @@ import styles from "./app.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState, useAppSelector } from "@/redux/store";
 import { logIn } from "@/redux/features/auth/authService";
 import { toast } from "react-toastify";
@@ -12,8 +12,8 @@ import { toast } from "react-toastify";
 export default function Login() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const user: IUser | any = useAppSelector((state: RootState) => {
-    state.userReducer?.login?.currentUser;
+  const user: IUser | any = useSelector((state: RootState) => {
+    state.authReducer?.login?.currentUser;
   });
   const [dataInput, setDataInput] = useState({
     email: user?.email || "",
