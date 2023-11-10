@@ -4,36 +4,32 @@ import Card from "react-bootstrap/Card";
 import useSWR, { Fetcher } from "swr";
 import axios from "axios";
 import { getStogare } from "@/app/helper/stogare";
+import { useEffect, useState } from "react";
 
 const ViewUserDetail = ({ params }: { params: { userId: string } }) => {
-   let token: string | null = null;
-   const currentUserString = getStogare("currentUser")?.trim();
-   if (currentUserString) {
-     const currentUser = JSON.parse(currentUserString);
-     token = currentUser?.token;
+  let token: string | null = null;
+  const currentUserString = getStogare("currentUser")?.trim();
+  if (currentUserString) {
+    const currentUser = JSON.parse(currentUserString);
+    token = currentUser?.token;
   }
-  
-  const fetcher: Fetcher<IUser, string> = (url: string) =>
-    axios
-      .get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => res.data);
-  const { data, error, isLoading } = useSWR(
-    `${process.env.BASE_URL}/user/${params.userId}`,
-    fetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
-  );
 
-  if (isLoading) {
-    return <h1>Loading...</h1>;
-  }
+  const [user, setUser] = useState<IUser | null>(null);
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data } = await axios.get(
+        `${process.env.BASE_URL}/user/${params.userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUser(data);
+    };
+    fetchUser();
+  }, [params.userId, token]);
+
   return (
     <>
       <div className="my-3">
@@ -47,15 +43,15 @@ const ViewUserDetail = ({ params }: { params: { userId: string } }) => {
           <h2>Thông tin cá nhân của người dùng</h2>
         </Card.Header>
         <Card.Body>
-          <Card.Text>Username: {data?.username}</Card.Text>
-          <Card.Text>Email: {data?.email}</Card.Text>
-          <Card.Text>Phone Number: {data?.phone}</Card.Text>
-          <Card.Text>Role: {data?.role}</Card.Text>
-          <Card.Text>Status: {data?.status}</Card.Text>
+          <Card.Text>Username: {user?.username}</Card.Text>
+          <Card.Text>Email: {user?.email}</Card.Text>
+          <Card.Text>Phone Number: {user?.phone}</Card.Text>
+          <Card.Text>Role: {user?.role}</Card.Text>
+          <Card.Text>Status: {user?.status}</Card.Text>
         </Card.Body>
         <Card.Footer className="text-muted">
-          <Card.Text>CreatedAt: {data?.createdAt}</Card.Text>
-          <Card.Text>UpdatedAt: {data?.updatedAt}</Card.Text>
+          <Card.Text>CreatedAt: {user?.createdAt}</Card.Text>
+          <Card.Text>UpdatedAt: {user?.updatedAt}</Card.Text>
         </Card.Footer>
       </Card>
     </>

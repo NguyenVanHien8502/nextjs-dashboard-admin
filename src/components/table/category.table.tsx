@@ -22,6 +22,7 @@ interface Iprops {
   itemsPerPage: number;
   setItemsPerPage: (value: number | any) => void;
   setSorts: (value: {} | any) => void;
+  sortsRedux: Object;
 }
 
 const CategoryTable = (props: Iprops) => {
@@ -34,6 +35,7 @@ const CategoryTable = (props: Iprops) => {
     itemsPerPage,
     setItemsPerPage,
     setSorts,
+    sortsRedux,
   } = props;
 
   let token: string | null = null;
@@ -214,6 +216,24 @@ const CategoryTable = (props: Iprops) => {
     },
   };
 
+  const getDefaultSort = () => {
+    if (!sortsRedux || Object.keys(sortsRedux).length === 0) {
+      return 1;
+    }
+    const column = Object.keys(sortsRedux)[0];
+    if (!column) return 1;
+    return (columns.findIndex((v) => v.name === column) || 0) + 1;
+  };
+
+  const getDefaultSortAsc = () => {
+    if (!sortsRedux || Object.keys(sortsRedux).length === 0) {
+      return true;
+    }
+    const column = Object.keys(sortsRedux)[0];
+    const orderSort = sortsRedux[column as keyof Object];
+    return orderSort?.toString() === "asc" ? true : false;
+  };
+
   const handlePerRowsChange = async (perPage: number, page: number) => {
     setLoading(true);
     setItemsPerPage(perPage);
@@ -252,7 +272,7 @@ const CategoryTable = (props: Iprops) => {
     column: TableColumn<ICategory>,
     sortOrder: string
   ) => {
-    setSorts(`sort[${column.name}]=${sortOrder}`);
+    if (column?.name) setSorts(`sort[${column.name}]=${sortOrder}`);
   };
 
   const [category, setCategory] = useState<ICategory | null>(null);
@@ -302,6 +322,9 @@ const CategoryTable = (props: Iprops) => {
             paginationTotalRows={allRows}
             paginationServer={true}
             onChangePage={handlePageChange}
+            sortServer
+            defaultSortFieldId={getDefaultSort()}
+            defaultSortAsc={getDefaultSortAsc()}
             onSort={(column, sortOrder) => {
               handleSort(column, sortOrder);
             }}

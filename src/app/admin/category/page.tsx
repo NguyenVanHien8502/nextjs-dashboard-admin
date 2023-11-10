@@ -1,14 +1,29 @@
 "use client";
 import { getStogare } from "@/app/helper/stogare";
 import CategoryTable from "@/components/table/category.table";
+import { getAllCategories } from "@/redux/features/category/categoryService";
+import {
+  getAllCategoriesError,
+  getAllCategoriesStart,
+  getAllCategoriesSuccess,
+} from "@/redux/features/category/categorySlice";
+import { RootState, useAppDispatch } from "@/redux/store";
 import Box from "@mui/material/Box";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { connect } from "react-redux";
 import { toast } from "react-toastify";
 
-export default function Category() {
-  let token: string | null = null;
+interface IProps {
+  sorts: {};
+  itemsPerPage: number;
+  currentPage: number;
+  allCategories: ICategory[] | null;
+}
+
+function Category(props: IProps) {
+  let token: string;
   const currentUserString = getStogare("currentUser")?.trim();
   if (currentUserString) {
     const currentUser = JSON.parse(currentUserString);
@@ -16,34 +31,43 @@ export default function Category() {
   }
 
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
-  const [sorts, setSorts] = useState({});
+  const sortsRedux: {} = props?.sorts;
+  const currentPageRedux: number = props?.currentPage;
+  const itemsPerPageRedux: number = props?.itemsPerPage;
+  const categories: ICategory[] | null = props?.allCategories;
+
+  const [currentPage, setCurrentPage] = useState<number>(currentPageRedux);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(itemsPerPageRedux);
+  const [sorts, setSorts] = useState<{}>(sortsRedux);
+
   const [loading, setLoading] = useState(false);
 
-  const [categories, setCategories] = useState([]);
-  useEffect(() => {
-    if (token) {
-      const fetchCategories = async () => {
-        setLoading(true);
-        const { data } = await axios.get(
-          `${process.env.BASE_URL}/category?${sorts}&page=${currentPage}&limit=${itemsPerPage}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setCategories(data?.data);
-        setLoading(false);
-      };
-      fetchCategories();
-    } else {
-      router.replace("/");
-      toast.error("JWT has expired. Please login again to use service");
+  const fetchCategories = async () => {
+    setLoading(true);
+    dispatch(getAllCategoriesStart());
+    try {
+      const response = await getAllCategories(
+        token,
+        sorts,
+        currentPage,
+        itemsPerPage
+      );
+
+      if (response?.status === true) {
+        dispatch(getAllCategoriesSuccess(response));
+      }
+    } catch (error) {
+      dispatch(getAllCategoriesError());
     }
-  }, [sorts, currentPage, itemsPerPage, token, router]);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sorts, currentPage, itemsPerPage]);
   return (
     <>
       <Box height={100} width={1000}>
@@ -56,8 +80,20 @@ export default function Category() {
           itemsPerPage={itemsPerPage}
           setItemsPerPage={setItemsPerPage}
           setSorts={setSorts}
+          sortsRedux={sortsRedux}
         />
       </Box>
     </>
   );
 }
+
+const mapStateToProps = (state: RootState) => {
+  return {
+    sorts: state?.categoryReducer?.getAllCategories?.sorts,
+    itemsPerPage: state?.categoryReducer?.getAllCategories?.itemsPerPage,
+    currentPage: state?.categoryReducer?.getAllCategories?.currentPage,
+    allCategories: state?.categoryReducer?.getAllCategories?.allCategories,
+  };
+};
+
+export default connect(mapStateToProps)(Category);

@@ -1,27 +1,23 @@
 "use client";
 import axios from "axios";
-import { Dispatch } from "@reduxjs/toolkit";
-import {
-  getAllMoviesError,
-  getAllMoviesStart,
-  getAllMoviesSuccess,
-} from "./movieSlice";
 
 //get all movies
-export const getAllMovies = async (token: string | any, dispatch: Dispatch) => {
-  dispatch(getAllMoviesStart());
-  try {
-    const { data } = await axios.get(`${process.env.BASE_URL}/movie`, {
+export const getAllMovies = async (
+  token: string,
+  sorts: {},
+  currentPage: number,
+  itemsPerPage: number
+) => {
+  const { data } = await axios.get(
+    `${process.env.BASE_URL}/movie?${sorts}&page=${currentPage}&limit=${itemsPerPage}`,
+    {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    });
-
-    if (data?.status === true) {
-      dispatch(getAllMoviesSuccess(data?.data));
-      return data?.data;
     }
-  } catch (error) {
-    dispatch(getAllMoviesError());
+  );
+
+  if (data?.status === true) {
+    return data;
   }
 };

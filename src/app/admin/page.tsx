@@ -6,10 +6,15 @@ import CategoryIcon from "@mui/icons-material/Category";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
 import { getStogare } from "../helper/stogare";
 import { getProfile } from "@/redux/features/user/userService";
-import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useAppDispatch } from "@/redux/store";
+import {
+  getProfileError,
+  getProfileStart,
+  getProfileSuccess,
+} from "@/redux/features/user/userSlice";
 
 const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
 const pData = [2400, 1398, 9800, 3908, 4800, 3800, 4300];
@@ -24,20 +29,33 @@ const xLabels = [
 ];
 
 export default function Admin() {
-  let token: string | null = null;
+  let token: string = "";
   const currentUserString = getStogare("currentUser")?.trim();
   if (currentUserString) {
     const currentUser = JSON.parse(currentUserString);
     token = currentUser?.token;
   }
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [totalUser, setTotalUser] = useState(0);
   const [totalMovie, setTotalMovie] = useState(0);
   const [totalCategory, setTotalCategory] = useState(0);
   useEffect(() => {
     if (token) {
+      const fetchProfile = async () => {
+        dispatch(getProfileStart());
+        try {
+          const response = await getProfile(token);
+          if (response?.status === true) {
+            dispatch(getProfileSuccess(response));
+          }
+        } catch (error) {
+          dispatch(getProfileError());
+        }
+      };
+      fetchProfile();
+
       const fetchAllUser = async () => {
         const { data } = await axios.get(`${process.env.BASE_URL}/user`, {
           headers: {

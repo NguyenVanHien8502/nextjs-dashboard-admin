@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
 import Card from "react-bootstrap/Card";
-import useSWR, { Fetcher } from "swr";
 import axios from "axios";
 import { getStogare } from "@/app/helper/stogare";
+import { useEffect, useState } from "react";
 
-const ViewUserDetail = ({ params }: { params: { categoryId: string } }) => {
+const ViewCategoryDetail = ({ params }: { params: { categoryId: string } }) => {
   let token: string | null = null;
   const currentUserString = getStogare("currentUser")?.trim();
   if (currentUserString) {
@@ -13,21 +13,22 @@ const ViewUserDetail = ({ params }: { params: { categoryId: string } }) => {
     token = currentUser?.token;
   }
 
-  const fetcher: Fetcher<ICategory, string> = (url: string) =>
-    axios.get(url).then((res) => res.data);
-  const { data, error, isLoading } = useSWR(
-    `${process.env.BASE_URL}/category/${params.categoryId}`,
-    fetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
-  );
-
-  if (isLoading) {
-    return <h1>Loading...</h1>;
-  }
+    const [category, setCategory] = useState<ICategory | null>(null);
+    useEffect(() => {
+      const fetchCategory = async () => {
+        const { data } = await axios.get(
+          `${process.env.BASE_URL}/category/${params.categoryId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setCategory(data);
+      };
+      fetchCategory();
+    }, [params.categoryId, token]);
+  
   return (
     <>
       <div className="my-3">
@@ -41,18 +42,18 @@ const ViewUserDetail = ({ params }: { params: { categoryId: string } }) => {
           <h2>Thông tin chi tiết category</h2>
         </Card.Header>
         <Card.Body>
-          <Card.Text>Name: {data?.name}</Card.Text>
-          <Card.Text>Slug: {data?.slug}</Card.Text>
-          <Card.Text>Status: {data?.status}</Card.Text>
-          <Card.Text>Description: {data?.desc}</Card.Text>
+          <Card.Text>Name: {category?.name}</Card.Text>
+          <Card.Text>Slug: {category?.slug}</Card.Text>
+          <Card.Text>Status: {category?.status}</Card.Text>
+          <Card.Text>Description: {category?.desc}</Card.Text>
         </Card.Body>
         <Card.Footer className="text-muted">
-          <Card.Text>CreatedAt: {data?.createdAt}</Card.Text>
-          <Card.Text>UpdatedAt: {data?.updatedAt}</Card.Text>
+          <Card.Text>CreatedAt: {category?.createdAt}</Card.Text>
+          <Card.Text>UpdatedAt: {category?.updatedAt}</Card.Text>
         </Card.Footer>
       </Card>
     </>
   );
 };
 
-export default ViewUserDetail;
+export default ViewCategoryDetail;

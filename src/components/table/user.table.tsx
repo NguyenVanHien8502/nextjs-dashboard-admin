@@ -21,6 +21,7 @@ interface Iprops {
   itemsPerPage: number;
   setItemsPerPage: (value: number | any) => void;
   setSorts: (value: {} | any) => void;
+  sortsRedux: Object;
 }
 
 const UserTable = (props: Iprops) => {
@@ -33,6 +34,7 @@ const UserTable = (props: Iprops) => {
     itemsPerPage,
     setItemsPerPage,
     setSorts,
+    sortsRedux,
   } = props;
 
   let token: string | null = null;
@@ -198,6 +200,7 @@ const UserTable = (props: Iprops) => {
       ),
     },
   ];
+
   const tableCustomStyles: TableStyles | undefined = {
     headCells: {
       style: {
@@ -219,6 +222,24 @@ const UserTable = (props: Iprops) => {
     },
   };
 
+  const getDefaultSort = () => {
+    if (!sortsRedux || Object.keys(sortsRedux).length === 0) {
+      return 1;
+    }
+    const column = Object.keys(sortsRedux)[0];
+    if (!column) return 1;
+    return (columns.findIndex((v) => v.name === column) || 0) + 1;
+  };
+
+  const getDefaultSortAsc = () => {
+    if (!sortsRedux || Object.keys(sortsRedux).length === 0) {
+      return true;
+    }
+    const column = Object.keys(sortsRedux)[0];
+    const orderSort = sortsRedux[column as keyof Object];
+    return orderSort?.toString() === "asc" ? true : false;
+  };
+
   const handlePerRowsChange = async (perPage: number, page: number) => {
     setLoading(true);
     setItemsPerPage(perPage);
@@ -235,9 +256,6 @@ const UserTable = (props: Iprops) => {
   }, [users]);
   const [keyWordSearch, setKeyWordSearch] = useState("");
   const handleSearch = async () => {
-    // const newData: IUser[] = users.filter((row) => {
-    //   return row.name.toLowerCase().includes(e.target.value.toLowerCase());
-    // });
     const { data } = await axios.get(
       `${process.env.BASE_URL}/user?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
       {
@@ -254,7 +272,7 @@ const UserTable = (props: Iprops) => {
   }, [keyWordSearch]);
 
   const handleSort = (column: TableColumn<IUser>, sortOrder: string) => {
-    setSorts(`sort[${column.name}]=${sortOrder}`);
+    if (column?.name) setSorts(`sort[${column.name}]=${sortOrder}`);
   };
 
   const [showModalUpdateUser, setShowModalUpdateUser] =
@@ -299,6 +317,9 @@ const UserTable = (props: Iprops) => {
             paginationTotalRows={allRows}
             paginationServer={true}
             onChangePage={handlePageChange}
+            sortServer
+            defaultSortFieldId={getDefaultSort()}
+            defaultSortAsc={getDefaultSortAsc()}
             onSort={(column, sortOrder) => {
               handleSort(column, sortOrder);
             }}

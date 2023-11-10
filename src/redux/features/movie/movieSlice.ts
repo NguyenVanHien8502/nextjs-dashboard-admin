@@ -5,18 +5,24 @@ type InitialState = {
 };
 
 type GetAllMoviesState = {
-  allMovies: IMovie[] | null;
   isLoading: boolean;
   isError: boolean;
   isSuccess: boolean;
+  allMovies: IMovie[] | null;
+  sorts: Object;
+  currentPage: number;
+  itemsPerPage: number;
 };
 
 const initialState = {
   getAllMovies: {
-    allMovies: null,
     isLoading: false,
     isError: false,
     isSuccess: false,
+    allMovies: null,
+    sorts: { name: "asc" },
+    currentPage: 1,
+    itemsPerPage: 10,
   } as GetAllMoviesState,
 } as InitialState;
 
@@ -39,7 +45,10 @@ export const movieSlice = createSlice({
       state.getAllMovies.isLoading = false;
       state.getAllMovies.isError = false;
       state.getAllMovies.isSuccess = true;
-      state.getAllMovies.allMovies = action.payload;
+      state.getAllMovies.allMovies = action.payload?.data;
+      state.getAllMovies.sorts = action.payload?.sortOrder;
+      state.getAllMovies.currentPage = action.payload?.page;
+      state.getAllMovies.itemsPerPage = action.payload?.limit;
     },
   },
 });

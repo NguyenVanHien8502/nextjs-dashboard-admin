@@ -22,6 +22,7 @@ interface Iprops {
   itemsPerPage: number;
   setItemsPerPage: (value: number | any) => void;
   setSorts: (value: {} | any) => void;
+  sortsRedux: Object;
 }
 
 const MovieTable = (props: Iprops) => {
@@ -34,6 +35,7 @@ const MovieTable = (props: Iprops) => {
     itemsPerPage,
     setItemsPerPage,
     setSorts,
+    sortsRedux,
   } = props;
 
   let token: string | null = null;
@@ -155,7 +157,7 @@ const MovieTable = (props: Iprops) => {
       name: "author",
       sortable: true,
       cell: (row: IMovie) => (
-        <div className={styles.custom}>{author[row.author]}</div>
+        <div className={styles.custom}>{author[row?.author]}</div>
       ),
     },
     {
@@ -224,6 +226,24 @@ const MovieTable = (props: Iprops) => {
     },
   };
 
+  const getDefaultSort = () => {
+    if (!sortsRedux || Object.keys(sortsRedux).length === 0) {
+      return 1;
+    }
+    const column = Object.keys(sortsRedux)[0];
+    if (!column) return 1;
+    return (columns.findIndex((v) => v.name === column) || 0) + 1;
+  };
+
+  const getDefaultSortAsc = () => {
+    if (!sortsRedux || Object.keys(sortsRedux).length === 0) {
+      return true;
+    }
+    const column = Object.keys(sortsRedux)[0];
+    const orderSort = sortsRedux[column as keyof Object];
+    return orderSort?.toString() === "asc" ? true : false;
+  };
+
   const handlePerRowsChange = async (perPage: number, page: number) => {
     setLoading(true);
     setItemsPerPage(perPage);
@@ -256,7 +276,7 @@ const MovieTable = (props: Iprops) => {
   }, [keyWordSearch]);
 
   const handleSort = async (column: TableColumn<IMovie>, sortOrder: string) => {
-    setSorts(`sort[${column.name}]=${sortOrder}`);
+    if (column?.name) setSorts(`sort[${column.name}]=${sortOrder}`);
   };
 
   const [movie, setMovie] = useState<IMovie | null>(null);
@@ -266,7 +286,7 @@ const MovieTable = (props: Iprops) => {
     useState<boolean>(false);
 
   //fetchAuthor for each authorId
-  const [author, setAuthor] = useState<IUser | any>({});
+  const [author, setAuthor] = useState<any>({});
   useEffect(() => {
     const fetchAuthor = async (authorId: string) => {
       try {
@@ -278,7 +298,7 @@ const MovieTable = (props: Iprops) => {
             },
           }
         );
-        const authorName = data.username;
+        const authorName = data?.username;
         setAuthor((prev: any) => ({
           ...prev,
           [authorId]: authorName,
@@ -288,7 +308,7 @@ const MovieTable = (props: Iprops) => {
       }
     };
     movies.forEach((movie: IMovie) => {
-      const authorId: string = movie.author;
+      const authorId: string = movie?.author;
       fetchAuthor(authorId);
     });
   }, [movies, token]);
@@ -337,6 +357,9 @@ const MovieTable = (props: Iprops) => {
             paginationTotalRows={allRows}
             paginationServer={true}
             onChangePage={handlePageChange}
+            sortServer
+            defaultSortFieldId={getDefaultSort()}
+            defaultSortAsc={getDefaultSortAsc()}
             onSort={(column, sortOrder) => {
               handleSort(column, sortOrder);
             }}

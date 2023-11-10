@@ -1,9 +1,6 @@
 "use client";
 import axios from "axios";
 import {
-  getAllUsersError,
-  getAllUsersStart,
-  getAllUsersSuccess,
   getProfileError,
   getProfileStart,
   getProfileSuccess,
@@ -11,27 +8,21 @@ import {
 import { Dispatch } from "@reduxjs/toolkit";
 
 //get profile
-export const getProfile = async (token: string | any, dispatch: Dispatch) => {
-  dispatch(getProfileStart());
-  try {
-    const { data } = await axios.get(`${process.env.BASE_URL}/user/profile`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+export const getProfile = async (token: string) => {
+  const { data } = await axios.get(`${process.env.BASE_URL}/user/profile`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-    if (data?.status === true) {
-      dispatch(getProfileSuccess(data?.profile));
-      return data?.profile;
-    }
-  } catch (error) {
-    dispatch(getProfileError());
+  if (data?.status === true) {
+    return data;
   }
 };
 
 //get all users
 export const getAllUsers = async (
-  token: string | any,
+  token: string,
   sorts: {},
   currentPage: number,
   itemsPerPage: number

@@ -1,12 +1,11 @@
 "use client";
 import Link from "next/link";
 import Card from "react-bootstrap/Card";
-import useSWR, { Fetcher } from "swr";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { getStogare } from "@/app/helper/stogare";
 
-const ViewUserDetail = ({ params }: { params: { movieId: string } }) => {
+const ViewMovieDetail = ({ params }: { params: { movieId: string } }) => {
   let token: string | null = null;
   const currentUserString = getStogare("currentUser")?.trim();
   if (currentUserString) {
@@ -14,44 +13,38 @@ const ViewUserDetail = ({ params }: { params: { movieId: string } }) => {
     token = currentUser?.token;
   }
 
-  const fetcher: Fetcher<IMovie, string> = (url: string) =>
-    axios.get(url).then((res) => res.data);
-  const { data, error, isLoading } = useSWR(
-    `${process.env.BASE_URL}/movie/${params.movieId}`,
-    fetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
-  );
-  const dataMovie: IMovie | any = data;
-  const [author, setAuthor] = useState<IUser | any>({});
-
+  const [movie, setMovie] = useState<IMovie | null>(null);
   useEffect(() => {
-    const fetchAuthor = async (userId: string | any) => {
+    const fetchMovie = async () => {
       const { data } = await axios.get(
-        `${process.env.BASE_URL}/user/${userId}`,
+        `${process.env.BASE_URL}/movie/${params.movieId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      const authorName = data.username;
-      setAuthor((prev: any) => ({
-        ...prev,
-        [userId]: authorName,
-      }));
+      setMovie(data);
     };
+    fetchMovie();
+  }, [params.movieId, token]);
 
-    const authorId: string | any = data?.author;
-    fetchAuthor(authorId);
-  }, [data, dataMovie, token]);
+  const [author, setAuthor] = useState<IUser | null>(null);
+  useEffect(() => {
+    const fetchAuthor = async () => {
+      const { data } = await axios.get(
+        `${process.env.BASE_URL}/user/${movie?.author}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setAuthor(data);
+    };
+    if (movie?.author) fetchAuthor();
+  }, [movie?.author, token]);
 
-  if (isLoading) {
-    return <h1>Loading...</h1>;
-  }
   return (
     <>
       <div className="my-3">
@@ -65,21 +58,21 @@ const ViewUserDetail = ({ params }: { params: { movieId: string } }) => {
           <h2>Thông tin chi tiết movie</h2>
         </Card.Header>
         <Card.Body>
-          <Card.Text>Name: {data?.name}</Card.Text>
-          <Card.Text>Slug: {data?.slug}</Card.Text>
-          <Card.Text>Category: {data?.category}</Card.Text>
-          <Card.Text>Link: {data?.link}</Card.Text>
-          <Card.Text>Status: {data?.status}</Card.Text>
-          <Card.Text>Description: {data?.desc}</Card.Text>
-          <Card.Text>Author: {author[dataMovie?.author]}</Card.Text>
+          <Card.Text>Name: {movie?.name}</Card.Text>
+          <Card.Text>Slug: {movie?.slug}</Card.Text>
+          <Card.Text>Category: {movie?.category}</Card.Text>
+          <Card.Text>Link: {movie?.link}</Card.Text>
+          <Card.Text>Status: {movie?.status}</Card.Text>
+          <Card.Text>Description: {movie?.desc}</Card.Text>
+          <Card.Text>Author: {author?.username}</Card.Text>
         </Card.Body>
         <Card.Footer className="text-muted">
-          <Card.Text>CreatedAt: {data?.createdAt}</Card.Text>
-          <Card.Text>UpdatedAt: {data?.updatedAt}</Card.Text>
+          <Card.Text>CreatedAt: {movie?.createdAt}</Card.Text>
+          <Card.Text>UpdatedAt: {movie?.updatedAt}</Card.Text>
         </Card.Footer>
       </Card>
     </>
   );
 };
 
-export default ViewUserDetail;
+export default ViewMovieDetail;

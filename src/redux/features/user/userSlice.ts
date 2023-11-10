@@ -10,7 +10,7 @@ type GetProfileState = {
   isLoading: boolean;
   isError: boolean;
   isSuccess: boolean;
-  profile: string | any;
+  profile: string;
 };
 
 type GetAllUsersState = {
@@ -18,7 +18,7 @@ type GetAllUsersState = {
   isError: boolean;
   isSuccess: boolean;
   allUsers: IUser[] | null;
-  sorts: {} | null;
+  sorts: Object;
   currentPage: number;
   itemsPerPage: number;
 };
@@ -31,13 +31,13 @@ const initialState = {
     profile: getStogare("currentUser"),
   } as GetProfileState,
   getAllUsers: {
-    allUsers: null,
-    sorts: {},
-    currentPage: 1,
-    itemsPerPage: 10,
     isLoading: false,
     isError: false,
     isSuccess: false,
+    allUsers: null,
+    sorts: { username: "asc" },
+    currentPage: 1,
+    itemsPerPage: 10,
   } as GetAllUsersState,
 } as InitialState;
 
@@ -60,7 +60,7 @@ export const userSlice = createSlice({
       state.getProfile.isLoading = false;
       state.getProfile.isError = false;
       state.getProfile.isSuccess = true;
-      state.getProfile.profile = action.payload;
+      state.getProfile.profile = action.payload?.profile;
     },
 
     //getAllUsers

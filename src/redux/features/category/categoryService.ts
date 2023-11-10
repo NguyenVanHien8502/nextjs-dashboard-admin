@@ -1,23 +1,23 @@
 "use client";
 import axios from "axios";
-import { Dispatch } from "@reduxjs/toolkit";
-import { getAllCategoriesError, getAllCategoriesStart, getAllCategoriesSuccess } from "./categorySlice";
 
 //get all categories
-export const getAllCategories = async (token: string | any, dispatch: Dispatch) => {
-  dispatch(getAllCategoriesStart());
-  try {
-    const { data } = await axios.get(`${process.env.BASE_URL}/category`, {
+export const getAllCategories = async (
+  token: string,
+  sorts: {},
+  currentPage: number,
+  itemsPerPage: number
+) => {
+  const { data } = await axios.get(
+    `${process.env.BASE_URL}/category?${sorts}&page=${currentPage}&limit=${itemsPerPage}`,
+    {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    });
-
-    if (data?.status === true) {
-      dispatch(getAllCategoriesSuccess(data?.data));
-      return data?.data;
     }
-  } catch (error) {
-    dispatch(getAllCategoriesError());
+  );
+
+  if (data?.status === true) {
+    return data;
   }
 };

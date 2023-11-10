@@ -1,13 +1,20 @@
 "use client";
 import { RootState, useAppSelector } from "@/redux/store";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import Card from "react-bootstrap/Card";
 
 const MyProfile = () => {
-  const currentUserString: string | any = useAppSelector(
+  const currentUserString: string = useAppSelector(
     (state: RootState) => state?.userReducer?.getProfile?.profile
   );
-  const currentUser = JSON.parse(currentUserString);
+  const [currentUser, setCurrentUser] = useState<IUser | null>(null);
+  useEffect(() => {
+    if (currentUserString) {
+      setCurrentUser(JSON.parse(JSON.stringify(currentUserString)));
+    }
+  }, [currentUserString]);
+
   return (
     <>
       <div className="my-3">

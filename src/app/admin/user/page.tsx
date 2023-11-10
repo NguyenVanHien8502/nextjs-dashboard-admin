@@ -7,44 +7,36 @@ import {
   getAllUsersStart,
   getAllUsersSuccess,
 } from "@/redux/features/user/userSlice";
-import { RootState, useAppSelector } from "@/redux/store";
+import { RootState, useAppDispatch } from "@/redux/store";
 import Box from "@mui/material/Box";
-import { useEffect, useRef, useState } from "react";
-import { connect, useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
+import { connect } from "react-redux";
 
 interface IProps {
-  sorts: {} | null;
+  sorts: {};
   itemsPerPage: number;
   currentPage: number;
   allUsers: IUser[] | null;
 }
 function User(props: IProps) {
-  let token: string | null = null;
+  let token: string = "";
   const currentUserString = getStogare("currentUser")?.trim();
   if (currentUserString) {
     const currentUser = JSON.parse(currentUserString);
     token = currentUser?.token;
   }
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  const sortsRedux: {} | any = props?.sorts;
+  const sortsRedux: {}  = props?.sorts;
   const currentPageRedux: number = props?.currentPage;
   const itemsPerPageRedux: number = props?.itemsPerPage;
   const users: IUser[] | null = props?.allUsers;
 
-  const [currentPage, setCurrentPage] = useState<number>(
-    currentPageRedux ? currentPageRedux : 1
-  );
+  const [currentPage, setCurrentPage] = useState<number>(currentPageRedux);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(itemsPerPageRedux);
+  const [sorts, setSorts] = useState<{}>(sortsRedux);
 
-  const [itemsPerPage, setItemsPerPage] = useState<number>(
-    itemsPerPageRedux ? itemsPerPageRedux : 10
-  );
-
-  // console.log(sortsRedux);
-
-  const [sorts, setSorts] = useState<{}>(sortsRedux ? sortsRedux : {});
-  // console.log(sorts);
   const [loading, setLoading] = useState<boolean>(false);
 
   const fetchUsers = async () => {
@@ -69,9 +61,6 @@ function User(props: IProps) {
 
   useEffect(() => {
     fetchUsers();
-    console.log(sortsRedux);
-    console.log(sorts);
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sorts, currentPage, itemsPerPage]);
 
@@ -87,6 +76,7 @@ function User(props: IProps) {
           itemsPerPage={itemsPerPage}
           setItemsPerPage={setItemsPerPage}
           setSorts={setSorts}
+          sortsRedux={sortsRedux}
         />
       </Box>
     </>

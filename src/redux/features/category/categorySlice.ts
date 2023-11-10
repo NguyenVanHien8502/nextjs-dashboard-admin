@@ -5,18 +5,24 @@ type InitialState = {
 };
 
 type GetAllCategoriesState = {
-  allCategories: ICategory[] | null;
   isLoading: boolean;
   isError: boolean;
   isSuccess: boolean;
+  allCategories: ICategory[] | null;
+  sorts: Object;
+  currentPage: number;
+  itemsPerPage: number;
 };
 
 const initialState = {
   getAllCategories: {
-    allCategories: null,
     isLoading: false,
     isError: false,
     isSuccess: false,
+    allCategories: null,
+    sorts: { name: "asc" },
+    currentPage: 1,
+    itemsPerPage: 10,
   } as GetAllCategoriesState,
 } as InitialState;
 
@@ -39,7 +45,10 @@ export const categorySlice = createSlice({
       state.getAllCategories.isLoading = false;
       state.getAllCategories.isError = false;
       state.getAllCategories.isSuccess = true;
-      state.getAllCategories.allCategories = action.payload;
+      state.getAllCategories.allCategories = action.payload?.data;
+      state.getAllCategories.sorts = action.payload?.sortOrder;
+      state.getAllCategories.currentPage = action.payload?.page;
+      state.getAllCategories.itemsPerPage = action.payload?.limit;
     },
   },
 });
