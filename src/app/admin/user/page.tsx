@@ -9,8 +9,10 @@ import {
 } from "@/redux/features/user/userSlice";
 import { RootState, useAppDispatch } from "@/redux/store";
 import Box from "@mui/material/Box";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
+import { toast } from "react-toastify";
 
 interface IProps {
   sorts: {};
@@ -26,9 +28,10 @@ function User(props: IProps) {
     token = currentUser?.token;
   }
 
+  const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const sortsRedux: {}  = props?.sorts;
+  const sortsRedux: {} = props?.sorts;
   const currentPageRedux: number = props?.currentPage;
   const itemsPerPageRedux: number = props?.itemsPerPage;
   const users: IUser[] | null = props?.allUsers;
@@ -53,16 +56,21 @@ function User(props: IProps) {
       if (response?.status === true) {
         dispatch(getAllUsersSuccess(response));
       }
-    } catch (error) {
+    } catch (error: any) {
       dispatch(getAllUsersError());
     }
     setLoading(false);
   };
 
   useEffect(() => {
+    if (!token) {
+      router.replace("/");
+      toast.warning("JWT has expired. Please log in again.");
+      return;
+    }
     fetchUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sorts, currentPage, itemsPerPage]);
+  }, [sorts, currentPage, itemsPerPage, token, router]);
 
   return (
     <>

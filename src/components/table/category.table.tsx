@@ -82,44 +82,49 @@ const CategoryTable = (props: Iprops) => {
 
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const handleDeleteManyCategory = async () => {
-    if (
-      window.confirm(
-        `Are you sure want to delete ${selectedRows.length} categories below? `
-      )
-    ) {
-      try {
-        const { data } = await axios.delete(
-          `${process.env.BASE_URL}/category`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            data: {
-              categoryIds: selectedRows,
-            },
-          }
-        );
-        if (data?.status === false) {
-          toast.warning(data?.msg);
-          return;
-        }
-        if (data?.status === true) {
-          toast.success(data?.msg);
-          const res = await axios.get(
-            `${process.env.BASE_URL}/category?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+    if (selectedRows.length > 0) {
+      if (
+        window.confirm(
+          `Are you sure want to delete ${selectedRows.length} categories below? `
+        )
+      ) {
+        try {
+          const { data } = await axios.delete(
+            `${process.env.BASE_URL}/category`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
+              data: {
+                categoryIds: selectedRows,
+              },
             }
           );
-          setRecords(res?.data?.data);
-          setAllRows(res.data?.totalCategories);
+          if (data?.status === false) {
+            toast.warning(data?.msg);
+            return;
+          }
+          if (data?.status === true) {
+            toast.success(data?.msg);
+            const res = await axios.get(
+              `${process.env.BASE_URL}/category?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            setRecords(res?.data?.data);
+            setAllRows(res.data?.totalCategories);
+          }
+        } catch (error: any) {
+          toast.error(error?.response?.data?.message);
+          return;
         }
-      } catch (error: any) {
-        toast.error(error?.response?.data?.message);
-        return;
       }
+    } else {
+      toast.warning("Please pick categories to delete them");
+      return;
     }
   };
 

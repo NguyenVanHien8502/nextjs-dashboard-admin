@@ -128,17 +128,19 @@ export default function Admin() {
       </div>
       <div className="mt-5">
         <h3>Data Chart</h3>
-        <LineChart
-          width={1000}
-          height={400}
-          series={[
-            { data: pData, label: "pv", yAxisKey: "leftAxisId" },
-            { data: uData, label: "uv", yAxisKey: "rightAxisId" },
-          ]}
-          xAxis={[{ scaleType: "point", data: xLabels }]}
-          yAxis={[{ id: "leftAxisId" }, { id: "rightAxisId" }]}
-          rightAxis="rightAxisId"
-        />
+        <div className="d-flex justify-content-between align-items-center">
+          <LineChart
+            width={1000}
+            height={500}
+            series={[
+              { data: pData, label: "pv", yAxisKey: "leftAxisId" },
+              { data: uData, label: "uv", yAxisKey: "rightAxisId" },
+            ]}
+            xAxis={[{ scaleType: "point", data: xLabels }]}
+            yAxis={[{ id: "leftAxisId" }, { id: "rightAxisId" }]}
+            rightAxis="rightAxisId"
+          />
+        </div>
       </div>
     </>
   );

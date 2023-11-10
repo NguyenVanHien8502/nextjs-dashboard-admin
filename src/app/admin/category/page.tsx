@@ -23,7 +23,7 @@ interface IProps {
 }
 
 function Category(props: IProps) {
-  let token: string;
+  let token: string = "";
   const currentUserString = getStogare("currentUser")?.trim();
   if (currentUserString) {
     const currentUser = JSON.parse(currentUserString);
@@ -65,9 +65,14 @@ function Category(props: IProps) {
   };
 
   useEffect(() => {
+    if (!token) {
+      router.replace("/");
+      toast.warning("JWT has expired. Please log in again.");
+      return;
+    }
     fetchCategories();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sorts, currentPage, itemsPerPage]);
+  }, [sorts, currentPage, itemsPerPage, token, router]);
   return (
     <>
       <Box height={100} width={1000}>

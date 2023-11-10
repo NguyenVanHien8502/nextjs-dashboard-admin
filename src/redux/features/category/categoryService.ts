@@ -17,7 +17,5 @@ export const getAllCategories = async (
     }
   );
 
-  if (data?.status === true) {
-    return data;
-  }
+  return data;
 };

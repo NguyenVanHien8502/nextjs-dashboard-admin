@@ -6,11 +6,16 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { registerUser } from "@/redux/features/auth/authService";
-import { useDispatch } from "react-redux";
+import {
+  registerError,
+  registerStart,
+  registerSuccess,
+} from "@/redux/features/auth/authSlice";
+import { useAppDispatch } from "@/redux/store";
 
 export default function Signup() {
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [data, setData] = useState({
     username: "",
     email: "",
@@ -18,21 +23,28 @@ export default function Signup() {
     role: "",
   });
   const handleSignUp = async (e: any) => {
+    e.preventDefault();
+    dispatch(registerStart());
     try {
-      e.preventDefault();
       const newUser = {
         username: data.username,
         email: data.email,
         password: data.password,
         role: data.role,
       };
-      const response = await registerUser(newUser, dispatch);
+      const response = await registerUser(newUser);
       if (response?.status === true && response?.newUser) {
-        toast.success("Please navigate to login page to login to use service!")
+        toast.success(response?.msg);
+        dispatch(registerSuccess());
+        toast.success("Please navigate to login page to login to use service!");
         router.replace("/");
       }
+      if (response?.status === false) {
+        toast.error(response?.msg);
+        dispatch(registerError());
+      }
     } catch {
-      toast.error("Error! An error occurred. Please try again later");
+      dispatch(registerError());
     }
   };
   return (

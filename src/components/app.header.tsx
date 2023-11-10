@@ -19,7 +19,6 @@ import CampaignIcon from "@mui/icons-material/Campaign";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SearchIcon from "@mui/icons-material/Search";
 import styles from "../app/admin/admin.module.css";
-import { RootState, useAppSelector } from "@/redux/store";
 import { getStogare, removeStogare } from "@/app/helper/stogare";
 
 const drawerWidth = 240;
@@ -46,10 +45,14 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-const AppHeader = () => {
-  const router = useRouter();
+interface IProps {
+  openDrawer: boolean;
+  setOpenDrawer: (value: boolean) => void;
+}
 
-  const [openDrawer, setOpenDrawer] = useState(true);
+const AppHeader = (props: IProps) => {
+  const { openDrawer, setOpenDrawer } = props;
+  const router = useRouter();
 
   const [anchorElMenu, setAnchorElMenu] = useState<HTMLButtonElement | null>(
     null

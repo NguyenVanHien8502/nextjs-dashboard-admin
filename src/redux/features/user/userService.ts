@@ -14,10 +14,7 @@ export const getProfile = async (token: string) => {
       Authorization: `Bearer ${token}`,
     },
   });
-
-  if (data?.status === true) {
-    return data;
-  }
+  return data;
 };
 
 //get all users
@@ -35,7 +32,5 @@ export const getAllUsers = async (
       },
     }
   );
-  if (data?.status === true) {
-    return data;
-  }
+  return data;
 };

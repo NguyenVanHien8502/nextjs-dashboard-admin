@@ -16,8 +16,5 @@ export const getAllMovies = async (
       },
     }
   );
-
-  if (data?.status === true) {
-    return data;
-  }
+  return data;
 };

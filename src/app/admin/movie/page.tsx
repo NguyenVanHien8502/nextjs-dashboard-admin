@@ -12,6 +12,7 @@ import Box from "@mui/material/Box";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
+import { toast } from "react-toastify";
 
 interface IProps {
   sorts: {};
@@ -21,7 +22,7 @@ interface IProps {
 }
 
 function Movie(props: IProps) {
-  let token: string;
+  let token: string = "";
   const currentUserString = getStogare("currentUser")?.trim();
   if (currentUserString) {
     const currentUser = JSON.parse(currentUserString);
@@ -63,9 +64,14 @@ function Movie(props: IProps) {
   };
 
   useEffect(() => {
+    if (!token) {
+      router.replace("/");
+      toast.warning("JWT has expired. Please log in again.");
+      return;
+    }
     fetchMovies();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sorts, currentPage, itemsPerPage]);
+  }, [sorts, currentPage, itemsPerPage, token, router]);
 
   return (
     <>

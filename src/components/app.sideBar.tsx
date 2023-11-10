@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import { styled, useTheme, Theme, CSSObject } from "@mui/material/styles";
 import MuiDrawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
@@ -66,19 +65,21 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-const AppSideBar = () => {
+interface IProps {
+  openDrawer: boolean;
+  setOpenDrawer: (value: boolean) => void;
+}
+
+const AppSideBar = (props: IProps) => {
+  const { openDrawer, setOpenDrawer } = props;
+
   const router = useRouter();
   const theme = useTheme();
-
-  const [openDrawer, setOpenDrawer] = useState(true);
-  const handleDrawerClose = () => {
-    setOpenDrawer(false);
-  };
 
   return (
     <Drawer variant="permanent" open={openDrawer}>
       <DrawerHeader>
-        <IconButton onClick={handleDrawerClose}>
+        <IconButton onClick={() => setOpenDrawer(false)}>
           {theme.direction === "rtl" ? (
             <ChevronRightIcon />
           ) : (

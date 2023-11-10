@@ -4,15 +4,19 @@ import styles from "./app.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, useAppSelector } from "@/redux/store";
+import { RootState, useAppDispatch, useAppSelector } from "@/redux/store";
 import { logIn } from "@/redux/features/auth/authService";
 import { toast } from "react-toastify";
+import {
+  logInError,
+  logInStart,
+  logInSuccess,
+} from "@/redux/features/auth/authSlice";
 
 export default function Login() {
   const router = useRouter();
-  const dispatch = useDispatch();
-  const user: IUser | any = useSelector((state: RootState) => {
+  const dispatch = useAppDispatch();
+  const user: IUser | any = useAppSelector((state: RootState) => {
     state.authReducer?.login?.currentUser;
   });
   const [dataInput, setDataInput] = useState({
@@ -20,15 +24,27 @@ export default function Login() {
     password: user?.password || "",
   });
 
+  const isLoading: boolean = useAppSelector(
+    (state: RootState) => state?.authReducer?.login?.isLoading
+  );
+
   const handleLogin = async (e: any) => {
+    e.preventDefault();
+    dispatch(logInStart());
     try {
-      e.preventDefault();
-      const response = await logIn(dataInput, dispatch);
-      if (response?.status === true && response?.user) {
+      const response = await logIn(dataInput);
+      const currentUser = response?.user;
+      if (response?.status === true && currentUser) {
+        toast.success(response?.msg);
+        dispatch(logInSuccess(currentUser));
         router.push("/admin");
       }
+      if (response?.status === false) {
+        toast.error(response?.msg);
+        dispatch(logInError());
+      }
     } catch (error) {
-      toast.error("Error! An error occurred. Please try again later");
+      dispatch(logInError());
     }
   };
 
@@ -36,7 +52,7 @@ export default function Login() {
     <div className={styles.main}>
       <div className={styles.container}>
         <div className={styles.title_container}>
-          <p className={styles.title}>Login</p>
+          <p className={styles.title}>Đăng nhập</p>
         </div>
         <form className={styles.form_container}>
           <div className={styles.inputs_container}>
@@ -81,8 +97,9 @@ export default function Login() {
               type="submit"
               onClick={(e) => handleLogin(e)}
               className={styles.button}
+              disabled={isLoading}
             >
-              Login
+              {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
             </Button>
           </div>
         </form>

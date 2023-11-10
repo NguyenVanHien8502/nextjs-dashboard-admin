@@ -1,9 +1,10 @@
 "use client";
-import { styled} from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import AppSideBar from "@/components/app.sideBar";
 import AppHeader from "@/components/app.header";
+import { useState } from "react";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -19,12 +20,14 @@ export default function MainLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const [openDrawer, setOpenDrawer] = useState(true);
+
   return (
     <>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
-        <AppHeader />
-        <AppSideBar />
+        <AppHeader openDrawer={openDrawer} setOpenDrawer={setOpenDrawer} />
+        <AppSideBar openDrawer={openDrawer} setOpenDrawer={setOpenDrawer} />
         <Box
           component="main"
           sx={{ flexGrow: 1, p: 3 }}
