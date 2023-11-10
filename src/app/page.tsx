@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { RootState, useAppDispatch, useAppSelector } from "@/redux/store";
-import { logIn } from "@/redux/features/auth/authService";
+import { logInAdmin } from "@/redux/features/auth/authService";
 import { toast } from "react-toastify";
 import {
   logInError,
@@ -32,7 +32,7 @@ export default function Login() {
     e.preventDefault();
     dispatch(logInStart());
     try {
-      const response = await logIn(dataInput);
+      const response = await logInAdmin(dataInput);
       const currentUser = response?.user;
       if (response?.status === true && currentUser) {
         toast.success(response?.msg);

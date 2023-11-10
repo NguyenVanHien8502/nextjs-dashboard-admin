@@ -1,10 +1,14 @@
 "use client";
 import { RootState, useAppSelector } from "@/redux/store";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Button } from "react-bootstrap";
 import Card from "react-bootstrap/Card";
 
 const MyProfile = () => {
+  const router = useRouter();
+
   const currentUserString: string = useAppSelector(
     (state: RootState) => state?.userReducer?.getProfile?.profile
   );
@@ -15,10 +19,17 @@ const MyProfile = () => {
     }
   }, [currentUserString]);
 
+  const goToChangePassword = () => {
+    router.replace("/admin/profile/changePassword");
+  };
+
   return (
     <>
-      <div className="my-3">
+      <div className="my-3 d-flex justify-content-between align-items-center">
         <Link href={"/admin"}>Go back</Link>
+        <Button variant="secondary" onClick={() => goToChangePassword()}>
+          Change Password
+        </Button>
       </div>
 
       <br />
