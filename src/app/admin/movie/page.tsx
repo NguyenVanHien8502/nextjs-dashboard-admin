@@ -15,7 +15,8 @@ import { connect } from "react-redux";
 import { toast } from "react-toastify";
 
 interface IProps {
-  sorts: {};
+  sortsSelector: string;
+  sortsDirection: string;
   itemsPerPage: number;
   currentPage: number;
   allMovies: IMovie[] | null;
@@ -32,14 +33,15 @@ function Movie(props: IProps) {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const sortsRedux: {} = props?.sorts;
+  const sortsSelectorRedux: string = props?.sortsSelector;
+  const sortsDirectionRedux: string = props?.sortsDirection;
   const currentPageRedux: number = props?.currentPage;
   const itemsPerPageRedux: number = props?.itemsPerPage;
   const movies: IMovie[] | null = props?.allMovies;
 
   const [currentPage, setCurrentPage] = useState<number>(currentPageRedux);
   const [itemsPerPage, setItemsPerPage] = useState<number>(itemsPerPageRedux);
-  const [sorts, setSorts] = useState<{}>(sortsRedux);
+  const sortsRedux: Object = { sortsSelectorRedux, sortsDirectionRedux };
 
   const [loading, setLoading] = useState(false);
 
@@ -47,12 +49,7 @@ function Movie(props: IProps) {
     setLoading(true);
     dispatch(getAllMoviesStart());
     try {
-      const response = await getAllMovies(
-        token,
-        sorts,
-        currentPage,
-        itemsPerPage
-      );
+      const response = await getAllMovies(token, currentPage, itemsPerPage);
 
       if (response?.status === true) {
         dispatch(getAllMoviesSuccess(response));
@@ -71,7 +68,7 @@ function Movie(props: IProps) {
     }
     fetchMovies();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sorts, currentPage, itemsPerPage, token, router]);
+  }, [currentPage, itemsPerPage, token, router]);
 
   return (
     <>
@@ -84,7 +81,6 @@ function Movie(props: IProps) {
           setCurrentPage={setCurrentPage}
           itemsPerPage={itemsPerPage}
           setItemsPerPage={setItemsPerPage}
-          setSorts={setSorts}
           sortsRedux={sortsRedux}
         />
       </Box>
@@ -94,7 +90,8 @@ function Movie(props: IProps) {
 
 const mapStateToProps = (state: RootState) => {
   return {
-    sorts: state?.movieReducer?.getAllMovies?.sorts,
+    sortsSelector: state?.movieReducer?.getSortsMovie?.selector,
+    sortsDirection: state?.movieReducer?.getSortsMovie?.direction,
     itemsPerPage: state?.movieReducer?.getAllMovies?.itemsPerPage,
     currentPage: state?.movieReducer?.getAllMovies?.currentPage,
     allMovies: state?.movieReducer?.getAllMovies?.allMovies,

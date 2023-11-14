@@ -7,11 +7,14 @@ import { toast } from "react-toastify";
 import CreateModalCategory from "../createModal/createCategory.modal";
 import UpdateModalCategory from "../updateModal/updateCategory.modal";
 import DataTable, {
+  Selector,
   TableColumn,
   TableStyles,
 } from "react-data-table-component";
 import styles from "../../app/admin/category/category.module.css";
 import { getStogare } from "@/app/helper/stogare";
+import { getSortsCategory } from "@/redux/features/category/categorySlice";
+import { useAppDispatch } from "@/redux/store";
 
 interface Iprops {
   loading: boolean;
@@ -21,7 +24,6 @@ interface Iprops {
   setCurrentPage: (value: number | any) => void;
   itemsPerPage: number;
   setItemsPerPage: (value: number | any) => void;
-  setSorts: (value: {} | any) => void;
   sortsRedux: Object;
 }
 
@@ -34,7 +36,6 @@ const CategoryTable = (props: Iprops) => {
     setCurrentPage,
     itemsPerPage,
     setItemsPerPage,
-    setSorts,
     sortsRedux,
   } = props;
 
@@ -44,6 +45,8 @@ const CategoryTable = (props: Iprops) => {
     const currentUser = JSON.parse(currentUserString);
     token = currentUser?.token;
   }
+
+  const dispatch = useAppDispatch();
 
   const handleDeleteCategory = async (id: string) => {
     if (window.confirm("Are you sure want to delete this category? ")) {
@@ -142,11 +145,12 @@ const CategoryTable = (props: Iprops) => {
     fetchTotalRows();
   }, [token]);
 
-  const columns: TableColumn<ICategory>[] = [
+  const columns: TableColumn<ICategory>[] | undefined = [
     {
       name: "name",
       sortable: true,
       cell: (row: ICategory) => <div className={styles.custom}>{row.name}</div>,
+      selector: (row: ICategory) => row.name,
     },
     {
       name: "status",
@@ -154,6 +158,7 @@ const CategoryTable = (props: Iprops) => {
       cell: (row: ICategory) => (
         <div className={styles.custom}>{row.status}</div>
       ),
+      selector: (row: ICategory) => row.status,
     },
     {
       name: "createdAt",
@@ -161,6 +166,7 @@ const CategoryTable = (props: Iprops) => {
       cell: (row: ICategory) => (
         <div className={styles.custom}>{row.createdAt}</div>
       ),
+      selector: (row: ICategory) => row.createdAt,
     },
     {
       name: "updatedAt",
@@ -168,6 +174,7 @@ const CategoryTable = (props: Iprops) => {
       cell: (row: ICategory) => (
         <div className={styles.custom}>{row.updatedAt}</div>
       ),
+      selector: (row: ICategory) => row.updatedAt,
     },
     {
       name: "Actions",
@@ -221,24 +228,6 @@ const CategoryTable = (props: Iprops) => {
     },
   };
 
-  const getDefaultSort = () => {
-    if (!sortsRedux || Object.keys(sortsRedux).length === 0) {
-      return 1;
-    }
-    const column = Object.keys(sortsRedux)[0];
-    if (!column) return 1;
-    return (columns.findIndex((v) => v.name === column) || 0) + 1;
-  };
-
-  const getDefaultSortAsc = () => {
-    if (!sortsRedux || Object.keys(sortsRedux).length === 0) {
-      return true;
-    }
-    const column = Object.keys(sortsRedux)[0];
-    const orderSort = sortsRedux[column as keyof Object];
-    return orderSort?.toString() === "asc" ? true : false;
-  };
-
   const handlePerRowsChange = async (perPage: number, page: number) => {
     setLoading(true);
     setItemsPerPage(perPage);
@@ -249,15 +238,13 @@ const CategoryTable = (props: Iprops) => {
     setCurrentPage(page);
   };
 
+  //handle search
   const [records, setRecords] = useState<ICategory[]>(categories);
   useEffect(() => {
     if (categories.length) setRecords(categories);
   }, [categories]);
   const [keyWordSearch, setKeyWordSearch] = useState("");
   const handleSearch = async () => {
-    // const newData: ICategory[] = categories.filter((row) => {
-    //   return row.name.toLowerCase().includes(e.target.value.toLowerCase());
-    // });
     const { data } = await axios.get(
       `${process.env.BASE_URL}/category?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
       {
@@ -273,18 +260,72 @@ const CategoryTable = (props: Iprops) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keyWordSearch]);
 
-  const handleSort = async (
-    column: TableColumn<ICategory>,
-    sortOrder: string
-  ) => {
-    if (column?.name) setSorts(`sort[${column.name}]=${sortOrder}`);
-  };
-
   const [category, setCategory] = useState<ICategory | null>(null);
   const [showModalCreateCategory, setShowModalCreateCategory] =
     useState<boolean>(false);
   const [showModalUpdateCategory, setShowModalUpdateCategory] =
     useState<boolean>(false);
+
+  //handle sort
+  const customSort = (
+    rows: ICategory[],
+    selector: Selector<ICategory>,
+    direction: string
+  ) => {
+    // Chuyển đổi hàm selector thành chuỗi
+    const selectorString = selector.toString();
+
+    // Sử dụng biểu thức chính quy để trích xuất tên trường (username)
+    const match = selectorString.match(/\(\w+\)\s*=>\s*row\.(\w+)/);
+
+    if (match) {
+      // match[1] chứa tên trường (ở đây là "name")
+      const fieldName = match[1];
+      dispatch(getSortsCategory({ fieldName, direction }));
+
+      return rows?.sort((rowA: ICategory, rowB: ICategory) => {
+        // use the selector function to resolve your field names by passing the sort comparitors
+        const aField = selector(rowA);
+        const bField = selector(rowB);
+
+        let comparison = 0;
+
+        if (aField > bField) {
+          comparison = 1;
+        } else if (aField < bField) {
+          comparison = -1;
+        }
+
+        return direction === "desc" ? comparison * -1 : comparison;
+      });
+    } else {
+      // Xử lý trường hợp không thể trích xuất thông tin
+      console.error(
+        "Unable to extract field name from selector:",
+        selectorString
+      );
+      return rows;
+    }
+  };
+
+  const getDefaultSortField = () => {
+    if (!sortsRedux || Object.keys(sortsRedux).length === 0) {
+      return 1;
+    }
+    const column = Object.keys(sortsRedux)[0];
+    const fieldName = sortsRedux[column as keyof Object];
+    if (!fieldName) return 1;
+    return (columns.findIndex((v) => v.name === fieldName.toString()) || 0) + 1;
+  };
+
+  const getDefaultSortAsc = () => {
+    if (!sortsRedux || Object.keys(sortsRedux).length === 0) {
+      return true;
+    }
+    const column = Object.keys(sortsRedux)[1];
+    const orderSort = sortsRedux[column as keyof Object];
+    return orderSort?.toString() === "asc" ? true : false;
+  };
 
   return (
     <>
@@ -327,12 +368,9 @@ const CategoryTable = (props: Iprops) => {
             paginationTotalRows={allRows}
             paginationServer={true}
             onChangePage={handlePageChange}
-            sortServer
-            defaultSortFieldId={getDefaultSort()}
             defaultSortAsc={getDefaultSortAsc()}
-            onSort={(column, sortOrder) => {
-              handleSort(column, sortOrder);
-            }}
+            defaultSortFieldId={getDefaultSortField()}
+            sortFunction={customSort}
             onRowClicked={(row, e) => {
               setCategory(row);
               setShowModalUpdateCategory(true);

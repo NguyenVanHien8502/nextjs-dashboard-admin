@@ -1,9 +1,10 @@
 "use client";
-import { Button } from "react-bootstrap";
+import { Button, Table } from "react-bootstrap";
 import Link from "next/link";
 import axios from "axios";
 import { toast } from "react-toastify";
 import DataTable, {
+  Selector,
   TableColumn,
   TableStyles,
 } from "react-data-table-component";
@@ -11,6 +12,8 @@ import UpdateModalUser from "../updateModal/updateUser.modal";
 import { useCallback, useEffect, useState } from "react";
 import styles from "../../app/admin/user/user.module.css";
 import { getStogare } from "@/app/helper/stogare";
+import { useAppDispatch } from "@/redux/store";
+import { getSortsUser } from "@/redux/features/user/userSlice";
 
 interface Iprops {
   loading: boolean;
@@ -20,7 +23,6 @@ interface Iprops {
   setCurrentPage: (value: number | any) => void;
   itemsPerPage: number;
   setItemsPerPage: (value: number | any) => void;
-  setSorts: (value: {} | any) => void;
   sortsRedux: Object;
 }
 
@@ -33,7 +35,6 @@ const UserTable = (props: Iprops) => {
     setCurrentPage,
     itemsPerPage,
     setItemsPerPage,
-    setSorts,
     sortsRedux,
   } = props;
 
@@ -43,6 +44,8 @@ const UserTable = (props: Iprops) => {
     const currentUser = JSON.parse(currentUserString);
     token = currentUser?.token;
   }
+
+  const dispatch = useAppDispatch();
 
   const handleDeleteUser = async (id: string) => {
     if (window.confirm("Are you sure want to delete this user? ")) {
@@ -143,22 +146,25 @@ const UserTable = (props: Iprops) => {
       name: "username",
       sortable: true,
       cell: (row: IUser) => <div className={styles.custom}>{row.username}</div>,
+      selector: (row: IUser) => row.username,
     },
     {
       name: "email",
       sortable: true,
       cell: (row: IUser) => <div className={styles.custom}>{row.email}</div>,
+      selector: (row: IUser) => row.email,
     },
     {
       name: "role",
       sortable: true,
       cell: (row: IUser) => <div className={styles.custom}>{row.role}</div>,
+      selector: (row: IUser) => row.role,
     },
     {
       name: "status",
-      selector: (row: IUser) => row.status,
       sortable: true,
       cell: (row: IUser) => <div className={styles.custom}>{row.status}</div>,
+      selector: (row: IUser) => row.status,
     },
     {
       name: "createdAt",
@@ -166,6 +172,7 @@ const UserTable = (props: Iprops) => {
       cell: (row: IUser) => (
         <div className={styles.custom}>{row.createdAt}</div>
       ),
+      selector: (row: IUser) => row.createdAt,
     },
     {
       name: "updatedAt",
@@ -173,6 +180,7 @@ const UserTable = (props: Iprops) => {
       cell: (row: IUser) => (
         <div className={styles.custom}>{row.updatedAt}</div>
       ),
+      selector: (row: IUser) => row.updatedAt,
     },
     {
       name: "Actions",
@@ -227,24 +235,6 @@ const UserTable = (props: Iprops) => {
     },
   };
 
-  const getDefaultSort = () => {
-    if (!sortsRedux || Object.keys(sortsRedux).length === 0) {
-      return 1;
-    }
-    const column = Object.keys(sortsRedux)[0];
-    if (!column) return 1;
-    return (columns.findIndex((v) => v.name === column) || 0) + 1;
-  };
-
-  const getDefaultSortAsc = () => {
-    if (!sortsRedux || Object.keys(sortsRedux).length === 0) {
-      return true;
-    }
-    const column = Object.keys(sortsRedux)[0];
-    const orderSort = sortsRedux[column as keyof Object];
-    return orderSort?.toString() === "asc" ? true : false;
-  };
-
   const handlePerRowsChange = async (perPage: number, page: number) => {
     setLoading(true);
     setItemsPerPage(perPage);
@@ -255,6 +245,7 @@ const UserTable = (props: Iprops) => {
     setCurrentPage(page);
   };
 
+  //handle search
   const [records, setRecords] = useState<IUser[]>(users);
   useEffect(() => {
     if (users.length) setRecords(users);
@@ -276,13 +267,70 @@ const UserTable = (props: Iprops) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keyWordSearch]);
 
-  const handleSort = (column: TableColumn<IUser>, sortOrder: string) => {
-    if (column?.name) setSorts(`sort[${column.name}]=${sortOrder}`);
-  };
-
+  const [user, setUser] = useState<IUser | null>(null);
   const [showModalUpdateUser, setShowModalUpdateUser] =
     useState<boolean>(false);
-  const [user, setUser] = useState<IUser | null>(null);
+
+  //handle sort
+  const customSort = (
+    rows: IUser[],
+    selector: Selector<IUser>,
+    direction: string
+  ) => {
+    // Chuyển đổi hàm selector thành chuỗi
+    const selectorString = selector.toString();
+
+    // Sử dụng biểu thức chính quy để trích xuất tên trường (username)
+    const match = selectorString.match(/\(\w+\)\s*=>\s*row\.(\w+)/);
+
+    if (match) {
+      // match[1] chứa tên trường (ở đây là "username")
+      const fieldName = match[1];
+      dispatch(getSortsUser({ fieldName, direction }));
+
+      return rows?.sort((rowA: IUser, rowB: IUser) => {
+        // use the selector function to resolve your field names by passing the sort comparitors
+        const aField = selector(rowA);
+        const bField = selector(rowB);
+
+        let comparison = 0;
+
+        if (aField > bField) {
+          comparison = 1;
+        } else if (aField < bField) {
+          comparison = -1;
+        }
+
+        return direction === "desc" ? comparison * -1 : comparison;
+      });
+    } else {
+      // Xử lý trường hợp không thể trích xuất thông tin
+      console.error(
+        "Unable to extract field name from selector:",
+        selectorString
+      );
+      return rows;
+    }
+  };
+
+  const getDefaultSortField = () => {
+    if (!sortsRedux || Object.keys(sortsRedux).length === 0) {
+      return 1;
+    }
+    const column = Object.keys(sortsRedux)[0];
+    const fieldName = sortsRedux[column as keyof Object];
+    if (!fieldName) return 1;
+    return (columns.findIndex((v) => v.name === fieldName.toString()) || 0) + 1;
+  };
+
+  const getDefaultSortAsc = () => {
+    if (!sortsRedux || Object.keys(sortsRedux).length === 0) {
+      return true;
+    }
+    const column = Object.keys(sortsRedux)[1];
+    const orderSort = sortsRedux[column as keyof Object];
+    return orderSort?.toString() === "asc" ? true : false;
+  };
 
   return (
     <>
@@ -322,12 +370,9 @@ const UserTable = (props: Iprops) => {
             paginationTotalRows={allRows}
             paginationServer={true}
             onChangePage={handlePageChange}
-            sortServer
-            defaultSortFieldId={getDefaultSort()}
             defaultSortAsc={getDefaultSortAsc()}
-            onSort={(column, sortOrder) => {
-              handleSort(column, sortOrder);
-            }}
+            defaultSortFieldId={getDefaultSortField()}
+            sortFunction={customSort}
             onRowClicked={(row, e) => {
               setUser(row);
               setShowModalUpdateUser(true);

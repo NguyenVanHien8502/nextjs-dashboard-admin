@@ -4,6 +4,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 type InitialState = {
   getProfile: GetProfileState;
   getAllUsers: GetAllUsersState;
+  getSortsUser: GetSortsUserState;
 };
 
 type GetProfileState = {
@@ -18,9 +19,13 @@ type GetAllUsersState = {
   isError: boolean;
   isSuccess: boolean;
   allUsers: IUser[] | null;
-  sorts: Object;
   currentPage: number;
   itemsPerPage: number;
+};
+
+type GetSortsUserState = {
+  selector: string;
+  direction: string;
 };
 
 const initialState = {
@@ -35,10 +40,13 @@ const initialState = {
     isError: false,
     isSuccess: false,
     allUsers: null,
-    sorts: { username: "asc" },
     currentPage: 1,
     itemsPerPage: 10,
   } as GetAllUsersState,
+  getSortsUser: {
+    selector: "username",
+    direction: "asc",
+  } as GetSortsUserState,
 } as InitialState;
 
 export const userSlice = createSlice({
@@ -79,9 +87,13 @@ export const userSlice = createSlice({
       state.getAllUsers.isError = false;
       state.getAllUsers.isSuccess = true;
       state.getAllUsers.allUsers = action.payload?.data;
-      state.getAllUsers.sorts = action.payload?.sortOrder;
       state.getAllUsers.currentPage = action.payload?.page;
       state.getAllUsers.itemsPerPage = action.payload?.limit;
+    },
+
+    getSortsUser: (state, action: PayloadAction<any>) => {
+      state.getSortsUser.selector = action.payload?.fieldName;
+      state.getSortsUser.direction = action.payload?.direction;
     },
   },
 });
@@ -93,6 +105,7 @@ export const {
   getAllUsersStart,
   getAllUsersError,
   getAllUsersSuccess,
+  getSortsUser,
 } = userSlice.actions;
 
 export default userSlice.reducer;

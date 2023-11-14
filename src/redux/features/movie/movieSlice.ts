@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type InitialState = {
   getAllMovies: GetAllMoviesState;
+  getSortsMovie: GetSortsMovieState;
 };
 
 type GetAllMoviesState = {
@@ -9,9 +10,13 @@ type GetAllMoviesState = {
   isError: boolean;
   isSuccess: boolean;
   allMovies: IMovie[] | null;
-  sorts: Object;
   currentPage: number;
   itemsPerPage: number;
+};
+
+type GetSortsMovieState = {
+  selector: string;
+  direction: string;
 };
 
 const initialState = {
@@ -20,10 +25,13 @@ const initialState = {
     isError: false,
     isSuccess: false,
     allMovies: null,
-    sorts: { name: "asc" },
     currentPage: 1,
     itemsPerPage: 10,
   } as GetAllMoviesState,
+  getSortsMovie: {
+    selector: "name",
+    direction: "asc",
+  } as GetSortsMovieState,
 } as InitialState;
 
 export const movieSlice = createSlice({
@@ -46,14 +54,22 @@ export const movieSlice = createSlice({
       state.getAllMovies.isError = false;
       state.getAllMovies.isSuccess = true;
       state.getAllMovies.allMovies = action.payload?.data;
-      state.getAllMovies.sorts = action.payload?.sortOrder;
       state.getAllMovies.currentPage = action.payload?.page;
       state.getAllMovies.itemsPerPage = action.payload?.limit;
+    },
+
+    getSortsMovie: (state, action: PayloadAction<any>) => {
+      state.getSortsMovie.selector = action.payload?.fieldName;
+      state.getSortsMovie.direction = action.payload?.direction;
     },
   },
 });
 
-export const { getAllMoviesStart, getAllMoviesError, getAllMoviesSuccess } =
-  movieSlice.actions;
+export const {
+  getAllMoviesStart,
+  getAllMoviesError,
+  getAllMoviesSuccess,
+  getSortsMovie,
+} = movieSlice.actions;
 
 export default movieSlice.reducer;

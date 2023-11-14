@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type InitialState = {
   getAllCategories: GetAllCategoriesState;
+  getSortsCategory: GetSortsCategoryState;
 };
 
 type GetAllCategoriesState = {
@@ -14,16 +15,24 @@ type GetAllCategoriesState = {
   itemsPerPage: number;
 };
 
+type GetSortsCategoryState = {
+  selector: string;
+  direction: string;
+};
+
 const initialState = {
   getAllCategories: {
     isLoading: false,
     isError: false,
     isSuccess: false,
     allCategories: null,
-    sorts: { name: "asc" },
     currentPage: 1,
     itemsPerPage: 10,
   } as GetAllCategoriesState,
+  getSortsCategory: {
+    selector: "name",
+    direction: "asc",
+  } as GetSortsCategoryState,
 } as InitialState;
 
 export const categorySlice = createSlice({
@@ -46,9 +55,13 @@ export const categorySlice = createSlice({
       state.getAllCategories.isError = false;
       state.getAllCategories.isSuccess = true;
       state.getAllCategories.allCategories = action.payload?.data;
-      state.getAllCategories.sorts = action.payload?.sortOrder;
       state.getAllCategories.currentPage = action.payload?.page;
       state.getAllCategories.itemsPerPage = action.payload?.limit;
+    },
+
+    getSortsCategory: (state, action: PayloadAction<any>) => {
+      state.getSortsCategory.selector = action.payload?.fieldName;
+      state.getSortsCategory.direction = action.payload?.direction;
     },
   },
 });
@@ -57,6 +70,7 @@ export const {
   getAllCategoriesStart,
   getAllCategoriesError,
   getAllCategoriesSuccess,
+  getSortsCategory,
 } = categorySlice.actions;
 
 export default categorySlice.reducer;

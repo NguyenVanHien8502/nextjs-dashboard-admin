@@ -99,7 +99,7 @@ export default function Login() {
               className={styles.button}
               disabled={isLoading}
             >
-              {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
+              Log in
             </Button>
           </div>
         </form>

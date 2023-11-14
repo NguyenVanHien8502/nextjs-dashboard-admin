@@ -15,7 +15,8 @@ import { connect } from "react-redux";
 import { toast } from "react-toastify";
 
 interface IProps {
-  sorts: {};
+  sortsSelector: string;
+  sortsDirection: string;
   itemsPerPage: number;
   currentPage: number;
   allUsers: IUser[] | null;
@@ -31,14 +32,15 @@ function User(props: IProps) {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const sortsRedux: {} = props?.sorts;
+  const sortsSelectorRedux: string = props?.sortsSelector;
+  const sortsDirectionRedux: string = props?.sortsDirection;
   const currentPageRedux: number = props?.currentPage;
   const itemsPerPageRedux: number = props?.itemsPerPage;
   const users: IUser[] | null = props?.allUsers;
 
   const [currentPage, setCurrentPage] = useState<number>(currentPageRedux);
   const [itemsPerPage, setItemsPerPage] = useState<number>(itemsPerPageRedux);
-  const [sorts, setSorts] = useState<{}>(sortsRedux);
+  const sortsRedux: Object = { sortsSelectorRedux, sortsDirectionRedux };
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -46,12 +48,7 @@ function User(props: IProps) {
     setLoading(true);
     dispatch(getAllUsersStart());
     try {
-      const response = await getAllUsers(
-        token,
-        sorts,
-        currentPage,
-        itemsPerPage
-      );
+      const response = await getAllUsers(token, currentPage, itemsPerPage);
 
       if (response?.status === true) {
         dispatch(getAllUsersSuccess(response));
@@ -70,7 +67,7 @@ function User(props: IProps) {
     }
     fetchUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sorts, currentPage, itemsPerPage, token, router]);
+  }, [currentPage, itemsPerPage, token, router]);
 
   return (
     <>
@@ -83,7 +80,6 @@ function User(props: IProps) {
           setCurrentPage={setCurrentPage}
           itemsPerPage={itemsPerPage}
           setItemsPerPage={setItemsPerPage}
-          setSorts={setSorts}
           sortsRedux={sortsRedux}
         />
       </Box>
@@ -93,7 +89,8 @@ function User(props: IProps) {
 
 const mapStateToProps = (state: RootState) => {
   return {
-    sorts: state?.userReducer?.getAllUsers?.sorts,
+    sortsSelector: state?.userReducer?.getSortsUser?.selector,
+    sortsDirection: state?.userReducer?.getSortsUser?.direction,
     itemsPerPage: state?.userReducer?.getAllUsers?.itemsPerPage,
     currentPage: state?.userReducer?.getAllUsers?.currentPage,
     allUsers: state?.userReducer?.getAllUsers?.allUsers,

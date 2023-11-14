@@ -9,14 +9,14 @@ import {
 } from "@/redux/features/category/categorySlice";
 import { RootState, useAppDispatch } from "@/redux/store";
 import Box from "@mui/material/Box";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
 
 interface IProps {
-  sorts: {};
+  sortsSelector: string;
+  sortsDirection: string;
   itemsPerPage: number;
   currentPage: number;
   allCategories: ICategory[] | null;
@@ -33,14 +33,15 @@ function Category(props: IProps) {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const sortsRedux: {} = props?.sorts;
+  const sortsSelectorRedux: string = props?.sortsSelector;
+  const sortsDirectionRedux: string = props?.sortsDirection;
   const currentPageRedux: number = props?.currentPage;
   const itemsPerPageRedux: number = props?.itemsPerPage;
   const categories: ICategory[] | null = props?.allCategories;
 
   const [currentPage, setCurrentPage] = useState<number>(currentPageRedux);
   const [itemsPerPage, setItemsPerPage] = useState<number>(itemsPerPageRedux);
-  const [sorts, setSorts] = useState<{}>(sortsRedux);
+  const sortsRedux: Object = { sortsSelectorRedux, sortsDirectionRedux };
 
   const [loading, setLoading] = useState(false);
 
@@ -48,12 +49,7 @@ function Category(props: IProps) {
     setLoading(true);
     dispatch(getAllCategoriesStart());
     try {
-      const response = await getAllCategories(
-        token,
-        sorts,
-        currentPage,
-        itemsPerPage
-      );
+      const response = await getAllCategories(token, currentPage, itemsPerPage);
 
       if (response?.status === true) {
         dispatch(getAllCategoriesSuccess(response));
@@ -72,7 +68,7 @@ function Category(props: IProps) {
     }
     fetchCategories();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sorts, currentPage, itemsPerPage, token, router]);
+  }, [currentPage, itemsPerPage, token, router]);
   return (
     <>
       <Box height={100} width={1000}>
@@ -84,7 +80,6 @@ function Category(props: IProps) {
           setCurrentPage={setCurrentPage}
           itemsPerPage={itemsPerPage}
           setItemsPerPage={setItemsPerPage}
-          setSorts={setSorts}
           sortsRedux={sortsRedux}
         />
       </Box>
@@ -94,7 +89,8 @@ function Category(props: IProps) {
 
 const mapStateToProps = (state: RootState) => {
   return {
-    sorts: state?.categoryReducer?.getAllCategories?.sorts,
+    sortsSelector: state?.categoryReducer?.getSortsCategory?.selector,
+    sortsDirection: state?.categoryReducer?.getSortsCategory?.direction,
     itemsPerPage: state?.categoryReducer?.getAllCategories?.itemsPerPage,
     currentPage: state?.categoryReducer?.getAllCategories?.currentPage,
     allCategories: state?.categoryReducer?.getAllCategories?.allCategories,
