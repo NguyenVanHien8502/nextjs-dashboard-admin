@@ -228,13 +228,15 @@ const CategoryTable = (props: Iprops) => {
     },
   };
 
-  const handlePerRowsChange = async (perPage: number, page: number) => {
+  //handle limit items per page
+  const handleChangeRowsPerPage = async (perPage: number, page: number) => {
     setLoading(true);
     setItemsPerPage(perPage);
     setLoading(false);
   };
 
-  const handlePageChange = (page: number): void => {
+  //handle change page
+  const handleChangePage = (page: number, totalRows: number): void => {
     setCurrentPage(page);
   };
 
@@ -364,10 +366,11 @@ const CategoryTable = (props: Iprops) => {
             fixedHeaderScrollHeight="450px"
             pagination
             paginationPerPage={itemsPerPage}
-            onChangeRowsPerPage={handlePerRowsChange}
-            paginationTotalRows={allRows}
             paginationServer={true}
-            onChangePage={handlePageChange}
+            paginationTotalRows={allRows}
+            onChangeRowsPerPage={handleChangeRowsPerPage}
+            onChangePage={handleChangePage}
+            paginationDefaultPage={currentPage}
             defaultSortAsc={getDefaultSortAsc()}
             defaultSortFieldId={getDefaultSortField()}
             sortFunction={customSort}

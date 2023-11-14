@@ -241,13 +241,15 @@ const MovieTable = (props: Iprops) => {
     },
   };
 
+  //handle limit items per page
   const handlePerRowsChange = async (perPage: number, page: number) => {
     setLoading(true);
     setItemsPerPage(perPage);
     setLoading(false);
   };
 
-  const handlePageChange = (page: number): void => {
+  //handle change page
+  const handleChangePage = (page: number, totalRows: number): void => {
     setCurrentPage(page);
   };
 
@@ -408,10 +410,11 @@ const MovieTable = (props: Iprops) => {
             fixedHeaderScrollHeight="450px"
             pagination
             paginationPerPage={itemsPerPage}
-            onChangeRowsPerPage={handlePerRowsChange}
-            paginationTotalRows={allRows}
             paginationServer={true}
-            onChangePage={handlePageChange}
+            paginationTotalRows={allRows}
+            onChangeRowsPerPage={handlePerRowsChange}
+            onChangePage={handleChangePage}
+            paginationDefaultPage={currentPage}
             defaultSortFieldId={getDefaultSortField()}
             defaultSortAsc={getDefaultSortAsc()}
             sortFunction={customSort}
