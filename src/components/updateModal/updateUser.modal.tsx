@@ -155,7 +155,7 @@ function UpdateModalUser(props: Iprops) {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Role</Form.Label>
+              <Form.Label>Role*</Form.Label>
               <Form.Select
                 id="role"
                 placeholder="Chọn role"
@@ -167,7 +167,6 @@ function UpdateModalUser(props: Iprops) {
                   }))
                 }
               >
-                <option value="">Select Role</option>
                 <option value="admin">Admin</option>
                 <option value="user">User</option>
               </Form.Select>

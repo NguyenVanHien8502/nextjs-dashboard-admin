@@ -37,7 +37,7 @@ function CreateModalCategory(props: Iprops) {
   const [dataCategory, setDataCategory] = useState({
     name: "",
     slug: "",
-    status: "",
+    status: "public",
     desc: "",
   });
 
@@ -157,9 +157,8 @@ function CreateModalCategory(props: Iprops) {
                   }))
                 }
               >
-                <option value="">Select Status</option>
-                <option value="private">Private</option>
                 <option value="public">Public</option>
+                <option value="private">Private</option>
               </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">
