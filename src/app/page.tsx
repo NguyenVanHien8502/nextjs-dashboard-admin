@@ -16,17 +16,18 @@ import {
 export default function Login() {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  
   const user: IUser | any = useAppSelector((state: RootState) => {
     state.authReducer?.login?.currentUser;
   });
+  const isLoading: boolean = useAppSelector(
+    (state: RootState) => state?.authReducer?.login?.isLoading
+  );
+
   const [dataInput, setDataInput] = useState({
     email: user?.email || "",
     password: user?.password || "",
   });
-
-  const isLoading: boolean = useAppSelector(
-    (state: RootState) => state?.authReducer?.login?.isLoading
-  );
 
   const handleLogin = async (e: any) => {
     e.preventDefault();

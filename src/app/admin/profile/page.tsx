@@ -12,7 +12,9 @@ const MyProfile = () => {
   const currentUserString: string = useAppSelector(
     (state: RootState) => state?.userReducer?.getProfile?.profile
   );
+
   const [currentUser, setCurrentUser] = useState<IUser | null>(null);
+  
   useEffect(() => {
     if (currentUserString) {
       setCurrentUser(JSON.parse(JSON.stringify(currentUserString)));

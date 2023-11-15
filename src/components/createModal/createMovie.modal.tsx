@@ -44,9 +44,9 @@ function CreateModalMovie(props: Iprops) {
   });
 
   const [isChangedInputSlug, setIsChangedInputSlug] = useState(false);
+  const [categories, setCategories] = useState<ICategory | any>([]);
 
   //fetch all Category
-  const [categories, setCategories] = useState<ICategory | any>([]);
   useEffect(() => {
     const fetchCategories = async () => {
       try {

@@ -17,7 +17,6 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import SearchIcon from "@mui/icons-material/Search";
 import styles from "../app/admin/admin.module.css";
 import { getStogare, removeStogare } from "@/app/helper/stogare";
 
@@ -138,17 +137,6 @@ const AppHeader = (props: IProps) => {
           </Typography>
         </Toolbar>
         <div className="d-flex align-items-center gap-5 mx-2">
-          <div className={styles.search_container}>
-            <input
-              className={styles.search}
-              type="text"
-              placeholder="Search..."
-            />
-            <span className={styles.span}>
-              <SearchIcon />
-            </span>
-          </div>
-
           <span className={styles.span} onClick={handleNotificationClick}>
             <div role="button" className="position-relative">
               <NotificationsNoneSharpIcon className="fs-4" />

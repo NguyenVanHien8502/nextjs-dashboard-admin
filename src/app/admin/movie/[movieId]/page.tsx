@@ -14,6 +14,8 @@ const ViewMovieDetail = ({ params }: { params: { movieId: string } }) => {
   }
 
   const [movie, setMovie] = useState<IMovie | null>(null);
+  const [author, setAuthor] = useState<IUser | null>(null);
+
   useEffect(() => {
     const fetchMovie = async () => {
       const { data } = await axios.get(
@@ -29,7 +31,6 @@ const ViewMovieDetail = ({ params }: { params: { movieId: string } }) => {
     fetchMovie();
   }, [params.movieId, token]);
 
-  const [author, setAuthor] = useState<IUser | null>(null);
   useEffect(() => {
     const fetchAuthor = async () => {
       const { data } = await axios.get(

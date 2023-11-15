@@ -44,6 +44,7 @@ function UpdateModalUser(props: Iprops) {
     status: "",
   });
 
+  //set data user when modal update open
   useEffect(() => {
     if (user && user._id) {
       setDataUser({

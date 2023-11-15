@@ -13,22 +13,23 @@ const ViewCategoryDetail = ({ params }: { params: { categoryId: string } }) => {
     token = currentUser?.token;
   }
 
-    const [category, setCategory] = useState<ICategory | null>(null);
-    useEffect(() => {
-      const fetchCategory = async () => {
-        const { data } = await axios.get(
-          `${process.env.BASE_URL}/category/${params.categoryId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setCategory(data);
-      };
-      fetchCategory();
-    }, [params.categoryId, token]);
-  
+  const [category, setCategory] = useState<ICategory | null>(null);
+
+  useEffect(() => {
+    const fetchCategory = async () => {
+      const { data } = await axios.get(
+        `${process.env.BASE_URL}/category/${params.categoryId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setCategory(data);
+    };
+    fetchCategory();
+  }, [params.categoryId, token]);
+
   return (
     <>
       <div className="my-3">

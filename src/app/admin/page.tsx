@@ -35,12 +35,14 @@ export default function Admin() {
     const currentUser = JSON.parse(currentUserString);
     token = currentUser?.token;
   }
+
   const router = useRouter();
   const dispatch = useAppDispatch();
 
   const [totalUser, setTotalUser] = useState(0);
   const [totalMovie, setTotalMovie] = useState(0);
   const [totalCategory, setTotalCategory] = useState(0);
+
   useEffect(() => {
     if (token) {
       const fetchProfile = async () => {
@@ -93,6 +95,7 @@ export default function Admin() {
       toast.error("JWT has expired. Please login again to use service");
     }
   }, [dispatch, router, token]);
+  
   return (
     <>
       <title>Home Admin Page</title>

@@ -41,9 +41,9 @@ function Movie(props: IProps) {
 
   const [currentPage, setCurrentPage] = useState<number>(currentPageRedux);
   const [itemsPerPage, setItemsPerPage] = useState<number>(itemsPerPageRedux);
-  const sortsRedux: Object = { sortsSelectorRedux, sortsDirectionRedux };
-
   const [loading, setLoading] = useState<boolean>(false);
+  
+  const sortsRedux: Object = { sortsSelectorRedux, sortsDirectionRedux };
 
   useEffect(() => {
     if (!token) {

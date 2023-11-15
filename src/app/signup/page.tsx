@@ -16,12 +16,14 @@ import { useAppDispatch } from "@/redux/store";
 export default function Signup() {
   const router = useRouter();
   const dispatch = useAppDispatch();
+
   const [data, setData] = useState({
     username: "",
     email: "",
     password: "",
     role: "",
   });
+
   const handleSignUp = async (e: any) => {
     e.preventDefault();
     dispatch(registerStart());
@@ -47,6 +49,7 @@ export default function Signup() {
       dispatch(registerError());
     }
   };
+  
   return (
     <div className={styles.main}>
       <div className={styles.container}>

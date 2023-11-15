@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import Card from "react-bootstrap/Card";
-import useSWR, { Fetcher } from "swr";
 import axios from "axios";
 import { getStogare } from "@/app/helper/stogare";
 import { useEffect, useState } from "react";
@@ -15,6 +14,7 @@ const ViewUserDetail = ({ params }: { params: { userId: string } }) => {
   }
 
   const [user, setUser] = useState<IUser | null>(null);
+
   useEffect(() => {
     const fetchUser = async () => {
       const { data } = await axios.get(

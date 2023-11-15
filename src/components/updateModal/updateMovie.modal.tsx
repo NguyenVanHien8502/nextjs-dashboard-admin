@@ -37,8 +37,18 @@ function UpdateModalMovie(props: Iprops) {
     setAllRows,
   } = props;
 
-  //fetch all category
   const [categories, setCategories] = useState<ICategory | any>([]);
+  const [dataMovie, setDataMovie] = useState({
+    id: "",
+    name: "",
+    slug: "",
+    category: "",
+    link: "",
+    status: "",
+    desc: "",
+  });
+
+  //fetch all category
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -55,16 +65,7 @@ function UpdateModalMovie(props: Iprops) {
     fetchCategories();
   }, [token]);
 
-  const [dataMovie, setDataMovie] = useState({
-    id: "",
-    name: "",
-    slug: "",
-    category: "",
-    link: "",
-    status: "",
-    desc: "",
-  });
-
+  //set data movie when modal update open
   useEffect(() => {
     if (movie && movie._id) {
       setDataMovie({
