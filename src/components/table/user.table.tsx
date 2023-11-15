@@ -4,7 +4,6 @@ import Link from "next/link";
 import axios from "axios";
 import { toast } from "react-toastify";
 import DataTable, {
-  Selector,
   TableColumn,
   TableStyles,
 } from "react-data-table-component";
@@ -47,87 +46,14 @@ const UserTable = (props: Iprops) => {
 
   const dispatch = useAppDispatch();
 
-  const handleDeleteUser = async (id: string) => {
-    if (window.confirm("Are you sure want to delete this user? ")) {
-      try {
-        const { data } = await axios.delete(
-          `${process.env.BASE_URL}/user/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        if (data?.status === false) {
-          toast.warning(data?.msg);
-          return;
-        }
-        if (data?.status === true) {
-          toast.success(data?.msg);
-          const res = await axios.get(
-            `${process.env.BASE_URL}/user?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          setRecords(res?.data?.data);
-          setAllRows(res.data?.totalUsers);
-        }
-      } catch (error: any) {
-        toast.error(error?.response?.data?.message);
-        return;
-      }
-    }
-  };
-
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
-  const handleDeleteManyUser = async () => {
-    if (selectedRows.length > 0) {
-      if (
-        window.confirm(
-          `Are you sure want to delete ${selectedRows.length} users below? `
-        )
-      ) {
-        try {
-          const { data } = await axios.delete(`${process.env.BASE_URL}/user`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            data: {
-              userIds: selectedRows,
-            },
-          });
-          if (data?.status === false) {
-            toast.warning(data?.msg);
-            return;
-          }
-          if (data?.status === true) {
-            toast.success(data?.msg);
-            const res = await axios.get(
-              `${process.env.BASE_URL}/user?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
-            setRecords(res?.data?.data);
-            setAllRows(res.data?.totalUsers);
-          }
-        } catch (error: any) {
-          toast.error(error?.response?.data?.message);
-          return;
-        }
-      }
-    } else {
-      toast.warning("Please pick users to delete them");
-      return;
-    }
-  };
-
   const [allRows, setAllRows] = useState(0);
+  const [records, setRecords] = useState<IUser[]>(users);
+  const [keyWordSearch, setKeyWordSearch] = useState("");
+  const [user, setUser] = useState<IUser | null>(null);
+  const [showModalUpdateUser, setShowModalUpdateUser] =
+    useState<boolean>(false);
+
   useEffect(() => {
     const fetchTotalRows = async () => {
       const { data } = await axios.get(`${process.env.BASE_URL}/user`, {
@@ -140,6 +66,15 @@ const UserTable = (props: Iprops) => {
     };
     fetchTotalRows();
   }, [token]);
+
+  useEffect(() => {
+    if (users.length) setRecords(users);
+  }, [users]);
+
+  useEffect(() => {
+    handleSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keyWordSearch]);
 
   const columns: TableColumn<IUser>[] | undefined = [
     {
@@ -235,6 +170,87 @@ const UserTable = (props: Iprops) => {
     },
   };
 
+  //handle delete user
+  const handleDeleteUser = async (id: string) => {
+    if (window.confirm("Are you sure want to delete this user? ")) {
+      try {
+        const { data } = await axios.delete(
+          `${process.env.BASE_URL}/user/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (data?.status === false) {
+          toast.warning(data?.msg);
+          return;
+        }
+        if (data?.status === true) {
+          toast.success(data?.msg);
+          const res = await axios.get(
+            `${process.env.BASE_URL}/user?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          setRecords(res?.data?.data);
+          setAllRows(res.data?.totalUsers);
+        }
+      } catch (error: any) {
+        toast.error(error?.response?.data?.message);
+        return;
+      }
+    }
+  };
+
+  //handle delete many user
+  const handleDeleteManyUser = async () => {
+    if (selectedRows.length > 0) {
+      if (
+        window.confirm(
+          `Are you sure want to delete ${selectedRows.length} users below? `
+        )
+      ) {
+        try {
+          const { data } = await axios.delete(`${process.env.BASE_URL}/user`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            data: {
+              userIds: selectedRows,
+            },
+          });
+          if (data?.status === false) {
+            toast.warning(data?.msg);
+            return;
+          }
+          if (data?.status === true) {
+            toast.success(data?.msg);
+            const res = await axios.get(
+              `${process.env.BASE_URL}/user?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            setRecords(res?.data?.data);
+            setAllRows(res.data?.totalUsers);
+          }
+        } catch (error: any) {
+          toast.error(error?.response?.data?.message);
+          return;
+        }
+      }
+    } else {
+      toast.warning("Please pick users to delete them");
+      return;
+    }
+  };
+
   //handle limit items per page
   const handleChangeRowsPerPage = async (perPage: number, page: number) => {
     setLoading(true);
@@ -248,11 +264,6 @@ const UserTable = (props: Iprops) => {
   };
 
   //handle search
-  const [records, setRecords] = useState<IUser[]>(users);
-  useEffect(() => {
-    if (users.length) setRecords(users);
-  }, [users]);
-  const [keyWordSearch, setKeyWordSearch] = useState("");
   const handleSearch = async () => {
     const { data } = await axios.get(
       `${process.env.BASE_URL}/user?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
@@ -264,57 +275,8 @@ const UserTable = (props: Iprops) => {
     );
     setRecords(data?.data);
   };
-  useEffect(() => {
-    handleSearch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keyWordSearch]);
-
-  const [user, setUser] = useState<IUser | null>(null);
-  const [showModalUpdateUser, setShowModalUpdateUser] =
-    useState<boolean>(false);
 
   //handle sort
-  const customSort = (
-    rows: IUser[],
-    selector: Selector<IUser>,
-    direction: string
-  ) => {
-    // Chuyển đổi hàm selector thành chuỗi
-    const selectorString = selector.toString();
-
-    // Sử dụng biểu thức chính quy để trích xuất tên trường (username)
-    const match = selectorString.match(/\(\w+\)\s*=>\s*row\.(\w+)/);
-
-    if (match) {
-      // match[1] chứa tên trường (ở đây là "username")
-      const fieldName = match[1];
-      dispatch(getSortsUser({ fieldName, direction }));
-
-      return rows?.sort((rowA: IUser, rowB: IUser) => {
-        // use the selector function to resolve your field names by passing the sort comparitors
-        const aField = selector(rowA);
-        const bField = selector(rowB);
-
-        let comparison = 0;
-
-        if (aField > bField) {
-          comparison = 1;
-        } else if (aField < bField) {
-          comparison = -1;
-        }
-
-        return direction === "desc" ? comparison * -1 : comparison;
-      });
-    } else {
-      // Xử lý trường hợp không thể trích xuất thông tin
-      console.error(
-        "Unable to extract field name from selector:",
-        selectorString
-      );
-      return rows;
-    }
-  };
-
   const getDefaultSortField = () => {
     if (!sortsRedux || Object.keys(sortsRedux).length === 0) {
       return 1;
@@ -375,7 +337,11 @@ const UserTable = (props: Iprops) => {
             paginationDefaultPage={currentPage}
             defaultSortAsc={getDefaultSortAsc()}
             defaultSortFieldId={getDefaultSortField()}
-            sortFunction={customSort}
+            onSort={(column, direction) => {
+              dispatch(
+                getSortsUser({ fieldName: column.name, direction: direction })
+              );
+            }}
             onRowClicked={(row, e) => {
               setUser(row);
               setShowModalUpdateUser(true);

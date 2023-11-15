@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 import CreateModalMovie from "../createModal/createMovie.modal";
 import UpdateModalMovie from "../updateModal/updateMovie.modal";
 import DataTable, {
-  Selector,
   TableColumn,
   TableStyles,
 } from "react-data-table-component";
@@ -48,87 +47,17 @@ const MovieTable = (props: Iprops) => {
 
   const dispatch = useAppDispatch();
 
-  const handleDeleteMovie = async (id: string) => {
-    if (window.confirm("Are you sure want to delete this movie? ")) {
-      try {
-        const { data } = await axios.delete(
-          `${process.env.BASE_URL}/movie/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        if (data?.status === false) {
-          toast.warning(data?.msg);
-          return;
-        }
-        if (data?.status === true) {
-          toast.success(data?.msg);
-          const res = await axios.get(
-            `${process.env.BASE_URL}/movie?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          setRecords(res?.data?.data);
-          setAllRows(res.data?.totalMovies);
-        }
-      } catch (error: any) {
-        toast.error(error?.response?.data?.message);
-        return;
-      }
-    }
-  };
-
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
-  const handleDeleteManyMovie = async () => {
-    if (selectedRows.length > 0) {
-      if (
-        window.confirm(
-          `Are you sure want to delete ${selectedRows.length} movies below? `
-        )
-      ) {
-        try {
-          const { data } = await axios.delete(`${process.env.BASE_URL}/movie`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            data: {
-              movieIds: selectedRows,
-            },
-          });
-          if (data?.status === false) {
-            toast.warning(data?.msg);
-            return;
-          }
-          if (data?.status === true) {
-            toast.success(data?.msg);
-            const res = await axios.get(
-              `${process.env.BASE_URL}/movie?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
-            setRecords(res?.data?.data);
-            setAllRows(res.data?.totalMovies);
-          }
-        } catch (error: any) {
-          toast.error(error?.response?.data?.message);
-          return;
-        }
-      }
-    } else {
-      toast.warning("Please pick movies to delete them");
-      return;
-    }
-  };
-
+  const [author, setAuthor] = useState<any>({});
   const [allRows, setAllRows] = useState(0);
+  const [keyWordSearch, setKeyWordSearch] = useState("");
+  const [records, setRecords] = useState<IMovie[]>(movies);
+  const [movie, setMovie] = useState<IMovie | null>(null);
+  const [showModalCreateMovie, setShowModalCreateMovie] =
+    useState<boolean>(false);
+  const [showModalUpdateMovie, setShowModalUpdateMovie] =
+    useState<boolean>(false);
+
   useEffect(() => {
     const fetchTotalRows = async () => {
       const { data } = await axios.get(`${process.env.BASE_URL}/movie`, {
@@ -141,6 +70,42 @@ const MovieTable = (props: Iprops) => {
     };
     fetchTotalRows();
   }, [token]);
+
+  useEffect(() => {
+    if (movies.length) setRecords(movies);
+  }, [movies]);
+
+  useEffect(() => {
+    handleSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keyWordSearch]);
+
+  //fetchAuthor for each authorId
+  useEffect(() => {
+    const fetchAuthor = async (authorId: string) => {
+      try {
+        const { data } = await axios.get(
+          `${process.env.BASE_URL}/user/${authorId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const authorName = data?.username;
+        setAuthor((prev: any) => ({
+          ...prev,
+          [authorId]: authorName,
+        }));
+      } catch {
+        throw new Error("Not found this author");
+      }
+    };
+    movies.forEach((movie: IMovie) => {
+      const authorId: string = movie?.author;
+      fetchAuthor(authorId);
+    });
+  }, [movies, token]);
 
   const columns: TableColumn<IMovie>[] = [
     {
@@ -241,6 +206,87 @@ const MovieTable = (props: Iprops) => {
     },
   };
 
+  //handle delete movie
+  const handleDeleteMovie = async (id: string) => {
+    if (window.confirm("Are you sure want to delete this movie? ")) {
+      try {
+        const { data } = await axios.delete(
+          `${process.env.BASE_URL}/movie/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (data?.status === false) {
+          toast.warning(data?.msg);
+          return;
+        }
+        if (data?.status === true) {
+          toast.success(data?.msg);
+          const res = await axios.get(
+            `${process.env.BASE_URL}/movie?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          setRecords(res?.data?.data);
+          setAllRows(res.data?.totalMovies);
+        }
+      } catch (error: any) {
+        toast.error(error?.response?.data?.message);
+        return;
+      }
+    }
+  };
+
+  //handle delete many movie
+  const handleDeleteManyMovie = async () => {
+    if (selectedRows.length > 0) {
+      if (
+        window.confirm(
+          `Are you sure want to delete ${selectedRows.length} movies below? `
+        )
+      ) {
+        try {
+          const { data } = await axios.delete(`${process.env.BASE_URL}/movie`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            data: {
+              movieIds: selectedRows,
+            },
+          });
+          if (data?.status === false) {
+            toast.warning(data?.msg);
+            return;
+          }
+          if (data?.status === true) {
+            toast.success(data?.msg);
+            const res = await axios.get(
+              `${process.env.BASE_URL}/movie?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            setRecords(res?.data?.data);
+            setAllRows(res.data?.totalMovies);
+          }
+        } catch (error: any) {
+          toast.error(error?.response?.data?.message);
+          return;
+        }
+      }
+    } else {
+      toast.warning("Please pick movies to delete them");
+      return;
+    }
+  };
+
   //handle limit items per page
   const handlePerRowsChange = async (perPage: number, page: number) => {
     setLoading(true);
@@ -254,11 +300,6 @@ const MovieTable = (props: Iprops) => {
   };
 
   //handle search
-  const [records, setRecords] = useState<IMovie[]>(movies);
-  useEffect(() => {
-    if (movies.length) setRecords(movies);
-  }, [movies]);
-  const [keyWordSearch, setKeyWordSearch] = useState("");
   const handleSearch = async () => {
     const { data } = await axios.get(
       `${process.env.BASE_URL}/movie?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
@@ -270,87 +311,8 @@ const MovieTable = (props: Iprops) => {
     );
     setRecords(data?.data);
   };
-  useEffect(() => {
-    handleSearch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keyWordSearch]);
-
-  const [movie, setMovie] = useState<IMovie | null>(null);
-  const [showModalCreateMovie, setShowModalCreateMovie] =
-    useState<boolean>(false);
-  const [showModalUpdateMovie, setShowModalUpdateMovie] =
-    useState<boolean>(false);
-
-  //fetchAuthor for each authorId
-  const [author, setAuthor] = useState<any>({});
-  useEffect(() => {
-    const fetchAuthor = async (authorId: string) => {
-      try {
-        const { data } = await axios.get(
-          `${process.env.BASE_URL}/user/${authorId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const authorName = data?.username;
-        setAuthor((prev: any) => ({
-          ...prev,
-          [authorId]: authorName,
-        }));
-      } catch {
-        throw new Error("Not found this author");
-      }
-    };
-    movies.forEach((movie: IMovie) => {
-      const authorId: string = movie?.author;
-      fetchAuthor(authorId);
-    });
-  }, [movies, token]);
 
   //handle sort
-  const customSort = (
-    rows: IMovie[],
-    selector: Selector<IMovie>,
-    direction: string
-  ) => {
-    // Chuyển đổi hàm selector thành chuỗi
-    const selectorString = selector.toString();
-
-    // Sử dụng biểu thức chính quy để trích xuất tên trường (username)
-    const match = selectorString.match(/\(\w+\)\s*=>\s*row\.(\w+)/);
-
-    if (match) {
-      // match[1] chứa tên trường (ở đây là "name")
-      const fieldName = match[1];
-      dispatch(getSortsMovie({ fieldName, direction }));
-
-      return rows?.sort((rowA: IMovie, rowB: IMovie) => {
-        // use the selector function to resolve your field names by passing the sort comparitors
-        const aField = selector(rowA);
-        const bField = selector(rowB);
-
-        let comparison = 0;
-
-        if (aField > bField) {
-          comparison = 1;
-        } else if (aField < bField) {
-          comparison = -1;
-        }
-
-        return direction === "desc" ? comparison * -1 : comparison;
-      });
-    } else {
-      // Xử lý trường hợp không thể trích xuất thông tin
-      console.error(
-        "Unable to extract field name from selector:",
-        selectorString
-      );
-      return rows;
-    }
-  };
-
   const getDefaultSortField = () => {
     if (!sortsRedux || Object.keys(sortsRedux).length === 0) {
       return 1;
@@ -417,7 +379,11 @@ const MovieTable = (props: Iprops) => {
             paginationDefaultPage={currentPage}
             defaultSortFieldId={getDefaultSortField()}
             defaultSortAsc={getDefaultSortAsc()}
-            sortFunction={customSort}
+            onSort={(column, direction) => {
+              dispatch(
+                getSortsMovie({ fieldName: column.name, direction: direction })
+              );
+            }}
             onRowClicked={(row, e) => {
               setMovie(row);
               setShowModalUpdateMovie(true);

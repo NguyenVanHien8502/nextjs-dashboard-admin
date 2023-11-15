@@ -43,7 +43,17 @@ function Category(props: IProps) {
   const [itemsPerPage, setItemsPerPage] = useState<number>(itemsPerPageRedux);
   const sortsRedux: Object = { sortsSelectorRedux, sortsDirectionRedux };
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!token) {
+      router.replace("/");
+      toast.warning("JWT has expired. Please log in again.");
+      return;
+    }
+    fetchCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, itemsPerPage, token, router]);
 
   const fetchCategories = async () => {
     setLoading(true);
@@ -60,15 +70,6 @@ function Category(props: IProps) {
     setLoading(false);
   };
 
-  useEffect(() => {
-    if (!token) {
-      router.replace("/");
-      toast.warning("JWT has expired. Please log in again.");
-      return;
-    }
-    fetchCategories();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, itemsPerPage, token, router]);
   return (
     <>
       <Box height={100} width={1000}>

@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 import CreateModalCategory from "../createModal/createCategory.modal";
 import UpdateModalCategory from "../updateModal/updateCategory.modal";
 import DataTable, {
-  Selector,
   TableColumn,
   TableStyles,
 } from "react-data-table-component";
@@ -48,90 +47,16 @@ const CategoryTable = (props: Iprops) => {
 
   const dispatch = useAppDispatch();
 
-  const handleDeleteCategory = async (id: string) => {
-    if (window.confirm("Are you sure want to delete this category? ")) {
-      try {
-        const { data } = await axios.delete(
-          `${process.env.BASE_URL}/category/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        if (data?.status === false) {
-          toast.warning(data?.msg);
-          return;
-        }
-        if (data?.status === true) {
-          toast.success(data?.msg);
-          const res = await axios.get(
-            `${process.env.BASE_URL}/category?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          setRecords(res?.data?.data);
-          setAllRows(res.data?.totalCategories);
-        }
-      } catch (error: any) {
-        toast.error(error?.response?.data?.message);
-        return;
-      }
-    }
-  };
-
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
-  const handleDeleteManyCategory = async () => {
-    if (selectedRows.length > 0) {
-      if (
-        window.confirm(
-          `Are you sure want to delete ${selectedRows.length} categories below? `
-        )
-      ) {
-        try {
-          const { data } = await axios.delete(
-            `${process.env.BASE_URL}/category`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-              data: {
-                categoryIds: selectedRows,
-              },
-            }
-          );
-          if (data?.status === false) {
-            toast.warning(data?.msg);
-            return;
-          }
-          if (data?.status === true) {
-            toast.success(data?.msg);
-            const res = await axios.get(
-              `${process.env.BASE_URL}/category?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
-            setRecords(res?.data?.data);
-            setAllRows(res.data?.totalCategories);
-          }
-        } catch (error: any) {
-          toast.error(error?.response?.data?.message);
-          return;
-        }
-      }
-    } else {
-      toast.warning("Please pick categories to delete them");
-      return;
-    }
-  };
-
   const [allRows, setAllRows] = useState(0);
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [records, setRecords] = useState<ICategory[]>(categories);
+  const [keyWordSearch, setKeyWordSearch] = useState("");
+  const [category, setCategory] = useState<ICategory | null>(null);
+  const [showModalCreateCategory, setShowModalCreateCategory] =
+    useState<boolean>(false);
+  const [showModalUpdateCategory, setShowModalUpdateCategory] =
+    useState<boolean>(false);
+
   useEffect(() => {
     const fetchTotalRows = async () => {
       const { data } = await axios.get(`${process.env.BASE_URL}/category`, {
@@ -144,6 +69,15 @@ const CategoryTable = (props: Iprops) => {
     };
     fetchTotalRows();
   }, [token]);
+
+  useEffect(() => {
+    if (categories.length) setRecords(categories);
+  }, [categories]);
+
+  useEffect(() => {
+    handleSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keyWordSearch]);
 
   const columns: TableColumn<ICategory>[] | undefined = [
     {
@@ -207,6 +141,7 @@ const CategoryTable = (props: Iprops) => {
       ),
     },
   ];
+
   const tableCustomStyles: TableStyles | undefined = {
     headCells: {
       style: {
@@ -228,6 +163,90 @@ const CategoryTable = (props: Iprops) => {
     },
   };
 
+  //handle delete category
+  const handleDeleteCategory = async (id: string) => {
+    if (window.confirm("Are you sure want to delete this category? ")) {
+      try {
+        const { data } = await axios.delete(
+          `${process.env.BASE_URL}/category/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (data?.status === false) {
+          toast.warning(data?.msg);
+          return;
+        }
+        if (data?.status === true) {
+          toast.success(data?.msg);
+          const res = await axios.get(
+            `${process.env.BASE_URL}/category?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          setRecords(res?.data?.data);
+          setAllRows(res.data?.totalCategories);
+        }
+      } catch (error: any) {
+        toast.error(error?.response?.data?.message);
+        return;
+      }
+    }
+  };
+
+  //handle delete many category
+  const handleDeleteManyCategory = async () => {
+    if (selectedRows.length > 0) {
+      if (
+        window.confirm(
+          `Are you sure want to delete ${selectedRows.length} categories below? `
+        )
+      ) {
+        try {
+          const { data } = await axios.delete(
+            `${process.env.BASE_URL}/category`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              data: {
+                categoryIds: selectedRows,
+              },
+            }
+          );
+          if (data?.status === false) {
+            toast.warning(data?.msg);
+            return;
+          }
+          if (data?.status === true) {
+            toast.success(data?.msg);
+            const res = await axios.get(
+              `${process.env.BASE_URL}/category?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            setRecords(res?.data?.data);
+            setAllRows(res.data?.totalCategories);
+          }
+        } catch (error: any) {
+          toast.error(error?.response?.data?.message);
+          return;
+        }
+      }
+    } else {
+      toast.warning("Please pick categories to delete them");
+      return;
+    }
+  };
+
   //handle limit items per page
   const handleChangeRowsPerPage = async (perPage: number, page: number) => {
     setLoading(true);
@@ -241,11 +260,6 @@ const CategoryTable = (props: Iprops) => {
   };
 
   //handle search
-  const [records, setRecords] = useState<ICategory[]>(categories);
-  useEffect(() => {
-    if (categories.length) setRecords(categories);
-  }, [categories]);
-  const [keyWordSearch, setKeyWordSearch] = useState("");
   const handleSearch = async () => {
     const { data } = await axios.get(
       `${process.env.BASE_URL}/category?s=${keyWordSearch}&page=${currentPage}&limit=${itemsPerPage}`,
@@ -257,59 +271,8 @@ const CategoryTable = (props: Iprops) => {
     );
     setRecords(data?.data);
   };
-  useEffect(() => {
-    handleSearch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keyWordSearch]);
-
-  const [category, setCategory] = useState<ICategory | null>(null);
-  const [showModalCreateCategory, setShowModalCreateCategory] =
-    useState<boolean>(false);
-  const [showModalUpdateCategory, setShowModalUpdateCategory] =
-    useState<boolean>(false);
 
   //handle sort
-  const customSort = (
-    rows: ICategory[],
-    selector: Selector<ICategory>,
-    direction: string
-  ) => {
-    // Chuyển đổi hàm selector thành chuỗi
-    const selectorString = selector.toString();
-
-    // Sử dụng biểu thức chính quy để trích xuất tên trường (username)
-    const match = selectorString.match(/\(\w+\)\s*=>\s*row\.(\w+)/);
-
-    if (match) {
-      // match[1] chứa tên trường (ở đây là "name")
-      const fieldName = match[1];
-      dispatch(getSortsCategory({ fieldName, direction }));
-
-      return rows?.sort((rowA: ICategory, rowB: ICategory) => {
-        // use the selector function to resolve your field names by passing the sort comparitors
-        const aField = selector(rowA);
-        const bField = selector(rowB);
-
-        let comparison = 0;
-
-        if (aField > bField) {
-          comparison = 1;
-        } else if (aField < bField) {
-          comparison = -1;
-        }
-
-        return direction === "desc" ? comparison * -1 : comparison;
-      });
-    } else {
-      // Xử lý trường hợp không thể trích xuất thông tin
-      console.error(
-        "Unable to extract field name from selector:",
-        selectorString
-      );
-      return rows;
-    }
-  };
-
   const getDefaultSortField = () => {
     if (!sortsRedux || Object.keys(sortsRedux).length === 0) {
       return 1;
@@ -373,7 +336,14 @@ const CategoryTable = (props: Iprops) => {
             paginationDefaultPage={currentPage}
             defaultSortAsc={getDefaultSortAsc()}
             defaultSortFieldId={getDefaultSortField()}
-            sortFunction={customSort}
+            onSort={(column, direction) => {
+              dispatch(
+                getSortsCategory({
+                  fieldName: column.name,
+                  direction: direction,
+                })
+              );
+            }}
             onRowClicked={(row, e) => {
               setCategory(row);
               setShowModalUpdateCategory(true);

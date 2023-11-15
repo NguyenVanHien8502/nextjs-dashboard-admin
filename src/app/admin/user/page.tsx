@@ -44,6 +44,16 @@ function User(props: IProps) {
 
   const [loading, setLoading] = useState<boolean>(false);
 
+  useEffect(() => {
+    if (!token) {
+      router.replace("/");
+      toast.warning("JWT has expired. Please log in again.");
+      return;
+    }
+    fetchUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, itemsPerPage, token, router]);
+
   const fetchUsers = async () => {
     setLoading(true);
     dispatch(getAllUsersStart());
@@ -58,16 +68,6 @@ function User(props: IProps) {
     }
     setLoading(false);
   };
-
-  useEffect(() => {
-    if (!token) {
-      router.replace("/");
-      toast.warning("JWT has expired. Please log in again.");
-      return;
-    }
-    fetchUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, itemsPerPage, token, router]);
 
   return (
     <>
