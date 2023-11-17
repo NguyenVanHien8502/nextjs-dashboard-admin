@@ -1,0 +1,40 @@
+.options_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 10px;
+}
+.search_input {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  padding: 6px 10px;
+  height: 40px;
+}
+
+.search_input::placeholder {
+  font-style: italic;
+  font-size: 13px;
+  color: #a7a2a2;
+}
+
+.search_input:focus {
+  border: 1px solid #e99999;
+}
+
+.container_table {
+  margin-top: 10px;
+  max-height: 520px;
+  max-width: 1000px;
+  overflow: auto;
+}
+
+.custom{
+  width: 100px;
+}
+
+.custom_link{
+  width: 300px;
+  cursor: pointer;
+  text-decoration: underline;
+}
