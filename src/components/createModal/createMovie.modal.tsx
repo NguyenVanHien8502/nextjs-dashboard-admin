@@ -37,7 +37,7 @@ function CreateModalMovie(props: Iprops) {
   const [dataMovie, setDataMovie] = useState<IMovie | any>({
     name: "",
     slug: "",
-    category: "",
+    categories: "",
     link: "",
     status: "pending",
     desc: "",
@@ -65,14 +65,14 @@ function CreateModalMovie(props: Iprops) {
 
   const handleSubmitForm = async () => {
     try {
-      const { name, slug, category, link, status, desc } = dataMovie;
+      const { name, slug, categories, link, status, desc } = dataMovie;
 
       const { data } = await axios.post(
         `${process.env.BASE_URL}/movie/create-movie`,
         {
           name: name,
           slug: slug,
-          category: category,
+          categories: categories,
           link: link,
           status: status,
           desc: desc,
@@ -83,6 +83,7 @@ function CreateModalMovie(props: Iprops) {
           },
         }
       );
+
 
       if (data?.status === false) {
         toast.warning(data?.msg);
@@ -105,7 +106,9 @@ function CreateModalMovie(props: Iprops) {
         setAllRows(allRows);
       }
     } catch (error: any) {
-      toast.error(error?.response?.data?.message);
+      error?.response?.data?.message.map((msg: string) => {
+        toast.error(msg);
+      });
       return;
     }
   };
@@ -114,7 +117,7 @@ function CreateModalMovie(props: Iprops) {
     setDataMovie({
       name: "",
       slug: "",
-      category: "",
+      categories: "",
       link: "",
       status: "",
       desc: "",
@@ -171,12 +174,12 @@ function CreateModalMovie(props: Iprops) {
             <Form.Group className="mb-3">
               <Form.Label>Category*</Form.Label>
               <Form.Select
-                id="category"
-                value={dataMovie.category}
+                id="categories"
+                value={dataMovie.categories}
                 onChange={(e) =>
                   setDataMovie((prev: any) => ({
                     ...prev,
-                    category: e.target.value,
+                    categories: e.target.value,
                   }))
                 }
               >

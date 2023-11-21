@@ -16,13 +16,10 @@ import {
 export default function Login() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  
+
   const user: IUser | any = useAppSelector((state: RootState) => {
     state.authReducer?.login?.currentUser;
   });
-  const isLoading: boolean = useAppSelector(
-    (state: RootState) => state?.authReducer?.login?.isLoading
-  );
 
   const [dataInput, setDataInput] = useState({
     email: user?.email || "",
@@ -98,7 +95,6 @@ export default function Login() {
               type="submit"
               onClick={(e) => handleLogin(e)}
               className={styles.button}
-              disabled={isLoading}
             >
               Log in
             </Button>

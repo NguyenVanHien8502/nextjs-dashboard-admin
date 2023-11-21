@@ -45,11 +45,11 @@ export default function Signup() {
         toast.error(response?.msg);
         dispatch(registerError());
       }
-    } catch {
+    } catch (error: any) {
       dispatch(registerError());
     }
   };
-  
+
   return (
     <div className={styles.main}>
       <div className={styles.container}>

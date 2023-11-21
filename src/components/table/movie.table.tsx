@@ -118,9 +118,9 @@ const MovieTable = (props: Iprops) => {
       name: "category",
       sortable: true,
       cell: (row: IMovie) => (
-        <div className={styles.custom}>{row.category}</div>
+        <div className={styles.custom}>{row.categories}</div>
       ),
-      selector: (row: IMovie) => row.category,
+      selector: (row: IMovie) => row.categories,
     },
     {
       name: "status",

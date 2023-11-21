@@ -2,7 +2,7 @@ interface IMovie {
   _id: string;
   name: string;
   slug: string;
-  category: string;
+  categories: string;
   link: string;
   status: string;
   desc: string;

@@ -81,7 +81,9 @@ function CreateModalCategory(props: Iprops) {
         setAllRows(allRows);
       }
     } catch (error: any) {
-      toast.error(error?.response?.data?.message);
+      error?.response?.data?.message.map((msg: string) => {
+        toast.error(msg);
+      });
       return;
     }
   };
