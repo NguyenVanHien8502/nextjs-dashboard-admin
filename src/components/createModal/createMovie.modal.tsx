@@ -37,7 +37,7 @@ function CreateModalMovie(props: Iprops) {
   const [dataMovie, setDataMovie] = useState<IMovie | any>({
     name: "",
     slug: "",
-    categories: "",
+    categories: [],
     link: "",
     status: "pending",
     desc: "",
@@ -84,7 +84,6 @@ function CreateModalMovie(props: Iprops) {
         }
       );
 
-
       if (data?.status === false) {
         toast.warning(data?.msg);
         return;
@@ -117,7 +116,7 @@ function CreateModalMovie(props: Iprops) {
     setDataMovie({
       name: "",
       slug: "",
-      categories: "",
+      categories: [],
       link: "",
       status: "",
       desc: "",
@@ -175,11 +174,15 @@ function CreateModalMovie(props: Iprops) {
               <Form.Label>Category*</Form.Label>
               <Form.Select
                 id="categories"
+                multiple
                 value={dataMovie.categories}
                 onChange={(e) =>
                   setDataMovie((prev: any) => ({
                     ...prev,
-                    categories: e.target.value,
+                    categories: Array.from(
+                      e.target.selectedOptions,
+                      (option) => option.value
+                    ),
                   }))
                 }
               >

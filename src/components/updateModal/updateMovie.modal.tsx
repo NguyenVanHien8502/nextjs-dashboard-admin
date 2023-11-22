@@ -42,7 +42,7 @@ function UpdateModalMovie(props: Iprops) {
     id: "",
     name: "",
     slug: "",
-    categories: "",
+    categories: [],
     link: "",
     status: "",
     desc: "",
@@ -72,7 +72,7 @@ function UpdateModalMovie(props: Iprops) {
         id: movie._id,
         name: movie.name,
         slug: movie.slug,
-        categories: movie.categories,
+        categories: movie.categories as any,
         link: movie.link,
         status: movie.status,
         desc: movie.desc,
@@ -133,7 +133,7 @@ function UpdateModalMovie(props: Iprops) {
       id: "",
       name: "",
       slug: "",
-      categories: "",
+      categories: [],
       link: "",
       status: "",
       desc: "",
@@ -188,13 +188,17 @@ function UpdateModalMovie(props: Iprops) {
             <Form.Group className="mb-3">
               <Form.Label>Category*</Form.Label>
               <Form.Select
-                id="category"
+                id="categories"
+                multiple
                 placeholder="Chọn category"
                 value={dataMovie.categories}
                 onChange={(e) =>
-                  setDataMovie((prevData) => ({
-                    ...prevData,
-                    categories: e.target.value,
+                  setDataMovie((prev: any) => ({
+                    ...prev,
+                    categories: Array.from(
+                      e.target.selectedOptions,
+                      (option) => option.value
+                    ),
                   }))
                 }
               >

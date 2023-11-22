@@ -116,11 +116,17 @@ const MovieTable = (props: Iprops) => {
     },
     {
       name: "category",
-      sortable: true,
+      // sortable: true,
       cell: (row: IMovie) => (
-        <div className={styles.custom}>{row.categories}</div>
+        <ul className={styles.ul_container}>
+          {row.categories?.map((category, index) => (
+            <li className={styles.custom} key={index}>
+              {category}
+            </li>
+          ))}
+        </ul>
       ),
-      selector: (row: IMovie) => row.categories,
+      // selector: (row: IMovie) => row.categories,
     },
     {
       name: "status",
